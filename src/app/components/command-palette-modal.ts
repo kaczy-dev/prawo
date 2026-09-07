@@ -155,6 +155,15 @@ export class CommandPaletteModal {
         action: () => this.navigateToTab.emit('threat-calc'),
       },
       {
+        id: 'nav-cases',
+        category: 'navigation',
+        title: 'Pulpit Kancelaryjny: Aktywne Sprawy & Dossier',
+        subtitle: 'Zarządzanie sprawami, przypięte artykuły k.k. i historia analiz',
+        icon: 'folder_shared',
+        badge: 'Moduł',
+        action: () => this.navigateToTab.emit('cases'),
+      },
+      {
         id: 'nav-code',
         category: 'navigation',
         title: 'Kodeks Karny (Baza Artykułów)',

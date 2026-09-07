@@ -53,7 +53,7 @@ export interface OffenseSentence {
             <div class="flex items-start gap-3">
               <mat-icon class="text-amber-400 text-xl mt-0.5">gavel</mat-icon>
               <div class="text-xs text-slate-300 leading-relaxed">
-                <strong class="text-amber-300 font-medium">Zasady orzekania (art. 86 § 1 k.k.):</strong> Sąd wymierza karę łączną w granicach od najwyższej z kar wymierzonych za poszczególne przestępstwa (dolna granica – pełna absorpcja) do ich sumy (górna granica – pełna kumulacja), nie przekraczając 20 lat (lub 30 lat pozbawienia wolności).
+                <strong class="text-amber-300 font-medium">Zasady orzekania (art. 86 § 1 k.k.):</strong> Sąd wymierza karę łączną w granicach od najwyższej z kar wymierzonych za poszczególne przestępstwa (dolna granica – pełna absorpcja) do ich sumy (górna granica – pełna kumulacja), nie przekraczając 30 lat pozbawienia wolności (art. 86 § 1 k.k. po reformie).
               </div>
             </div>
           </div>

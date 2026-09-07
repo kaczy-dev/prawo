@@ -284,6 +284,18 @@
         </button>
 
         <button
+          id="nav-cases"
+          (click)="activeTab.set('cases')"
+          [class]="activeTab() === 'cases'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+        >
+          <mat-icon class="text-base text-amber-400">folder_shared</mat-icon>
+          <span>Sprawy & Dossier</span>
+        </button>
+
+        <button
           id="nav-penal-code"
           (click)="activeTab.set('penal-code')"
           [class]="activeTab() === 'penal-code'
@@ -369,6 +381,13 @@
       <div class="md:hidden mt-2 p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-1 animate-fade-in shadow-2xl">
         <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-2 px-2">Wszystkie moduły</div>
         <button
+          (click)="activeTab.set('cases'); isMobileMenuOpen.set(false)"
+          class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
+        >
+          <mat-icon class="text-sm text-amber-400">folder_shared</mat-icon>
+          <span>Sprawy & Aktywne Dossier</span>
+        </button>
+        <button
           (click)="activeTab.set('handbooks'); isMobileMenuOpen.set(false)"
           class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
         >
@@ -417,14 +436,6 @@
   >
     @switch (activeTab()) {
       @case ('threat-calc') {
-        <app-dashboard-widget-grid
-          (openInCalculator)="executeGlobalSearch($event)"
-          (openArticleInCode)="searchInPenalCodeById($event)"
-          (openNotes)="activeTab.set('notes')"
-          (openDictionary)="openLegalDictionary($event)"
-          (openHandbook)="openHandbookTopic($event)"
-        />
-
         <app-threat-calculator
           [query]="threatQuery()"
           [activeCategory]="threatCategoryFilter()"
@@ -440,6 +451,16 @@
           (searchInRulings)="searchInRulings($event)"
           (exportPdf)="exportCurrentAnalysisToPdf()"
           (savePrescriptionNote)="savePrescriptionNote($event)"
+        />
+      }
+
+      @case ('cases') {
+        <app-dashboard-widget-grid
+          (openInCalculator)="executeGlobalSearch($event)"
+          (openArticleInCode)="searchInPenalCodeById($event)"
+          (openNotes)="activeTab.set('notes')"
+          (openDictionary)="openLegalDictionary($event)"
+          (openHandbook)="openHandbookTopic($event)"
         />
       }
 

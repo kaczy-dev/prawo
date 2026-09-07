@@ -43,6 +43,7 @@ import { DocumentExportModalComponent } from './components/document-export-modal
 
 export type ActiveTab =
   | 'threat-calc'
+  | 'cases'
   | 'handbooks'
   | 'penal-code'
   | 'rulings'
