@@ -25,7 +25,7 @@ export class PdfExportService {
 
     doc.setTextColor(245, 158, 11); // amber-500
     doc.setFontSize(10);
-    doc.text('PRAWNBOT – KANCELARYJNY ASYSTENT PRAWA KARNEGO', 15, 12);
+    doc.text('PRAWNIK Z ŁUCZNICZEJ – ASYSTENT PRAWA KARNEGO', 15, 12);
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(14);
@@ -87,7 +87,7 @@ export class PdfExportService {
     this.addFooter(doc, pageWidth);
 
     // Zapisz plik
-    const filename = `Notatka_${note.title.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '_')}_prawnBot.pdf`;
+    const filename = `Notatka_${note.title.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '_')}_Prawnik_z_Luczniczej.pdf`;
     doc.save(filename);
   }
 
@@ -110,7 +110,7 @@ export class PdfExportService {
 
     doc.setTextColor(245, 158, 11);
     doc.setFontSize(10);
-    doc.text('PRAWNBOT – MODUŁ ANALIZY RYZYKA I ORZECZNICTWA', 15, 12);
+    doc.text('PRAWNIK Z ŁUCZNICZEJ – ANALIZA RYZYKA I ORZECZNICTWA', 15, 12);
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(14);
@@ -374,7 +374,7 @@ export class PdfExportService {
       doc.setFontSize(8);
       doc.setTextColor(148, 163, 184);
       doc.text(
-        'Wygenerowano automatycznie przez prawnBot (System Prawa Karnego). Dokument ma charakter informacyjny i nie zastępuje indywidualnej porady adwokackiej.',
+        'Wygenerowano przez system Prawnik z Łuczniczej (System Prawa Karnego). Dokument ma charakter informacyjny i nie zastępuje indywidualnej porady adwokackiej.',
         pageWidth / 2,
         287,
         { align: 'center' }

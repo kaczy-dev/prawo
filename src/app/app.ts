@@ -41,6 +41,7 @@ import { OfflineSyncService } from './services/offline-sync.service';
 import { CommandPaletteModal } from './components/command-palette-modal';
 import { CumulativeSentenceModalComponent } from './components/cumulative-sentence-modal';
 import { DocumentExportModalComponent } from './components/document-export-modal';
+import { DocumentScannerModalComponent } from './components/document-scanner-modal';
 
 export type ActiveTab =
   | 'threat-calc'
@@ -77,6 +78,7 @@ export type ActiveTab =
     CommandPaletteModal,
     CumulativeSentenceModalComponent,
     DocumentExportModalComponent,
+    DocumentScannerModalComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -121,6 +123,12 @@ export class App {
 
   // Modal kancelaryjnego wydruku i eksportu A4
   readonly isDocumentExportModalOpen = signal<boolean>(false);
+
+  // Modal 100% lokalnego skanera dokumentów procesowych (OCR)
+  readonly isDocumentScannerModalOpen = signal<boolean>(false);
+
+  // Dropdown Narzędzia Kancelaryjne w nagłówku
+  readonly isToolsMenuOpen = signal<boolean>(false);
 
   // Tryb gęstości sali sądowej (Courtroom Dense Mode) dla desktopu
   readonly isCourtroomDense = signal<boolean>(false);
@@ -282,6 +290,11 @@ export class App {
       if (this.cryptoService.isAuthenticated()) {
         this.lockVault();
       }
+      return;
+    }
+    // Klawisz Escape - Kancelaryjny "Panic Mute" na sali sądowej (natychmiastowe wyciszenie całego dźwięku)
+    if (e.key === 'Escape' && (this.tts.isPlaying() || this.speech.isListening())) {
+      this.voiceOrch.stopAll();
       return;
     }
     // Alt+1..5 - Szybkie skoki po zakładkach na desktopie
@@ -496,6 +509,14 @@ export class App {
 
   closeDocumentExportModal(): void {
     this.isDocumentExportModalOpen.set(false);
+  }
+
+  openDocumentScannerModal(): void {
+    this.isDocumentScannerModalOpen.set(true);
+  }
+
+  closeDocumentScannerModal(): void {
+    this.isDocumentScannerModalOpen.set(false);
   }
 
   async savePrescriptionNote(data: { title: string; content: string; linkedArticle: string }): Promise<void> {

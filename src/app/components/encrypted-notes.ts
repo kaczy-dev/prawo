@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { CourtRuling, EncryptedNote, PenalArticle } from '../models/legal.model';
@@ -400,6 +400,8 @@ export class EncryptedNotes {
   readonly pdfService = inject(PdfExportService);
   readonly speech = inject(SpeechDictationService);
 
+  readonly requestUnlockVault = output<void>();
+
   readonly showNoteForm = signal<boolean>(false);
   readonly editingNoteId = signal<string | null>(null);
   readonly noteTitle = signal<string>('');
@@ -598,18 +600,26 @@ III. PLANOWANE KROKI OBROŃCZE:
       .map((t) => t.trim())
       .filter(Boolean);
 
-    await this.legalData.saveNote(
-      {
-        title,
-        content,
-        category: this.noteCategory(),
-        linkedArticle: this.noteLinkedArticle().trim() || undefined,
-        tags,
-      },
-      this.editingNoteId() || undefined
-    );
-
-    this.resetNoteForm();
+    try {
+      await this.legalData.saveNote(
+        {
+          title,
+          content,
+          category: this.noteCategory(),
+          linkedArticle: this.noteLinkedArticle().trim() || undefined,
+          tags,
+        },
+        this.editingNoteId() || undefined
+      );
+      this.resetNoteForm();
+    } catch (e: unknown) {
+      const err = e as Error;
+      if (!this.cryptoService.isAuthenticated()) {
+        this.requestUnlockVault.emit();
+      } else {
+        alert(err.message || 'Błąd zapisu notatki.');
+      }
+    }
   }
 
   editNote(note: EncryptedNote): void {

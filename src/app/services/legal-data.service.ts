@@ -1154,14 +1154,17 @@ Art. 62a. Jeżeli przedmiotem czynu są środki odurzające lub substancje psych
     let contentToStore = note.content;
     let isEncrypted = false;
 
-    // Szyfruj zawartość, jeśli użytkownik jest zalogowany do bezpiecznego skarbca
-    if (isAuth) {
-      try {
-        contentToStore = await this.cryptoService.encrypt(note.content);
-        isEncrypted = true;
-      } catch (e) {
-        console.warn('Szyfrowanie nie powiodło się, zapis w trybie jawnym:', e);
-      }
+    // Weryfikacja tajemnicy zawodowej: zabroń zapisu notatki jawnym tekstem
+    if (!isAuth) {
+      throw new Error('Skarbiec AES-256 jest zablokowany. Odblokuj sejf hasłem, aby zapisać poufną notatkę sprawy.');
+    }
+
+    try {
+      contentToStore = await this.cryptoService.encrypt(note.content);
+      isEncrypted = true;
+    } catch (e) {
+      console.error('Błąd szyfrowania notatki:', e);
+      throw new Error('Szyfrowanie notatki nie powiodło się. Zapis przerwany ze względów bezpieczeństwa.');
     }
 
     const newNote: EncryptedNote = {

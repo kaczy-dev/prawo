@@ -370,7 +370,7 @@ export class PrescriptionTimer {
 
   async copyCalculation(): Promise<void> {
     const r = this.result();
-    const text = `KALKULACJA PRZEDAWNIENIA KARALNOŚCI (prawnBot)
+    const text = `KALKULACJA PRZEDAWNIENIA KARALNOŚCI (Prawnik z Łuczniczej)
 Czyn: Art. ${r.article.number}${r.article.suffix || ''} k.k. (${r.article.title})
 Data zdarzenia: ${r.eventDate}
 Data ustania karalności: ${r.formattedExpirationDate} (${r.targetExpirationDate})

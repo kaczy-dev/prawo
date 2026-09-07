@@ -16,7 +16,7 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
           <div>
             <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
               <mat-icon class="text-amber-400">smart_toy</mat-icon>
-              prawnBot – Asystent Prawny Kancelarii
+              Prawnik z Łuczniczej – Asystent Prawny Kancelarii
             </h2>
             <p class="text-xs text-slate-400 mt-0.5">
               100% lokalny silnik kwalifikacji prawno-karnej. Obsługuje dyktowanie głosem (Web Speech API).
@@ -50,7 +50,7 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
         <div class="py-2.5 px-1 border-b border-slate-800/80 shrink-0">
           <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
             <span class="text-[11px] text-slate-400 whitespace-nowrap flex items-center gap-1 mr-1">
-              <mat-icon class="text-xs text-amber-400">tips_and_updates</mat-icon> Zapytaj prawnBota:
+              <mat-icon class="text-xs text-amber-400">tips_and_updates</mat-icon> Zadaj pytanie:
             </span>
             @for (quick of quickPromptSuggestions; track quick) {
               <button
@@ -81,7 +81,7 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
                   <span class="font-semibold flex items-center gap-1">
                     @if (msg.sender === 'assistant') {
                       <mat-icon class="text-xs text-amber-400">balance</mat-icon>
-                      <span>prawnBot (AI Kancelaria)</span>
+                      <span>Prawnik z Łuczniczej</span>
                     } @else {
                       <mat-icon class="text-xs text-amber-300">person</mat-icon>
                       <span>Prawnik / Użytkownik</span>
@@ -261,7 +261,7 @@ export class LegalChat {
       id: 'welcome-msg',
       sender: 'assistant',
       timestamp: '11:00',
-      text: 'Dzień dobry. Jestem **prawnBot** – asystent prawa karnego. Działam w 100% lokalnie i bezpiecznie na Twoim urządzeniu, gwarantując bezwzględną poufność danych. Możesz pisać lub **dyktować zapytania głosem** za pomocą mikrofonu.\n\nW czym mogę pomóc Twojej kancelarii lub w Twojej sprawie karnej?',
+      text: 'Dzień dobry. Jestem **Prawnik z Łuczniczej** – asystent prawa karnego. Działam w 100% lokalnie i bezpiecznie na Twoim urządzeniu, gwarantując bezwzględną poufność danych. Możesz pisać lub **dyktować zapytania głosem** za pomocą mikrofonu.\n\nW czym mogę pomóc Twojej kancelarii lub w Twojej sprawie karnej?',
       suggestedFollowUps: [
         'Co grozi za jazdę z 1.5 promila?',
         'Jak działa warunkowe umorzenie postępowania?',

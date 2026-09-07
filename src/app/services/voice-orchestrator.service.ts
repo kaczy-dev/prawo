@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal, DestroyRef } from '@angular/core';
 import { SpeechDictationService } from './speech-dictation.service';
 import { TextToSpeechService } from './text-to-speech.service';
 import { CourtRuling, PenalArticle } from '../models/legal.model';
@@ -11,6 +11,7 @@ export type VoiceInteractionMode = 'idle' | 'listening' | 'speaking' | 'barge_in
 export class VoiceOrchestratorService {
   private readonly speech = inject(SpeechDictationService);
   private readonly tts = inject(TextToSpeechService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // Statusy reaktywne całego pipeline'u głosowego
   readonly isBargeInEnabled = signal<boolean>(true);
@@ -21,8 +22,10 @@ export class VoiceOrchestratorService {
   // Audio Context & Analyser dla natywnego Web Audio API VAD
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
+  private sourceNode: MediaStreamAudioSourceNode | null = null;
   private mediaStream: MediaStream | null = null;
   private vadAnimationId: number | null = null;
+  private speechEventListener: (() => void) | null = null;
   private consecutiveVoiceHits = 0;
 
   // Próg czułości VAD (wartość RMS od 0 do 100)
@@ -44,6 +47,9 @@ export class VoiceOrchestratorService {
 
   constructor() {
     this.setupBargeInHooks();
+    this.destroyRef.onDestroy(() => {
+      this.cleanupAllResources();
+    });
   }
 
   /**
@@ -52,11 +58,12 @@ export class VoiceOrchestratorService {
    */
   private setupBargeInHooks(): void {
     if (typeof window !== 'undefined') {
-      window.addEventListener('prawnbot-speech-detected', () => {
+      this.speechEventListener = () => {
         if (this.isBargeInEnabled() && this.tts.isPlaying()) {
           this.triggerBargeIn('speech-recognition');
         }
-      });
+      };
+      window.addEventListener('prawnbot-speech-detected', this.speechEventListener);
     }
   }
 
@@ -89,11 +96,14 @@ export class VoiceOrchestratorService {
         this.audioContext = new AudioCtx();
       }
 
-      const source = this.audioContext.createMediaStreamSource(this.mediaStream);
+      if (this.sourceNode) {
+        this.sourceNode.disconnect();
+      }
+      this.sourceNode = this.audioContext.createMediaStreamSource(this.mediaStream);
       this.analyser = this.audioContext.createAnalyser();
       this.analyser.fftSize = 512;
       this.analyser.smoothingTimeConstant = 0.3;
-      source.connect(this.analyser);
+      this.sourceNode.connect(this.analyser);
 
       this.isVadListening.set(true);
       this.loopVadDetection();
@@ -143,6 +153,15 @@ export class VoiceOrchestratorService {
       this.vadAnimationId = null;
     }
 
+    if (this.sourceNode) {
+      try {
+        this.sourceNode.disconnect();
+      } catch {
+        // Ignoruj błąd rozłączenia węzła
+      }
+      this.sourceNode = null;
+    }
+
     if (this.mediaStream) {
       this.mediaStream.getTracks().forEach((t) => t.stop());
       this.mediaStream = null;
@@ -159,6 +178,14 @@ export class VoiceOrchestratorService {
 
     this.isVadListening.set(false);
     this.voiceActivityLevel.set(0);
+  }
+
+  private cleanupAllResources(): void {
+    this.stopVadMonitoring();
+    if (typeof window !== 'undefined' && this.speechEventListener) {
+      window.removeEventListener('prawnbot-speech-detected', this.speechEventListener);
+      this.speechEventListener = null;
+    }
   }
 
   /**

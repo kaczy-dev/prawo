@@ -121,6 +121,7 @@ export class CommandPaletteModal {
   readonly selectArticle = output<PenalArticle>();
   readonly toggleVault = output<void>();
   readonly openTemplate = output<string>();
+  readonly openScanner = output<void>();
 
   readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   readonly searchQuery = signal<string>('');
@@ -189,6 +190,15 @@ export class CommandPaletteModal {
         icon: this.cryptoService.isAuthenticated() ? 'lock_open' : 'lock',
         badge: 'Bezpieczeństwo',
         action: () => this.toggleVault.emit(),
+      },
+      {
+        id: 'nav-scanner',
+        category: 'navigation',
+        title: 'Skaner Dokumentów Procesowych (100% Offline OCR)',
+        subtitle: 'Rozpoznawanie sygnatur, terminów zawitych k.p.k. i pism z kamery/pliku',
+        icon: 'document_scanner',
+        badge: 'OCR WASM',
+        action: () => this.openScanner.emit(),
       },
       {
         id: 'tmpl-art66',

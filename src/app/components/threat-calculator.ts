@@ -219,7 +219,7 @@ export interface QuickScenario {
         <div class="hidden print:block mb-6 pb-4 border-b-2 border-slate-900 text-slate-900 print-avoid-break">
           <div class="flex items-center justify-between gap-4 mb-3">
             <div>
-              <div class="text-[11px] font-bold uppercase tracking-widest text-slate-700">Kancelaria Prawna & System PRAWNBOT</div>
+              <div class="text-[11px] font-bold uppercase tracking-widest text-slate-700">Kancelaria Prawna & System PRAWNIK Z ŁUCZNICZEJ</div>
               <h1 class="text-xl font-bold text-slate-950">OFICJALNA ANALIZA ZAGROŻENIA I KWALIFIKACJI CZYNU</h1>
               <p class="text-xs text-slate-600">Sporządzono zgodnie ze stanem prawnym Kodeksu Karnego RP (2025/2026)</p>
             </div>
@@ -461,10 +461,10 @@ export interface QuickScenario {
         <div class="hidden print:block mt-8 pt-4 border-t border-slate-400 text-[10px] text-slate-700 print-avoid-break">
           <div class="flex justify-between items-start gap-4">
             <div class="max-w-2xl">
-              <strong>PRAWNBOT LEGAL ADVISORY:</strong> Niniejszy dokument stanowi wstępną komputerową analizę prawno-karną opartą na przepisach ustawy z dnia 6 czerwca 1997 r. – Kodeks Karny (Dz.U. z 2024 r. poz. 17 ze zm.) oraz najnowszym orzecznictwie Sądu Najwyższego RP. Wydruk objęty jest klauzulą poufności klienta.
+              <strong>PRAWNIK Z ŁUCZNICZEJ:</strong> Niniejszy dokument stanowi wstępną komputerową analizę prawno-karną opartą na przepisach ustawy z dnia 6 czerwca 1997 r. – Kodeks Karny (Dz.U. z 2024 r. poz. 17 ze zm.) oraz najnowszym orzecznictwie Sądu Najwyższego RP. Wydruk objęty jest klauzulą poufności klienta.
             </div>
             <div class="text-right font-mono text-[9px] text-slate-600 whitespace-nowrap">
-              Wygenerowano przez prawnBot AI<br />
+              Wygenerowano przez Prawnik z Łuczniczej AI<br />
               Wydruk urzędowy A4
             </div>
           </div>

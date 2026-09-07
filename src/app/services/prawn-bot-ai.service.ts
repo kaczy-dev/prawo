@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { LegalDataService } from './legal-data.service';
+import { LegalGuardrailService } from './legal-guardrail.service';
 import { PenalArticle, ThreatAnalysisResult, ChatMessage } from '../models/legal.model';
 
 @Injectable({
@@ -7,12 +8,34 @@ import { PenalArticle, ThreatAnalysisResult, ChatMessage } from '../models/legal
 })
 export class PrawnBotAiService {
   private readonly legalData = inject(LegalDataService);
+  private readonly guardrail = inject(LegalGuardrailService);
 
   /**
    * Główny silnik analizy ryzyka "Co mi grozi?"
    * Działa w 100% lokalnie w przeglądarce, bez zewnętrznych API.
    */
   analyzeSituation(rawQuery: string): ThreatAnalysisResult {
+    // Ewaluacja Guardrails (zapobieganie pomocnictwu w przestępstwie art. 18 § 3 k.k.)
+    const guardrailCheck = this.guardrail.evaluateInput(rawQuery);
+    if (!guardrailCheck.isAllowed) {
+      return {
+        matchedArticles: [],
+        riskLevel: 'bardzo wysoki',
+        primarySentenceRange: 'ZAPYTANIE ZABLOKOWANE PRZEZ GUARDRAILS',
+        possibleSanctions: [guardrailCheck.statutoryBasis || 'Art. 18 § 3 k.k. (Pomocnictwo)'],
+        mandatoryMeasures: ['Odmowa generowania instrukcji modus operandi'],
+        mitigatingFactors: ['Skorzystanie z profesjonalnej pomocy adwokata w toczącym się śledztwie'],
+        aggravatingFactors: ['Podejmowanie prób zacierania śladów (art. 239 k.k.)'],
+        plainExplanation: `${guardrailCheck.warningTitle}: ${guardrailCheck.warningMessage}`,
+        similarRulings: [],
+        recommendedSteps: [
+          'Skonsultuj się osobiście z adwokatem lub radcą prawnym w kancelarii.',
+          'Pamiętaj, że oskarżony/podejrzany ma prawo do odmowy składania wyjaśnień (art. 175 k.p.k.).',
+          'Nie podejmuj działań zmierzających do niszczenia dowodów lub matactwa procesowego.',
+        ],
+      };
+    }
+
     const q = rawQuery.toLowerCase().trim();
     const allArticles = this.legalData.articles();
     const allRulings = this.legalData.courtRulings();
@@ -1507,8 +1530,8 @@ ${analysis.recommendedSteps.map((step, idx) => `${idx + 1}. ${step}`).join('\n')
         'Czy sprawa trafi do rejestru skazanych KRK?',
       ];
     } else {
-      // Domyślna odpowiedź doradcy prawnego prawnBot
-      text = `Jestem **prawnBot** – Twoim asystentem prawa karnego. Działam w 100% lokalnie i bezpiecznie na Twoim urządzeniu, gwarantując poufność danych.
+      // Domyślna odpowiedź doradcy prawnego Prawnik z Łuczniczej
+      text = `Jestem **Prawnik z Łuczniczej** – Twoim asystentem prawa karnego. Działam w 100% lokalnie i bezpiecznie na Twoim urządzeniu, gwarantując pełną poufność danych.
 
 Mogę pomóc Ci w:
 - **Analizie "Co mi grozi?"**: Wpisz sytuację życiową (np. *jazda po 2 piwach*, *kradzież w markecie*, *płatność znalezioną kartą*), a przedstawię sankcje, przepisy i linię obrony.

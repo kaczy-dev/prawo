@@ -319,7 +319,7 @@ export class LegalDictionaryModal {
 
   copyDefinition(term: LegalDictionaryTerm): void {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      const formatted = `[Słownik prawnBot] ${term.term}\nDefinicja: ${term.plainDefinition}\nPrzykład: ${term.practicalExample}\nPodstawa: ${term.legalBasis}`;
+      const formatted = `[Słownik - Prawnik z Łuczniczej] ${term.term}\nDefinicja: ${term.plainDefinition}\nPrzykład: ${term.practicalExample}\nPodstawa: ${term.legalBasis}`;
       navigator.clipboard.writeText(formatted).then(() => {
         this.isCopied.set(true);
         setTimeout(() => this.isCopied.set(false), 2000);

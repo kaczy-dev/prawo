@@ -35,11 +35,14 @@ export class TextToSpeechService {
   readonly availableVoices = signal<SpeechSynthesisVoice[]>([]);
   readonly selectedVoice = signal<SpeechSynthesisVoice | null>(null);
 
-  // Obliczona lista głosów w języku polskim
+  // Obliczona lista głosów w języku polskim (Zero-Leak: preferencja głosów 100% lokalnych)
   readonly polishVoices = computed(() => {
-    return this.availableVoices().filter(
+    const allPl = this.availableVoices().filter(
       (v) => v.lang.startsWith('pl') || v.lang.includes('PL')
     );
+    // Jeśli dostępne są głosy lokalne (offline), wybierz wyłącznie je, eliminując wyciek audio do chmury
+    const localOnly = allPl.filter((v) => v.localService);
+    return localOnly.length > 0 ? localOnly : allPl;
   });
 
   // Postęp odtwarzania w procentach (0 - 100%)
@@ -78,16 +81,11 @@ export class TextToSpeechService {
       if (voices && voices.length > 0) {
         this.availableVoices.set(voices);
 
-        // Automatyczny wybór najlepszego polskiego głosu (preferowany głos naturalny/sieciowy)
+        // Wybór bezpiecznego lokalnego głosu offline (Zero-Data-Retention / Zero-Leak)
         if (!this.selectedVoice()) {
-          const plVoices = voices.filter(
-            (v) => v.lang.startsWith('pl') || v.lang.includes('PL')
-          );
-          const preferredPl =
-            plVoices.find((v) => !v.localService || v.name.includes('Google') || v.name.includes('Natural')) ||
-            plVoices[0] ||
-            null;
-          this.selectedVoice.set(preferredPl);
+          const plVoices = this.polishVoices();
+          const localPl = plVoices.find((v) => v.localService) || plVoices[0] || null;
+          this.selectedVoice.set(localPl);
         }
       }
     };

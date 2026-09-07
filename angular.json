@@ -5,7 +5,8 @@
     "packageManager": "npm",
     "schematicCollections": [
       "angular-eslint"
-    ]
+    ],
+    "analytics": "ba408a21-acc8-440d-8375-4dc868d8e61f"
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -56,7 +57,7 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
-              "externalDependencies": ["@google/genai"]
+              "externalDependencies": ["@google/genai", "tesseract.js"]
             }
           },
           "defaultConfiguration": "production"

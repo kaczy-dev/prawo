@@ -52,7 +52,7 @@ import { CryptoService } from '../services/crypto.service';
               [value]="passwordInput()"
               (input)="passwordInput.set($any($event.target).value)"
               (keydown.enter)="handleAuth()"
-              placeholder="Wpisz min. 4 znaki..."
+              placeholder="Wpisz hasło (min. 8 znaków)..."
               class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition-colors"
             />
           </div>
@@ -96,8 +96,8 @@ export class VaultModal {
 
   async handleAuth(): Promise<void> {
     const pwd = this.passwordInput().trim();
-    if (pwd.length < 4) {
-      this.errorMessage.set('Hasło musi mieć co najmniej 4 znaki.');
+    if (pwd.length < 8) {
+      this.errorMessage.set('Hasło musi mieć co najmniej 8 znaków ze względów bezpieczeństwa.');
       return;
     }
 

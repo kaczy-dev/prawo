@@ -2,9 +2,12 @@ import { Injectable, signal } from '@angular/core';
 
 export interface VaultMetadata {
   salt: string; // Base64
-  verificationHash: string; // SHA-256 hash do walidacji hasła
+  verificationHash?: string; // Legacy SHA-256 hash (do automatycznej migracji)
+  canaryCipher?: string; // AES-256-GCM zaszyfrowany token kanarka weryfikacyjnego
   createdAt: string;
 }
+
+const VAULT_CANARY_PLAINTEXT = 'PRAWNBOT_AES_GCM_VAULT_CANARY_VERIFIED_v1';
 
 @Injectable({
   providedIn: 'root',
@@ -33,26 +36,32 @@ export class CryptoService {
 
   /**
    * Rejestracja / Inicjalizacja skarbca lokalnego hasłem użytkownika
+   * Generuje sól PBKDF2 (min. 100 000 iteracji) oraz szyfrowany kanarek AES-GCM
    */
   async initializeVault(password: string): Promise<boolean> {
     try {
       const salt = crypto.getRandomValues(new Uint8Array(16));
       const saltBase64 = this.bufferToBase64(salt);
 
-      // Hasz weryfikacyjny (SHA-256 z solą)
-      const verificationHash = await this.hashPassword(password, salt);
+      // Wyprowadź klucz
+      const key = await this.deriveKeyFromPassword(password, salt);
+
+      // Zaszyfruj kanarek testowy AES-GCM
+      const canaryCipher = await this.encryptWithKey(VAULT_CANARY_PLAINTEXT, key);
 
       const meta: VaultMetadata = {
         salt: saltBase64,
-        verificationHash,
+        canaryCipher,
         createdAt: new Date().toISOString(),
       };
 
       localStorage.setItem(this.VAULT_META_KEY, JSON.stringify(meta));
       this.isVaultInitialized.set(true);
 
-      // Zaloguj od razu po zainicjalizowaniu
-      return await this.login(password);
+      this.currentKey = key;
+      this.isAuthenticated.set(true);
+      this.currentUser.set(this.DEFAULT_USER);
+      return true;
     } catch (error) {
       console.error('Błąd inicjalizacji skarbca:', error);
       return false;
@@ -60,26 +69,45 @@ export class CryptoService {
   }
 
   /**
-   * Logowanie przy użyciu lokalnego hasła
+   * Logowanie przy użyciu lokalnego hasła z weryfikacją AES-GCM kanarka (i płynną migracją legacy)
    */
   async login(password: string): Promise<boolean> {
     try {
       const metaJson = localStorage.getItem(this.VAULT_META_KEY);
       if (!metaJson) {
-        // Jeśli sejf jeszcze nie istnieje, utwórz go z podanym hasłem
         return await this.initializeVault(password);
       }
 
       const meta: VaultMetadata = JSON.parse(metaJson);
       const salt = this.base64ToBuffer(meta.salt);
+      const derivedKey = await this.deriveKeyFromPassword(password, salt);
 
-      const checkHash = await this.hashPassword(password, salt);
-      if (checkHash !== meta.verificationHash) {
+      if (meta.canaryCipher) {
+        // Nowoczesna weryfikacja: odszyfrowanie kanarka z uwierzytelnieniem AES-GCM
+        try {
+          const decryptedCanary = await this.decryptWithKey(meta.canaryCipher, derivedKey);
+          if (decryptedCanary !== VAULT_CANARY_PLAINTEXT) {
+            return false;
+          }
+        } catch {
+          // Błąd uwierzytelnienia GCM = nieprawidłowe hasło
+          return false;
+        }
+      } else if (meta.verificationHash) {
+        // Ścieżka legacy dla istniejących sejfów: sprawdź SHA-256 i zmigruj do kanarka AES-GCM
+        const checkHash = await this.hashPassword(password, salt);
+        if (checkHash !== meta.verificationHash) {
+          return false;
+        }
+        // Migracja do canaryCipher
+        meta.canaryCipher = await this.encryptWithKey(VAULT_CANARY_PLAINTEXT, derivedKey);
+        delete meta.verificationHash;
+        localStorage.setItem(this.VAULT_META_KEY, JSON.stringify(meta));
+      } else {
         return false;
       }
 
-      // Wyprowadź klucz AES-GCM 256-bit za pomocą PBKDF2
-      this.currentKey = await this.deriveKeyFromPassword(password, salt);
+      this.currentKey = derivedKey;
       this.isAuthenticated.set(true);
       this.currentUser.set(this.DEFAULT_USER);
       return true;
@@ -105,7 +133,20 @@ export class CryptoService {
     if (!this.currentKey) {
       throw new Error('Skarbiec jest zablokowany. Wymagane uwierzytelnienie.');
     }
+    return this.encryptWithKey(plainText, this.currentKey);
+  }
 
+  /**
+   * Deszyfrowanie ciągu tekstowego
+   */
+  async decrypt(cipherJson: string): Promise<string> {
+    if (!this.currentKey) {
+      throw new Error('Skarbiec jest zablokowany. Wymagane uwierzytelnienie.');
+    }
+    return this.decryptWithKey(cipherJson, this.currentKey);
+  }
+
+  private async encryptWithKey(plainText: string, key: CryptoKey): Promise<string> {
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const encoder = new TextEncoder();
     const encodedData = encoder.encode(plainText);
@@ -115,7 +156,7 @@ export class CryptoService {
         name: 'AES-GCM',
         iv: iv as unknown as BufferSource,
       },
-      this.currentKey,
+      key,
       encodedData
     );
 
@@ -127,18 +168,11 @@ export class CryptoService {
     return JSON.stringify(payload);
   }
 
-  /**
-   * Deszyfrowanie ciągu tekstowego
-   */
-  async decrypt(cipherJson: string): Promise<string> {
-    if (!this.currentKey) {
-      throw new Error('Skarbiec jest zablokowany. Wymagane uwierzytelnienie.');
-    }
-
+  private async decryptWithKey(cipherJson: string, key: CryptoKey): Promise<string> {
     try {
       const parsed = JSON.parse(cipherJson);
       if (!parsed.iv || !parsed.data) {
-        return cipherJson; // Nie było zaszyfrowane w tym formacie
+        return cipherJson;
       }
 
       const iv = this.base64ToBuffer(parsed.iv);
@@ -149,7 +183,7 @@ export class CryptoService {
           name: 'AES-GCM',
           iv: iv as unknown as BufferSource,
         },
-        this.currentKey,
+        key,
         cipherBuffer as unknown as BufferSource
       );
 
