@@ -18,30 +18,10 @@ export class LegalDataService {
   readonly courtRulings = signal<CourtRuling[]>([]);
   readonly legalAlerts = signal<LegalAlert[]>([]);
   readonly notes = signal<EncryptedNote[]>([]);
-  readonly isOnline = signal<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
-  readonly syncStatus = signal<'synced' | 'syncing' | 'offline'>('synced');
 
   constructor() {
     this.initDatabase();
-    this.setupNetworkListeners();
     this.loadNotesFromStorage();
-  }
-
-  private setupNetworkListeners(): void {
-    if (typeof window === 'undefined') return;
-
-    window.addEventListener('online', () => {
-      this.isOnline.set(true);
-      this.syncStatus.set('syncing');
-      setTimeout(() => {
-        this.syncStatus.set('synced');
-      }, 1200);
-    });
-
-    window.addEventListener('offline', () => {
-      this.isOnline.set(false);
-      this.syncStatus.set('offline');
-    });
   }
 
   private initDatabase(): void {

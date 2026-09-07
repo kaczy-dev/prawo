@@ -179,8 +179,7 @@ export interface LegalDictionaryTerm {
 export type DashboardWidgetId =
   | 'pinned-articles'
   | 'active-cases'
-  | 'recent-searches'
-  | 'quick-launcher';
+  | 'recent-searches';
 
 export interface DashboardWidgetConfig {
   id: DashboardWidgetId;

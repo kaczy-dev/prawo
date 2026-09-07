@@ -51,15 +51,6 @@ export class DashboardWidgetsService {
       order: 2,
       collapsed: false,
     },
-    {
-      id: 'quick-launcher',
-      title: 'Szybkie Narzędzia & Generator Analizy',
-      icon: 'bolt',
-      visible: true,
-      colSpan: 1,
-      order: 3,
-      collapsed: false,
-    },
   ];
 
   readonly preferences = signal<DashboardPreferences>({

@@ -11,135 +11,39 @@ import { DashboardWidgetConfig, PenalArticle, ActiveCaseItem } from '../models/l
   imports: [CommonModule, MatIconModule],
   template: `
     <div id="dashboard-widget-system" class="space-y-4 mb-6">
-      <!-- Pasek Sterowania Pulpitem (Header & Customize Bar) -->
+      <!-- Pasek Pulpitu (Czysty, kancelaryjny styl Taste-Skill) -->
       <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
-            <mat-icon class="text-xl">dashboard_customize</mat-icon>
+            <mat-icon class="text-xl">dashboard</mat-icon>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-base sm:text-lg font-bold text-white tracking-wide">
-                Pulpit Kancelaryjny & Przypięte Moduły
+              <h2 class="text-base sm:text-lg font-bold text-white tracking-wide font-serif">
+                Pulpit Kancelaryjny & Sprawy
               </h2>
-              <span class="text-[10px] bg-slate-800 border border-slate-700 text-slate-300 px-2 py-0.5 rounded-full font-mono">
-                Układ: {{ widgetsService.preferences().columns }} kol.
-              </span>
             </div>
             <p class="text-xs text-slate-400">
-              Personalizowany widok roboczy: przypięte artykuły k.k., aktywne sprawy oraz historia zapytań.
+              Podręczne dossier: przypięte artykuły Kodeksu Karnego, aktywne sprawy oraz historia analiz.
             </p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap self-end sm:self-auto">
-          <!-- Wybór kolumn siatki -->
-          <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl p-1 gap-1 text-xs">
-            <button
-              type="button"
-              (click)="widgetsService.setColumns(1)"
-              [class]="widgetsService.preferences().columns === 1 ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-400 hover:text-white'"
-              class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
-              title="1 kolumna (układ zwarty)"
-            >
-              1
-            </button>
-            <button
-              type="button"
-              (click)="widgetsService.setColumns(2)"
-              [class]="widgetsService.preferences().columns === 2 ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-400 hover:text-white'"
-              class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
-              title="2 kolumny (układ standardowy)"
-            >
-              2
-            </button>
-            <button
-              type="button"
-              (click)="widgetsService.setColumns(3)"
-              [class]="widgetsService.preferences().columns === 3 ? 'bg-amber-500/20 text-amber-300 font-bold' : 'text-slate-400 hover:text-white'"
-              class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
-              title="3 kolumny (układ panoramiczny)"
-            >
-              3
-            </button>
-          </div>
-
-          <!-- Przycisk konfiguracji siatki -->
+        <div class="flex items-center gap-2">
           <button
-            id="btn-toggle-customize-dashboard"
             type="button"
-            (click)="widgetsService.toggleCustomizing()"
-            [class]="widgetsService.isCustomizing() ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer shadow-sm"
+            (click)="toggleAddCaseModal()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer"
           >
-            <mat-icon class="text-sm">tune</mat-icon>
-            <span>{{ widgetsService.isCustomizing() ? 'Zakończ Edycję' : 'Dostosuj Pulpit' }}</span>
+            <mat-icon class="text-sm">add</mat-icon>
+            <span>Nowa Sprawa</span>
           </button>
         </div>
       </div>
 
-      <!-- Panel Konfiguracji Widżetów (Widoczny w trybie edycji) -->
-      @if (widgetsService.isCustomizing()) {
-        <div class="bg-amber-950/20 border border-amber-500/40 rounded-2xl p-4 sm:p-5 text-xs text-slate-200 space-y-3 animate-fade-in">
-          <div class="flex items-center justify-between gap-3 border-b border-amber-500/20 pb-2">
-            <div class="flex items-center gap-2 font-bold text-amber-300">
-              <mat-icon class="text-sm">settings</mat-icon>
-              <span>Ustawienia widoczności i układu widżetów</span>
-            </div>
-            <button
-              type="button"
-              (click)="widgetsService.resetLayout()"
-              class="text-[11px] text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <mat-icon class="text-xs">restart_alt</mat-icon>
-              <span>Przywróć domyślny układ</span>
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            @for (widget of widgetsService.preferences().widgets; track widget.id) {
-              <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                  <mat-icon class="text-sm text-amber-400">{{ widget.icon }}</mat-icon>
-                  <span class="font-medium text-slate-200">{{ widget.title }}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <button
-                    type="button"
-                    (click)="widgetsService.toggleWidgetVisibility(widget.id)"
-                    [class]="widget.visible ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 bg-slate-800'"
-                    class="p-1 rounded-md text-xs cursor-pointer"
-                    [title]="widget.visible ? 'Ukryj widżet' : 'Pokaż widżet'"
-                  >
-                    <mat-icon class="text-sm">{{ widget.visible ? 'visibility' : 'visibility_off' }}</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    (click)="widgetsService.moveWidget(widget.id, 'up')"
-                    class="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 cursor-pointer"
-                    title="Przesuń w lewo / w górę"
-                  >
-                    <mat-icon class="text-sm">arrow_upward</mat-icon>
-                  </button>
-                  <button
-                    type="button"
-                    (click)="widgetsService.moveWidget(widget.id, 'down')"
-                    class="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-800 cursor-pointer"
-                    title="Przesuń w prawo / w dół"
-                  >
-                    <mat-icon class="text-sm">arrow_downward</mat-icon>
-                  </button>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- Dynamiczna Siatka Widżetów (Widget Grid System) -->
+      <!-- Dynamiczna Siatka Widżetów (Czysty 2-kolumnowy responsywny grid) -->
       <div
-        class="grid gap-4 transition-all duration-300"
-        [class]="getGridColsClass()"
+        class="grid grid-cols-1 lg:grid-cols-2 gap-4 transition-all duration-300"
       >
         @for (widget of visibleWidgets(); track widget.id) {
           <div
@@ -481,71 +385,6 @@ import { DashboardWidgetConfig, PenalArticle, ActiveCaseItem } from '../models/l
                       }
                     </div>
                   }
-                }
-
-                <!-- ================= WIDŻET 4: SZYBKIE NARZĘDZIA ================= -->
-                @if (widget.id === 'quick-launcher') {
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <!-- Skrót: Słownik Prawny -->
-                    <button
-                      type="button"
-                      (click)="openDictionary.emit(undefined)"
-                      class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-800/80 text-left transition-all cursor-pointer group flex items-start gap-2.5"
-                    >
-                      <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20">
-                        <mat-icon class="text-base">auto_stories</mat-icon>
-                      </div>
-                      <div>
-                        <div class="font-bold text-slate-200 group-hover:text-amber-300">Słownik Prawny</div>
-                        <div class="text-[11px] text-slate-400">Pojęcia i definicje offline</div>
-                      </div>
-                    </button>
-
-                    <!-- Skrót: Nowa Szyfrowana Notatka -->
-                    <button
-                      type="button"
-                      (click)="openNotes.emit()"
-                      class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-800/80 text-left transition-all cursor-pointer group flex items-start gap-2.5"
-                    >
-                      <div class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20">
-                        <mat-icon class="text-base">enhanced_encryption</mat-icon>
-                      </div>
-                      <div>
-                        <div class="font-bold text-slate-200 group-hover:text-emerald-300">Skarbiec AES-256</div>
-                        <div class="text-[11px] text-slate-400">Szyfrowane akta i notatki</div>
-                      </div>
-                    </button>
-
-                    <!-- Skrót: Przewodnik Obrona Konieczna -->
-                    <button
-                      type="button"
-                      (click)="openHandbookTopic('obrona-konieczna-art-25')"
-                      class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-800/80 text-left transition-all cursor-pointer group flex items-start gap-2.5"
-                    >
-                      <div class="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20">
-                        <mat-icon class="text-base">shield</mat-icon>
-                      </div>
-                      <div>
-                        <div class="font-bold text-slate-200 group-hover:text-blue-300">Kazus: Obrona Konieczna</div>
-                        <div class="text-[11px] text-slate-400">Art. 25 k.k. z orzecznictwem</div>
-                      </div>
-                    </button>
-
-                    <!-- Skrót: Przewodnik Konfiskata Auta -->
-                    <button
-                      type="button"
-                      (click)="openHandbookTopic('alkohol-art-178a-konfiskata')"
-                      class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-800/80 text-left transition-all cursor-pointer group flex items-start gap-2.5"
-                    >
-                      <div class="p-1.5 rounded-lg bg-red-500/10 text-red-400 group-hover:bg-red-500/20">
-                        <mat-icon class="text-base">no_drinks</mat-icon>
-                      </div>
-                      <div>
-                        <div class="font-bold text-slate-200 group-hover:text-red-300">Konfiskata Pojazdów</div>
-                        <div class="text-[11px] text-slate-400">Reguły po 14 marca 2024</div>
-                      </div>
-                    </button>
-                  </div>
                 }
               </div>
             }
