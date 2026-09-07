@@ -207,6 +207,22 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
               </button>
               <button
                 type="button"
+                (click)="applyTemplate('nadzwyczajne-zlagodzenie')"
+                class="px-2.5 py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/40 text-emerald-200 hover:text-emerald-100 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                title="Wstaw wniosek o nadzwyczajne złagodzenie kary (art. 60 § 2 k.k.)"
+              >
+                Nadzwyczajne złagodzenie (art. 60 k.k.)
+              </button>
+              <button
+                type="button"
+                (click)="applyTemplate('umorzenie-narkotyki')"
+                class="px-2.5 py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/40 text-emerald-200 hover:text-emerald-100 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                title="Wstaw wniosek o umorzenie z art. 62a UoPN (posiadanie nieznacznej ilości)"
+              >
+                Umorzenie z art. 62a UoPN
+              </button>
+              <button
+                type="button"
                 (click)="applyTemplate('linia-obrony')"
                 class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-amber-300 text-xs whitespace-nowrap cursor-pointer transition-colors"
                 title="Wstaw konspekt memorandum strategii procesowej"
@@ -449,6 +465,10 @@ export class EncryptedNotes {
     this.showNoteForm.set(true);
     if (tmpl === 'art66' || tmpl === 'warunkowe-umorzenie') {
       this.applyTemplate('warunkowe-umorzenie');
+    } else if (tmpl === 'art60' || tmpl === 'nadzwyczajne-zlagodzenie') {
+      this.applyTemplate('nadzwyczajne-zlagodzenie');
+    } else if (tmpl === 'uopn62a' || tmpl === 'umorzenie-narkotyki') {
+      this.applyTemplate('umorzenie-narkotyki');
     } else if (tmpl === 'art169' || tmpl === 'wniosek-dowodowy') {
       this.applyTemplate('wniosek-dowodowy');
     } else if (tmpl === 'driving' || tmpl === 'zazalenie-zatrzymanie') {
@@ -458,8 +478,60 @@ export class EncryptedNotes {
     }
   }
 
-  applyTemplate(type: 'warunkowe-umorzenie' | 'wniosek-dowodowy' | 'zazalenie-zatrzymanie' | 'linia-obrony'): void {
+  applyTemplate(type: 'warunkowe-umorzenie' | 'nadzwyczajne-zlagodzenie' | 'umorzenie-narkotyki' | 'wniosek-dowodowy' | 'zazalenie-zatrzymanie' | 'linia-obrony'): void {
     switch (type) {
+      case 'nadzwyczajne-zlagodzenie':
+        this.noteTitle.set('Wniosek o nadzwyczajne złagodzenie kary (art. 60 § 2 k.k.)');
+        this.noteCategory.set('Analiza prawna');
+        this.noteLinkedArticle.set('Art. 60 § 2 i § 6 k.k.');
+        this.noteTagsInput.set('art 60 kk, nadzwyczajne złagodzenie, pojednanie, naprawienie szkody, wniosek');
+        this.noteContent.set(
+`SĄD REJONOWY W: [Miejscowość, Wydział Karny]
+Sygn. akt: [Sygnatura akt sprawy]
+
+Oskarżony: [Imię i Nazwisko]
+Obrońca: [Imię i Nazwisko Adwokata]
+
+WNIOSEK OBROŃCY O ZASTOSOWANIE NADZWYCZAJNEGO ZŁAGODZENIA KARY
+(art. 60 § 2 pkt 1 i § 6 k.k.)
+
+Działając jako obrońca oskarżonego, na zasadzie art. 60 § 2 pkt 1 k.k. w zw. z art. 60 § 6 pkt 3/4 k.k., wnoszę o:
+1. Zastosowanie wobec oskarżonego dobrodziejstwa nadzwyczajnego złagodzenia kary.
+2. Wymierzenie kary wolnościowej w postaci grzywny albo kary ograniczenia wolności, ewentualnie kary pozbawienia wolności z warunkowym zawieszeniem jej wykonania (art. 69 § 1 k.k.).
+
+UZASADNIENIE
+1. POJEDNANIE I NAPRAWIENIE SZKODY: Oskarżony przed otwarciem przewodu sądowego w całości zrekompensował szkodę materialną wyrządzoną przestępstwem oraz zawarł z pokrzywdzonym ugodę pojednawczą.
+2. POSTAWA SPRAWCY: Oskarżony szczerze wyraził skruchę, złożył wyczerpujące wyjaśnienia i współpracował z organami ścigania.
+3. Zgodnie z utrwalonym orzecznictwem Sądu Najwyższego (m.in. I KZP 12/20) całkowite naprawienie szkody i pojednanie z pokrzywdzonym stanowi samodzielną podstawę do odstąpienia od kary izolacyjnej.`
+        );
+        break;
+
+      case 'umorzenie-narkotyki':
+        this.noteTitle.set('Wniosek o umorzenie postępowania na podst. art. 62a UoPN');
+        this.noteCategory.set('Wniosek dowodowy');
+        this.noteLinkedArticle.set('Art. 62a UoPN');
+        this.noteTagsInput.set('uopn, art 62a, marihuana, własny użytek, nieznaczna ilość, umorzenie');
+        this.noteContent.set(
+`PROKURATURA REJONOWA W: [Miejscowość] / KOMENDA POLICJI
+Sygn. akt: [Sygnatura dochodzenia / śledztwa]
+
+Podejrzany: [Imię i Nazwisko]
+Obrońca: [Imię i Nazwisko Adwokata]
+
+WNIOSEK O UMORZENIE POSTĘPOWANIA PRZED WYDANIEM POSTANOWIENIA O WSZCZĘCIU
+(art. 62a Ustawy o przeciwdziałaniu narkomanii)
+
+Działając imieniem podejrzanego, na podstawie art. 62a UoPN, wnoszę o:
+1. Umorzenie postępowania karnego w przedmiocie zarzutu z art. 62 ust. 1 UoPN.
+2. Orzeczenie przepadku zabezpieczonych substancji odurzających.
+
+UZASADNIENIE
+1. ILOŚĆ NIEZNACZNA: Przedmiotem zabezpieczenia była minimalna ilość suszu ([...] grama), stanowiąca co najwyżej jedną porcję konsumpcyjną.
+2. WŁASNY UŻYTEK: W toku przeszukania nie ujawniono wag elektronicznych, woreczków strunowych ani gotówki wskazującej na dystrybucję.
+3. BEZCELOWOŚĆ KARANIA: Podejrzany jest osobą młodą, dotychczas niekaraną, pracującą/uczącą się. Stopień społecznej szkodliwości czynu jest znikomy, a orzeczenie kary byłoby sprzeczne z celami wychowawczymi.`
+        );
+        break;
+
       case 'warunkowe-umorzenie':
         this.noteTitle.set('Wniosek o warunkowe umorzenie postępowania karnego (art. 66 k.k.)');
         this.noteCategory.set('Analiza prawna');
