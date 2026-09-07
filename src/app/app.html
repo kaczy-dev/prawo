@@ -30,8 +30,8 @@
           <button type="button"
                   (click)="toggleOverflowMenu()"
                   class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 cursor-pointer"
-                  [title]="overflowMenuOpen ? 'Zamknij dodatkowe opcje' : 'Więcej opcji'">
-            <mat-icon class="text-lg">{{ overflowMenuOpen ? 'close' : 'menu' }}</mat-icon>
+                  [title]="overflowMenuOpen() ? 'Zamknij dodatkowe opcje' : 'Więcej opcji'">
+            <mat-icon class="text-lg">{{ overflowMenuOpen() ? 'close' : 'menu' }}</mat-icon>
           </button>
         </div>
       </div>
