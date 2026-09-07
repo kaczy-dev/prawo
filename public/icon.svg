@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141928" />
+      <stop offset="50%" stop-color="#0a0d16" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE68A" />
+      <stop offset="50%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#996515" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Tło: Zaokrąglony obsydianowy kwadrat z obramowaniem -->
+  <rect width="512" height="512" rx="108" fill="url(#bgGrad)" />
+  <rect x="12" y="12" width="488" height="488" rx="96" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-opacity="0.5" />
+  <circle cx="256" cy="256" r="220" fill="none" stroke="url(#goldGrad)" stroke-width="2" stroke-opacity="0.25" stroke-dasharray="8 6" />
+
+  <!-- Szala sprawiedliwości & Miecz prawa (Gilded Seal) -->
+  <g filter="url(#glow)">
+    <!-- Pionowy miecz / filar -->
+    <path d="M256 100 L262 130 L260 380 L256 395 L252 380 L250 130 Z" fill="url(#goldGrad)" />
+    <!-- Głowica miecza i jelec -->
+    <circle cx="256" cy="85" r="14" fill="url(#goldGrad)" />
+    <path d="M200 130 Q256 120 312 130" stroke="url(#goldGrad)" stroke-width="8" stroke-linecap="round" fill="none" />
+    
+    <!-- Pozioma belka wagi -->
+    <path d="M120 180 L392 180" stroke="url(#goldGrad)" stroke-width="7" stroke-linecap="round" />
+    <circle cx="256" cy="180" r="10" fill="url(#goldGrad)" />
+
+    <!-- Lewa szala wagi -->
+    <line x1="150" y1="183" x2="115" y2="270" stroke="url(#goldGrad)" stroke-width="3" opacity="0.85" />
+    <line x1="150" y1="183" x2="185" y2="270" stroke="url(#goldGrad)" stroke-width="3" opacity="0.85" />
+    <path d="M105 270 Q150 305 195 270 Z" fill="url(#goldGrad)" />
+
+    <!-- Prawa szala wagi -->
+    <line x1="362" y1="183" x2="327" y2="270" stroke="url(#goldGrad)" stroke-width="3" opacity="0.85" />
+    <line x1="362" y1="183" x2="397" y2="270" stroke="url(#goldGrad)" stroke-width="3" opacity="0.85" />
+    <path d="M317 270 Q362 305 407 270 Z" fill="url(#goldGrad)" />
+
+    <!-- Podstawa / cokół -->
+    <path d="M210 395 L302 395 L320 425 L192 425 Z" fill="url(#goldGrad)" />
+    <line x1="180" y1="425" x2="332" y2="425" stroke="url(#goldGrad)" stroke-width="5" stroke-linecap="round" />
+  </g>
+</svg>

@@ -122,6 +122,9 @@ export class CommandPaletteModal {
   readonly toggleVault = output<void>();
   readonly openTemplate = output<string>();
   readonly openScanner = output<void>();
+  readonly openDeadlines = output<void>();
+  readonly openPreventiveMeasures = output<void>();
+  readonly openTrustModal = output<void>();
 
   readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   readonly searchQuery = signal<string>('');
@@ -259,6 +262,81 @@ export class CommandPaletteModal {
           this.navigateToTab.emit('encrypted-notes');
           this.openTemplate.emit('uopn62a');
         },
+      },
+      {
+        id: 'tmpl-art422',
+        category: 'template',
+        title: 'Wzór: Wniosek o uzasadnienie wyroku (art. 422 k.p.k.)',
+        subtitle: 'Termin zawity 7 dni – niezbędny do sporządzenia apelacji',
+        icon: 'schedule',
+        badge: 'Wzór Pisma',
+        action: () => {
+          this.navigateToTab.emit('encrypted-notes');
+          this.openTemplate.emit('wniosek-uzasadnienie');
+        },
+      },
+      {
+        id: 'tmpl-art506',
+        category: 'template',
+        title: 'Wzór: Sprzeciw od wyroku nakazowego (art. 506 k.p.k.)',
+        subtitle: 'Termin 7 dni – wyrok nakazowy traci moc, sprawa trafia na rozprawę',
+        icon: 'cancel',
+        badge: 'Wzór Pisma',
+        action: () => {
+          this.navigateToTab.emit('encrypted-notes');
+          this.openTemplate.emit('sprzeciw-nakazowy');
+        },
+      },
+      {
+        id: 'tmpl-art252',
+        category: 'template',
+        title: 'Wzór: Zażalenie na areszt tymczasowy (art. 252 k.p.k.)',
+        subtitle: 'Zaskarżenie postanowienia o areszcie, wniosek o poręczenie majątkowe/dozór',
+        icon: 'lock_reset',
+        badge: 'Wzór Pisma',
+        action: () => {
+          this.navigateToTab.emit('encrypted-notes');
+          this.openTemplate.emit('zazalenie-areszt');
+        },
+      },
+      {
+        id: 'tmpl-art387',
+        category: 'template',
+        title: 'Wzór: Dobrowolne poddanie się karze (art. 387 k.p.k.)',
+        subtitle: 'Wydanie wyroku skazującego bez postępowania dowodowego',
+        icon: 'handshake',
+        badge: 'Wzór Pisma',
+        action: () => {
+          this.navigateToTab.emit('encrypted-notes');
+          this.openTemplate.emit('dobrowolne-podst');
+        },
+      },
+      {
+        id: 'action-deadlines',
+        category: 'action',
+        title: 'Kalkulator Terminów Procesowych (art. 122–126 k.p.k.)',
+        subtitle: 'Obliczanie terminów zawitych z regułą soboty i świąt oraz Poczty Polskiej',
+        icon: 'schedule',
+        badge: 'Kalkulator',
+        action: () => this.openDeadlines.emit(),
+      },
+      {
+        id: 'action-preventive',
+        category: 'action',
+        title: 'Środki Zapobiegawcze & Przesłanki Aresztu (art. 249–275 k.p.k.)',
+        subtitle: 'Weryfikacja przesłanek aresztowych, kaucja, dozór oraz zegary 48/24h',
+        icon: 'gavel',
+        badge: 'Asystent',
+        action: () => this.openPreventiveMeasures.emit(),
+      },
+      {
+        id: 'action-trust',
+        category: 'action',
+        title: 'Nota Prawna, Tajemnica Obrończa (art. 178 k.p.k.) i RODO',
+        subtitle: 'Prywatność Zero-Cloud, standardy bezpieczeństwa i status prawny aplikacji',
+        icon: 'verified_user',
+        badge: 'Zgodność',
+        action: () => this.openTrustModal.emit(),
       },
     ];
 

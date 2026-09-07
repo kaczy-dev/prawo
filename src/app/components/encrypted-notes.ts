@@ -53,16 +53,40 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
           </p>
         </div>
 
-        <div class="relative z-10 flex items-center gap-3 shrink-0">
+        <div class="relative z-10 flex flex-wrap items-center gap-2.5 shrink-0">
+          <input #backupFileInput type="file" accept=".json" class="hidden" (change)="handleBackupFile($event)" />
+
+          <button
+            type="button"
+            (click)="downloadVaultBackup()"
+            class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-[#111624] hover:bg-[#1a2136] text-amber-300 border border-amber-500/30 hover:border-amber-400 transition-all cursor-pointer shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+            title="Eksportuj zaszyfrowaną kopię zapasową wszystkich notatek do pliku JSON"
+            aria-label="Pobierz kopię zapasową skarbca"
+          >
+            <mat-icon class="text-sm">file_download</mat-icon>
+            <span>Kopia (.json)</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="triggerImportBackup(backupFileInput)"
+            class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-[#111624] hover:bg-[#1a2136] text-slate-200 border border-slate-700/80 hover:border-amber-500/40 transition-all cursor-pointer shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+            title="Przywróć notatki z pliku kopii zapasowej JSON"
+            aria-label="Przywróć notatki z pliku JSON"
+          >
+            <mat-icon class="text-sm">file_upload</mat-icon>
+            <span>Przywróć</span>
+          </button>
+
           <button
             type="button"
             (click)="navigateToCases.emit()"
-            class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-[#111624] hover:bg-[#1a2136] text-slate-200 border border-slate-700/80 hover:border-amber-500/40 transition-all cursor-pointer shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+            class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#111624] hover:bg-[#1a2136] text-slate-200 border border-slate-700/80 hover:border-amber-500/40 transition-all cursor-pointer shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             title="Powrót do dossier i aktywnych spraw"
             aria-label="Powrót do dossier i aktywnych spraw"
           >
             <mat-icon class="text-sm text-amber-400">arrow_back</mat-icon>
-            <span>Dossier Spraw</span>
+            <span>Dossier</span>
           </button>
 
           @if (!showNoteForm()) {
@@ -70,7 +94,7 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
               id="btn-create-new-note"
               type="button"
               (click)="resetNoteForm(); showNoteForm.set(true)"
-              class="flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 active:scale-[0.98] text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-amber-500/25 border border-amber-300/40 transition-all cursor-pointer whitespace-nowrap focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+              class="flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 active:scale-[0.98] text-slate-950 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl shadow-lg shadow-amber-500/25 border border-amber-300/40 transition-all cursor-pointer whitespace-nowrap focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
               aria-label="Utwórz nową notatkę procesową"
             >
               <mat-icon class="text-base">add</mat-icon>
@@ -226,6 +250,46 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
               <span class="text-[10px] text-slate-400 hidden sm:inline">Gotowa struktura wniosków i memorandów</span>
             </div>
             <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 text-xs">
+              <button
+                type="button"
+                (click)="applyTemplate('wniosek-uzasadnienie')"
+                class="px-3 py-1.5 rounded-lg bg-amber-950/50 hover:bg-amber-900/60 border border-amber-500/40 text-amber-200 hover:text-amber-100 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                title="Wstaw wniosek o sporządzenie i doręczenie uzasadnienia wyroku (art. 422 k.p.k. - termin zawity 7 dni)"
+              >
+                <mat-icon class="text-xs text-amber-400">schedule</mat-icon>
+                <span>Uzasadnienie wyroku (art. 422 k.p.k.)</span>
+              </button>
+
+              <button
+                type="button"
+                (click)="applyTemplate('sprzeciw-nakazowy')"
+                class="px-3 py-1.5 rounded-lg bg-amber-950/50 hover:bg-amber-900/60 border border-amber-500/40 text-amber-200 hover:text-amber-100 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                title="Wstaw sprzeciw od wyroku nakazowego (art. 506 k.p.k. - termin 7 dni)"
+              >
+                <mat-icon class="text-xs text-amber-400">cancel</mat-icon>
+                <span>Sprzeciw od nakazowego (art. 506 k.p.k.)</span>
+              </button>
+
+              <button
+                type="button"
+                (click)="applyTemplate('zazalenie-areszt')"
+                class="px-3 py-1.5 rounded-lg bg-rose-950/50 hover:bg-rose-900/60 border border-rose-500/40 text-rose-200 hover:text-rose-100 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:outline-none"
+                title="Wstaw zażalenie na postanowienie o zastosowaniu tymczasowego aresztowania (art. 252 k.p.k.)"
+              >
+                <mat-icon class="text-xs text-rose-400">lock_reset</mat-icon>
+                <span>Zażalenie na areszt (art. 252 k.p.k.)</span>
+              </button>
+
+              <button
+                type="button"
+                (click)="applyTemplate('dobrowolne-podst')"
+                class="px-3 py-1.5 rounded-lg bg-[#14192b] hover:bg-[#1d243d] border border-amber-500/30 hover:border-amber-400 text-slate-200 hover:text-amber-200 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                title="Wstaw wniosek o dobrowolne poddanie się odpowiedzialności karnej (art. 387 k.p.k.)"
+              >
+                <mat-icon class="text-xs text-amber-400">handshake</mat-icon>
+                <span>Dobrowolne skazanie (art. 387 k.p.k.)</span>
+              </button>
+
               <button
                 type="button"
                 (click)="applyTemplate('warunkowe-umorzenie')"
@@ -572,8 +636,117 @@ export class EncryptedNotes {
     }
   }
 
-  applyTemplate(type: 'warunkowe-umorzenie' | 'nadzwyczajne-zlagodzenie' | 'umorzenie-narkotyki' | 'wniosek-dowodowy' | 'zazalenie-zatrzymanie' | 'linia-obrony'): void {
+  applyTemplate(type: 'warunkowe-umorzenie' | 'nadzwyczajne-zlagodzenie' | 'umorzenie-narkotyki' | 'wniosek-dowodowy' | 'zazalenie-zatrzymanie' | 'linia-obrony' | 'wniosek-uzasadnienie' | 'sprzeciw-nakazowy' | 'zazalenie-areszt' | 'dobrowolne-podst'): void {
     switch (type) {
+      case 'wniosek-uzasadnienie':
+        this.noteTitle.set('Wniosek o sporządzenie i doręczenie uzasadnienia wyroku (art. 422 k.p.k.)');
+        this.noteCategory.set('Sprawa klienta');
+        this.noteLinkedArticle.set('Art. 422 § 1 k.p.k.');
+        this.noteTagsInput.set('uzasadnienie, art 422 kpk, termin zawity, wyrok, zapowiedź apelacji');
+        this.noteContent.set(
+`SĄD REJONOWY W: [Miejscowość]
+Wydział [Numer, np. II] Karny
+Sygn. akt: [Sygnatura akt sprawy]
+
+Oskarżony: [Imię i Nazwisko]
+Obrońca: [Imię i Nazwisko Adwokata/Radcy Prawnego]
+
+WNIOSEK O SPORZĄDZENIE I DORĘCZENIE UZASADNIENIA WYROKU
+(art. 422 § 1 i § 2 k.p.k.)
+
+Działając w imieniu oskarżonego, wnoszę o:
+1. Sporządzenie na piśmie uzasadnienia wyroku tutejszego Sądu wydanego i ogłoszonego w dniu [Data ogłoszenia wyroku].
+2. Doręczenie odpisu wyroku wraz z pisemnym uzasadnieniem na adres kancelarii obrońcy.
+
+Wskazuję, iż wniosek dotyczy uzasadnienia wyroku w całości / w części dotyczącej rozstrzygnięcia o karze.
+
+[Miejscowość, Data] ____________________________
+(podpis obrońcy / oskarżonego)`
+        );
+        break;
+
+      case 'sprzeciw-nakazowy':
+        this.noteTitle.set('Sprzeciw od wyroku nakazowego (art. 506 k.p.k.)');
+        this.noteCategory.set('Sprawa klienta');
+        this.noteLinkedArticle.set('Art. 506 § 1 k.p.k.');
+        this.noteTagsInput.set('sprzeciw, wyrok nakazowy, art 506 kpk, utrata mocy, rozprawa');
+        this.noteContent.set(
+`SĄD REJONOWY W: [Miejscowość]
+Wydział [Numer] Karny
+Sygn. akt: [Sygnatura sprawy, np. II K ...]
+
+Oskarżony: [Imię i Nazwisko, PESEL, Adres]
+
+SPRZECIW OD WYROKU NAKAZOWEGO
+(art. 506 § 1 k.p.k.)
+
+Działając osobiście / przez ustanowionego obrońcę, niniejszym:
+WNIOŚCIE SPRZECIW
+od wyroku nakazowego Sądu Rejonowego w [Miejscowość] z dnia [Data wydania wyroku], sygn. akt [Sygnatura], doręczonego w dniu [Data doręczenia].
+
+UZASADNIENIE
+Oskarżony nie zgadza się z przypisanym mu czynem oraz wymierzoną karą. Okoliczności czynu oraz wina budzą istotne wątpliwości wymagające przeprowadzenia postępowania dowodowego na rozprawie głównej (art. 500 § 1 k.p.k. a contrario).
+Zgodnie z art. 506 § 3 k.p.k. w razie wniesienia sprzeciwu wyrok nakazowy traci moc, a sprawa podlega rozpoznaniu na zasadach ogólnych.
+
+[Miejscowość, Data] ____________________________
+(podpis)`
+        );
+        break;
+
+      case 'zazalenie-areszt':
+        this.noteTitle.set('Zażalenie na postanowienie o zastosowaniu tymczasowego aresztowania (art. 252 k.p.k.)');
+        this.noteCategory.set('Sprawa klienta');
+        this.noteLinkedArticle.set('Art. 252 § 1 w zw. z art. 257/258 k.p.k.');
+        this.noteTagsInput.set('zażalenie, areszt, art 252 kpk, art 257 kpk, poręczenie, wolność');
+        this.noteContent.set(
+`SĄD OKRĘGOWY W: [Miejscowość]
+Wydział Karny Odwoławczy
+za pośrednictwem: Sąd Rejonowy w [Miejscowość]
+Sygn. akt: [Sygnatura sprawy aresztowej, np. II Kp ...]
+
+Podejrzany: [Imię i Nazwisko]
+Obrońca: [Imię i Nazwisko Adwokata]
+
+ZAŻALENIE OBROŃCY NA POSTANOWIENIE O ZASTOSOWANIU TYMCZASOWEGO ARESZTOWANIA
+(art. 252 § 1 k.p.k. w zw. z art. 460 k.p.k.)
+
+Działając jako obrońca podejrzanego, zaskarżam w całości postanowienie Sądu Rejonowego w [Miejscowość] z dnia [Data], w przedmiocie zastosowania tymczasowego aresztowania na okres [np. 3 miesięcy].
+
+ZARZUTY:
+1. Obrazę przepisów postępowania, tj. art. 257 § 1 k.p.k. (zasady subsydiarności), poprzez błędne uznanie, że jedynie izolacyjny środek zapobiegawczy zabezpieczy prawidłowy tok śledztwa, podczas gdy w pełni wystarczające byłoby orzeczenie dozoru Policji i poręczenia majątkowego.
+2. Naruszenie art. 258 § 1 pkt 2 k.p.k. poprzez bezpodstawne przyjęcie obawy matactwa w sytuacji, gdy kluczowe dowody z dokumentów i nośników zostały już zabezpieczone.
+3. Naruszenie art. 259 § 1 k.p.k. poprzez pominięcie okoliczności, że pozbawienie wolności pociągnie za sobą wyjątkowo ciężkie skutki dla chorej matki podejrzanego, nad którą sprawuje wyłączną opiekę.
+
+WNIOSEK:
+Wnoszę o zmianę zaskarżonego postanowienia poprzez uchylenie tymczasowego aresztowania, ewentualnie zastosowanie w jego miejsce środków o charakterze nieizolacyjnym (art. 266 k.p.k. oraz art. 275 k.p.k.).`
+        );
+        break;
+
+      case 'dobrowolne-podst':
+        this.noteTitle.set('Wniosek o wydanie wyroku skazującego bez postępowania dowodowego (art. 387 k.p.k.)');
+        this.noteCategory.set('Sprawa klienta');
+        this.noteLinkedArticle.set('Art. 387 k.p.k.');
+        this.noteTagsInput.set('art 387 kpk, dobrowolne poddanie się karze, konsensus, porozumienie');
+        this.noteContent.set(
+`SĄD REJONOWY W: [Miejscowość]
+Wydział Karny
+Sygn. akt: [Sygnatura sprawy]
+
+Oskarżony: [Imię i Nazwisko]
+
+WNIOSEK O WYDANIE WYROKU SKAZUJĄCEGO
+(art. 387 § 1 k.p.k.)
+
+Działając w imieniu oskarżonego, przed zakończeniem pierwszego przesłuchania wszystkich oskarżonych na rozprawie głównej, wnoszę o:
+1. Wydanie wyroku skazującego i orzeczenie uzgodnionej kary:
+   - kary [grzywny / ograniczenia wolności / pozbawienia wolności z warunkowym zawieszeniem]
+   - obowiązku naprawienia szkody (art. 46 § 1 k.k.) w kwocie [...] zł
+   - bez przeprowadzania postępowania dowodowego.
+
+UZASADNIENIE
+Okoliczności popełnienia przestępstwa i wina oskarżonego nie budzą wątpliwości. Postawa oskarżonego wskazuje, że cele postępowania zostaną osiągnięte mimo nieprzeprowadzenia rozprawy w całości. Wniosek został uzgodniony z prokuratorem.`
+        );
+        break;
       case 'nadzwyczajne-zlagodzenie':
         this.noteTitle.set('Wniosek o nadzwyczajne złagodzenie kary (art. 60 § 2 k.k.)');
         this.noteCategory.set('Analiza prawna');
@@ -856,4 +1029,40 @@ III. PLANOWANE KROKI OBROŃCZE:
       ['orzecznictwo', ruling.court.toLowerCase(), 'precedens']
     );
   }
+
+  // --- Kopia Zapasowa Skarbca (Backup & Restore) ---
+  downloadVaultBackup(): void {
+    try {
+      const json = this.legalData.exportVaultBackup();
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prawnik-kopia-sejfu-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      alert('Błąd eksportu kopii zapasowej: ' + (e.message || 'Nieznany błąd'));
+    }
+  }
+
+  triggerImportBackup(fileInput: HTMLInputElement): void {
+    fileInput.click();
+  }
+
+  async handleBackupFile(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    try {
+      const text = await file.text();
+      const count = this.legalData.importVaultBackup(text);
+      alert(`Pomyślnie zaimportowano ${count} notatek do skarbca.`);
+    } catch (e: any) {
+      alert(e.message || 'Błąd importu pliku kopii zapasowej.');
+    } finally {
+      input.value = '';
+    }
+  }
 }
+

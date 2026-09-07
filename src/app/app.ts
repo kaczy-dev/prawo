@@ -42,6 +42,9 @@ import { CommandPaletteModal } from './components/command-palette-modal';
 import { CumulativeSentenceModalComponent } from './components/cumulative-sentence-modal';
 import { DocumentExportModalComponent } from './components/document-export-modal';
 import { DocumentScannerModalComponent } from './components/document-scanner-modal';
+import { ProceduralDeadlinesModalComponent } from './components/procedural-deadlines-modal';
+import { PreventiveMeasuresModalComponent } from './components/preventive-measures-modal';
+import { LegalTrustModalComponent } from './components/legal-trust-modal';
 
 export type ActiveTab =
   | 'threat-calc'
@@ -79,6 +82,9 @@ export type ActiveTab =
     CumulativeSentenceModalComponent,
     DocumentExportModalComponent,
     DocumentScannerModalComponent,
+    ProceduralDeadlinesModalComponent,
+    PreventiveMeasuresModalComponent,
+    LegalTrustModalComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -126,6 +132,15 @@ export class App {
 
   // Modal 100% lokalnego skanera dokumentów procesowych (OCR)
   readonly isDocumentScannerModalOpen = signal<boolean>(false);
+
+  // Modal kalkulatora terminów procesowych (art. 122-126 k.p.k.)
+  readonly isProceduralDeadlinesModalOpen = signal<boolean>(false);
+
+  // Modal asystenta środków zapobiegawczych & aresztu (art. 249-275 k.p.k.)
+  readonly isPreventiveMeasuresModalOpen = signal<boolean>(false);
+
+  // Modal noty prawnej, tajemnicy obrończej i RODO
+  readonly isLegalTrustModalOpen = signal<boolean>(false);
 
   // Dropdown Narzędzia Kancelaryjne w nagłówku
   readonly isToolsMenuOpen = signal<boolean>(false);
@@ -539,6 +554,30 @@ export class App {
 
   closeDocumentScannerModal(): void {
     this.isDocumentScannerModalOpen.set(false);
+  }
+
+  openProceduralDeadlinesModal(): void {
+    this.isProceduralDeadlinesModalOpen.set(true);
+  }
+
+  closeProceduralDeadlinesModal(): void {
+    this.isProceduralDeadlinesModalOpen.set(false);
+  }
+
+  openPreventiveMeasuresModal(): void {
+    this.isPreventiveMeasuresModalOpen.set(true);
+  }
+
+  closePreventiveMeasuresModal(): void {
+    this.isPreventiveMeasuresModalOpen.set(false);
+  }
+
+  openLegalTrustModal(): void {
+    this.isLegalTrustModalOpen.set(true);
+  }
+
+  closeLegalTrustModal(): void {
+    this.isLegalTrustModalOpen.set(false);
   }
 
   async savePrescriptionNote(data: { title: string; content: string; linkedArticle: string }): Promise<void> {

@@ -53,9 +53,9 @@ describe('PenaltyCalculatorService', () => {
 
     const result = service.calculateDirectives(mockArticle, directives);
 
-    expect(result.art60Mitigation.isApplicable).toBeTrue();
+    expect(result.art60Mitigation.isApplicable).toBe(true);
     expect(result.art60Mitigation.mitigatedRange).toContain('Grzywna (od 100 stawek dziennych)');
-    expect(result.isSuspensionPossible).toBeTrue();
+    expect(result.isSuspensionPossible).toBe(true);
   });
 
   it('should calculate art. 60 k.k. mitigation for felony with min >= 3 years (art. 60 § 6 pkt 1 k.k.)', () => {
@@ -92,7 +92,7 @@ describe('PenaltyCalculatorService', () => {
 
     const result = service.calculateDirectives(mockFelony, directives);
 
-    expect(result.art60Mitigation.isApplicable).toBeTrue();
+    expect(result.art60Mitigation.isApplicable).toBe(true);
     expect(result.art60Mitigation.mitigatedRange).toContain('2 lat i 8 miesięcy');
   });
 });

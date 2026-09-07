@@ -1375,4 +1375,50 @@ Art. 62a. Jeżeli przedmiotem czynu są środki odurzające lub substancje psych
       arts.map((a) => (a.id === articleId ? { ...a, isOfflinePinned: !a.isOfflinePinned } : a))
     );
   }
+
+  /**
+   * Eksportuje pełną kopię zapasową dossier i notatek skarbca do formatu JSON
+   */
+  exportVaultBackup(): string {
+    const backupData = {
+      app: 'Prawnik z Łuczniczej',
+      version: '2.0.0',
+      exportedAt: new Date().toISOString(),
+      notesCount: this.notes().length,
+      notes: this.notes(),
+    };
+    return JSON.stringify(backupData, null, 2);
+  }
+
+  /**
+   * Importuje notatki z pliku kopii zapasowej JSON
+   */
+  importVaultBackup(backupJson: string): number {
+    try {
+      const parsed = JSON.parse(backupJson);
+      if (!parsed || !Array.isArray(parsed.notes)) {
+        throw new Error('Nieprawidłowy format pliku kopii zapasowej.');
+      }
+      const existing = this.notes();
+      const existingIds = new Set(existing.map((n) => n.id));
+      let importedCount = 0;
+
+      const merged = [...existing];
+      for (const note of parsed.notes) {
+        if (note && note.id && note.title) {
+          if (!existingIds.has(note.id)) {
+            merged.push(note);
+            importedCount++;
+          }
+        }
+      }
+
+      this.notes.set(merged);
+      this.persistNotesToStorage(merged);
+      return importedCount;
+    } catch (e: any) {
+      throw new Error('Błąd odczytu pliku kopii zapasowej: ' + (e.message || 'Nieznany błąd'));
+    }
+  }
 }
+

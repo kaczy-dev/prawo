@@ -1,0 +1,25 @@
+{
+  "name": "Prawnik z Łuczniczej – Inteligentny Asystent Prawa Karnego",
+  "short_name": "PrawnikŁucznicza",
+  "description": "Profesjonalny asystent prawa karnego z kodeksem karnym, orzecznictwem SN, kalkulatorem zagrożenia i szyfrowanym sejfem akt (AES-256-GCM).",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#090D16",
+  "orientation": "any",
+  "lang": "pl",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["productivity", "utilities", "business"]
+}

@@ -183,6 +183,36 @@
                 </div>
               </button>
 
+              <!-- Kalkulator Terminów Procesowych k.p.k. -->
+              <button
+                type="button"
+                (click)="openProceduralDeadlinesModal()"
+                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+              >
+                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <mat-icon class="text-sm">schedule</mat-icon>
+                </div>
+                <div>
+                  <div class="font-semibold text-white">Terminy Procesowe (k.p.k.)</div>
+                  <div class="text-[10px] text-slate-400">Terminy zawite i reguła świąt</div>
+                </div>
+              </button>
+
+              <!-- Środki Zapobiegawcze & Areszt -->
+              <button
+                type="button"
+                (click)="openPreventiveMeasuresModal()"
+                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+              >
+                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <mat-icon class="text-sm">gavel</mat-icon>
+                </div>
+                <div>
+                  <div class="font-semibold text-white">Środki Zapobiegawcze</div>
+                  <div class="text-[10px] text-slate-400">Areszt, kaucja, dozór, 24/48h</div>
+                </div>
+              </button>
+
               <!-- Panel Wydruku A4 -->
               <button
                 type="button"
@@ -210,6 +240,21 @@
                 <div>
                   <div class="font-semibold text-white">Słownik Pojęć</div>
                   <div class="text-[10px] text-slate-400">Definicje k.k. i k.p.k.</div>
+                </div>
+              </button>
+
+              <!-- Nota Prawna, Tajemnica & RODO -->
+              <button
+                type="button"
+                (click)="openLegalTrustModal()"
+                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+              >
+                <div class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <mat-icon class="text-sm">verified_user</mat-icon>
+                </div>
+                <div>
+                  <div class="font-semibold text-white">Nota Prawna & RODO</div>
+                  <div class="text-[10px] text-slate-400">Tajemnica art. 178 k.p.k.</div>
                 </div>
               </button>
 
@@ -424,16 +469,47 @@
   </main>
 
   <!-- Stopka Kancelaryjna & Klauzula Prawna -->
-  <footer class="border-t border-slate-900 bg-slate-950/80 px-4 py-5 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+  <footer class="border-t border-slate-900 bg-slate-950/80 px-4 py-6 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-2">
         <mat-icon class="text-sm text-amber-500">verified_user</mat-icon>
         <span>
           <strong>Prawnik z Łuczniczej</strong> — Zero-Cloud & Tajemnica Obrończa (Offline Architecture).
         </span>
       </div>
-      <p class="text-[11px] text-slate-400">
-        Aplikacja wspiera analizę prawną i sporządzanie pism. W konkretnej sprawie karnej zawsze skonsultuj się z adwokatem lub radcą prawnym.
+
+      <!-- Szybkie linki prawne i procedury -->
+      <div class="flex flex-wrap items-center justify-center gap-3 text-xs">
+        <button
+          type="button"
+          (click)="openLegalTrustModal()"
+          class="text-amber-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+        >
+          <mat-icon class="text-xs">shield</mat-icon>
+          <span>Nota Prawna & RODO</span>
+        </button>
+        <span class="text-slate-800">•</span>
+        <button
+          type="button"
+          (click)="openProceduralDeadlinesModal()"
+          class="text-slate-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+        >
+          <mat-icon class="text-xs">schedule</mat-icon>
+          <span>Terminy Procesowe (k.p.k.)</span>
+        </button>
+        <span class="text-slate-800">•</span>
+        <button
+          type="button"
+          (click)="openPreventiveMeasuresModal()"
+          class="text-slate-400 hover:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+        >
+          <mat-icon class="text-xs">gavel</mat-icon>
+          <span>Areszt & Środki Zapobiegawcze</span>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-slate-400 text-center md:text-right">
+        W konkretnej sprawie karnej zawsze skonsultuj się z adwokatem lub radcą prawnym.
       </p>
     </div>
   </footer>
@@ -441,6 +517,21 @@
   <!-- Modal Skarbca Kryptograficznego -->
   @if (isVaultModalOpen()) {
     <app-vault-modal (closeModal)="closeVaultModal()" />
+  }
+
+  <!-- Modal Kalkulatora Terminów Procesowych k.p.k. -->
+  @if (isProceduralDeadlinesModalOpen()) {
+    <app-procedural-deadlines-modal (close)="closeProceduralDeadlinesModal()" />
+  }
+
+  <!-- Modal Asystenta Środków Zapobiegawczych & Przesłanek Aresztowych -->
+  @if (isPreventiveMeasuresModalOpen()) {
+    <app-preventive-measures-modal (close)="closePreventiveMeasuresModal()" />
+  }
+
+  <!-- Modal Noty Prawnej, Tajemnicy Obrończej i RODO -->
+  @if (isLegalTrustModalOpen()) {
+    <app-legal-trust-modal (close)="closeLegalTrustModal()" />
   }
 
   <!-- Pływający odtwarzacz lektora Web Speech API -->
@@ -482,6 +573,9 @@
       (toggleVault)="cryptoService.isAuthenticated() ? lockVault() : openVaultModal()"
       (openTemplate)="notesComp()?.insertTemplate($event)"
       (openScanner)="openDocumentScannerModal()"
+      (openDeadlines)="openProceduralDeadlinesModal()"
+      (openPreventiveMeasures)="openPreventiveMeasuresModal()"
+      (openTrustModal)="openLegalTrustModal()"
     />
   }
 
@@ -683,6 +777,45 @@
             </div>
             <span class="text-xs font-bold text-white">Słownik Pojęć</span>
             <span class="text-[10px] text-slate-400">Definicje k.k.</span>
+          </button>
+
+          <!-- Terminy Procesowe k.p.k. -->
+          <button
+            type="button"
+            (click)="openProceduralDeadlinesModal(); overflowMenuOpen.set(false)"
+            class="p-3 bg-[#0d111c] border border-slate-700/80 hover:border-amber-500/40 rounded-2xl text-left flex flex-col gap-1.5 transition-all cursor-pointer active:scale-[0.97]"
+          >
+            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <mat-icon class="text-lg">schedule</mat-icon>
+            </div>
+            <span class="text-xs font-bold text-white">Terminy (k.p.k.)</span>
+            <span class="text-[10px] text-slate-400">7/14 dni & święta</span>
+          </button>
+
+          <!-- Środki Zapobiegawcze & Areszt -->
+          <button
+            type="button"
+            (click)="openPreventiveMeasuresModal(); overflowMenuOpen.set(false)"
+            class="p-3 bg-[#0d111c] border border-slate-700/80 hover:border-amber-500/40 rounded-2xl text-left flex flex-col gap-1.5 transition-all cursor-pointer active:scale-[0.97]"
+          >
+            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <mat-icon class="text-lg">gavel</mat-icon>
+            </div>
+            <span class="text-xs font-bold text-white">Środki & Areszt</span>
+            <span class="text-[10px] text-slate-400">24/48h i kaucja</span>
+          </button>
+
+          <!-- Nota Prawna & RODO -->
+          <button
+            type="button"
+            (click)="openLegalTrustModal(); overflowMenuOpen.set(false)"
+            class="p-3 bg-[#0d111c] border border-slate-700/80 hover:border-emerald-500/40 rounded-2xl text-left flex flex-col gap-1.5 transition-all cursor-pointer active:scale-[0.97]"
+          >
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+              <mat-icon class="text-lg">verified_user</mat-icon>
+            </div>
+            <span class="text-xs font-bold text-white">Nota Prawna</span>
+            <span class="text-[10px] text-slate-400">RODO & Tajemnica</span>
           </button>
 
           <!-- Podręczniki Obrońcy -->
