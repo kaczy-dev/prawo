@@ -39,11 +39,21 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
         </div>
 
         <div class="flex items-center gap-2.5">
+          <button
+            type="button"
+            (click)="navigateToCases.emit()"
+            class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer"
+            title="Powrót do dossier i aktywnych spraw"
+          >
+            <mat-icon class="text-sm text-amber-400">arrow_back</mat-icon>
+            <span>Dossier Spraw</span>
+          </button>
+
           @if (!showNoteForm()) {
             <button
               id="btn-create-new-note"
               (click)="resetNoteForm(); showNoteForm.set(true)"
-              class="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-semibold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap"
+              class="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold text-xs md:text-sm px-4 py-2 rounded-xl shadow-lg shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap"
             >
               <mat-icon class="text-base">add</mat-icon>
               <span>Nowa Notatka</span>
@@ -401,6 +411,7 @@ export class EncryptedNotes {
   readonly speech = inject(SpeechDictationService);
 
   readonly requestUnlockVault = output<void>();
+  readonly navigateToCases = output<void>();
 
   readonly showNoteForm = signal<boolean>(false);
   readonly editingNoteId = signal<string | null>(null);

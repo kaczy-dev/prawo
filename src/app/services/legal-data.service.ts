@@ -120,25 +120,31 @@ export class LegalDataService {
       {
         id: 'art-286',
         number: 286,
-        title: 'Oszustwo',
+        codePrefix: 'k.k.',
+        title: 'Oszustwo (Klasyczne, wyłudzenie kredytu, oszustwo internetowe / BLIK)',
         chapter: 'Przestępstwa przeciwko mieniu',
         chapterNumber: 'Rozdział XXXV',
         content: `§ 1. Kto, w celu osiągnięcia korzyści majątkowej, doprowadza inną osobę do niekorzystnego rozporządzenia własnym lub cudzym mieniem za pomocą wprowadzenia jej w błąd albo wyzyskania błędu lub niezdolności do należytego pojmowania przedsiębranego działania, podlega karze pozbawienia wolności od 6 miesięcy do lat 8.
-§ 3. W wypadku mniejszej wagi, sprawca podlega grzywnie, karze ograniczenia wolności albo pozbawienia wolności do lat 2.`,
-        plainSummary: 'Wyłudzenie pieniędzy lub towaru przez kłamstwo, fałszywy sklep internetowy, oszustwo "na wnuczka" lub "na Blik", nieopłacenie zamówionego towaru, sfałszowanie dokumentów finansowych.',
+§ 2. Tej samej karze podlega, kto żąda korzyści majątkowej w zamian za zwrot bezprawnie zabranej rzeczy.
+§ 3. W wypadku mniejszej wagi, sprawca podlega grzywnie, karze ograniczenia wolności albo pozbawienia wolności do lat 2.
+§ 4. Jeżeli czyn popełniono na szkodę osoby najbliższej, ściganie następuje na wniosek pokrzywdzonego.
+(W związku z art. 294 § 1 k.k. – jeżeli oszustwa dopuszczono się w stosunku do mienia znacznej wartości powyżej 200 000 zł, sprawca podlega karze pozbawienia wolności od 1 roku do lat 10, a przy mieniu wielkiej wartości powyżej 5 000 000 zł nawet od 3 do 20 lat pozbawienia wolności).`,
+        plainSummary: 'Świadome wprowadzenie w błąd w celu wyłudzenia pieniędzy, towaru, kredytu lub usług. Dotyczy m.in. oszustw na BLIK, fałszywych sklepów, wyłudzeń dotacji, nieopłacenia faktur przy z góry powziętym zamiarze niewywiązania się z umowy. Kluczowa linia obrony: wykazanie braku zamiaru bezpośredniego (dolus directus coloratus) w chwili zawierania transakcji lub kwalifikacja z § 3 jako wypadek mniejszej wagi.',
         penalties: {
           fine: true,
           restrictionOfLiberty: true,
           imprisonmentMinMonths: 6,
           imprisonmentMaxMonths: 96,
-          summary: 'Pozbawienie wolności od 6 miesięcy do 8 lat. W wypadku mniejszej wagi: grzywna, ograniczenie wolności lub więzienie do lat 2.',
+          summary: 'Pozbawienie wolności od 6 miesięcy do lat 8. Wypadek mniejszej wagi (§ 3): grzywna, ograniczenie wolności lub więzienie do lat 2. Mienie znacznej wartości (art. 294 § 1 k.k.): od 1 roku do 10 lat.',
         },
         additionalSanctions: [
-          'Obowiązek pełnego zwrotu wyłudzonej kwoty (naprawienie szkody)',
-          'Grzywna orzekana kumulatywnie przy działaniu w celu zysku',
+          'Obligatoryjny obowiązek naprawienia szkody w całości lub w części (art. 46 § 1 k.k.)',
+          'Przepadek osiągniętej korzyści majątkowej (art. 45 § 1 k.k.)',
+          'Możliwość orzeczenia grzywny kumulatywnej obok pozbawienia wolności (art. 33 § 2 k.k.)',
+          'Zakaz prowadzenia działalności gospodarczej lub zajmowania określonych stanowisk (art. 41 § 1 k.k.)',
         ],
         isFelony: false,
-        keywords: ['oszustwo', 'wyłudzenie', 'blik', 'fałszywy sklep', 'błąd', 'korzyść majątkowa', 'kredyt', 'faktura'],
+        keywords: ['oszustwo', 'wyłudzenie', 'blik', 'fałszywy sklep', 'błąd', 'korzyść majątkowa', 'kredyt', 'faktura', 'art 286', 'oszustwo gospodarcze', '294 kk', 'wyłudzenie pożyczki', 'mniejszej wagi'],
         isOfflinePinned: true,
       },
       {
@@ -303,22 +309,30 @@ export class LegalDataService {
       {
         id: 'art-207',
         number: 207,
-        title: 'Znęcanie się psychiczne lub fizyczne',
+        codePrefix: 'k.k.',
+        title: 'Znęcanie się fizyczne lub psychiczne (Przemoc domowa, ustawa antyprzemocowa)',
         chapter: 'Przestępstwa przeciwko rodzinie i opiece',
         chapterNumber: 'Rozdział XXVI',
         content: `§ 1. Kto znęca się fizycznie lub psychicznie nad osobą najbliższą lub nad inną osobą pozostającą w stałym lub przemijającym stosunku zależności od sprawcy, podlega karze pozbawienia wolności od 3 miesięcy do lat 5.
-§ 1a. Kto znęca się fizycznie lub psychicznie nad osobą nieporadną ze względu na jej wiek, stan psychiczny lub fizyczny, podlega karze pozbawienia wolności od 6 miesięcy do lat 8.`,
-        plainSummary: 'Domowa przemoc, poniżanie, bicie, głodzenie, izolowanie partnera, dzieci lub schorowanych rodziców.',
+§ 1a. Kto znęca się fizycznie lub psychicznie nad osobą nieporadną ze względu na jej wiek, stan psychiczny lub fizyczny, podlega karze pozbawienia wolności od 6 miesięcy do lat 8.
+§ 2. Jeżeli czyn określony w § 1 lub 1a połączony jest ze stosowaniem szczególnego okrucieństwa, sprawca podlega karze pozbawienia wolności od roku do lat 10.
+§ 3. Jeżeli następstwem czynu określonego w § 1–2 jest targnięcie się pokrzywdzonego na własne życie, sprawca podlega karze pozbawienia wolności od lat 2 do 15.`,
+        plainSummary: 'Zarzucone zachowanie musi charakteryzować się powtarzalnością i przewagą sprawcy nad ofiarą (np. wyzwiska, awantury, izolacja ekonomiczna, naruszanie nietykalności). Zgodnie z utrwaloną linią Sądu Najwyższego (m.in. IV KKN 491/99), przestępstwo znęcania NIE zachodzi przy konflikcie symetrycznym, w którym obie strony wykazują agresję i obopólnie się prowokują.',
         penalties: {
           fine: false,
           restrictionOfLiberty: false,
           imprisonmentMinMonths: 3,
           imprisonmentMaxMonths: 60,
-          summary: 'Pozbawienie wolności od 3 miesięcy do 5 lat (ze szczególnym okrucieństwem od 1 do 10 lat).',
+          summary: 'Pozbawienie wolności od 3 miesięcy do lat 5 (osoba nieporadna § 1a: od 6 miesięcy do 8 lat; szczególne okrucieństwo § 2: od 1 do 10 lat; próba samobójcza § 3: od 2 do 15 lat).',
         },
-        additionalSanctions: ['Natychmiastowy nakaz opuszczenia lokalu mieszkalnego', 'Zakaz zbliżania się do rodziny'],
+        additionalSanctions: [
+          'Natychmiastowy policyjny nakaz opuszczenia lokalu i zakaz zbliżania się na 14 dni (ustawa antyprzemocowa)',
+          'Sądowy zakaz zbliżania się i zakaz kontaktowania (art. 41a k.k.)',
+          'Dozór elektroniczny (SDE) lub areszt tymczasowy w celu izolacji',
+          'Nawiązka na rzecz pokrzywdzonego (art. 46 k.k.)',
+        ],
         isFelony: false,
-        keywords: ['znęcanie', 'przemoc domowa', 'niebieska karta', 'awantury', 'bicie żony', 'bicie męża'],
+        keywords: ['znęcanie', 'przemoc domowa', 'niebieska karta', 'awantury', 'bicie żony', 'bicie męża', 'art 207', 'konflikt symetryczny', 'nakaz opuszczenia lokalu', 'osoba nieporadna'],
         isOfflinePinned: true,
       },
       {
@@ -521,27 +535,55 @@ export class LegalDataService {
         id: 'art-62-uopn',
         number: 62,
         codePrefix: 'UoPN',
-        title: 'Posiadanie środków odurzających (w tym marihuany) oraz umorzenie z art. 62a',
+        title: 'Posiadanie środków odurzających i psychotropowych oraz umorzenie z art. 62a',
         chapter: 'Przepisy karne (Ustawa o przeciwdziałaniu narkomanii)',
         chapterNumber: 'Rozdział 7 (UoPN)',
         content: `Art. 62. 1. Kto, wbrew przepisom ustawy, posiada środki odurzające lub substancje psychotropowe, podlega karze pozbawienia wolności do lat 3.
+2. Jeżeli przedmiotem czynu jest znaczna ilość środków odurzających lub substancji psychotropowych, sprawca podlega karze pozbawienia wolności od roku do lat 10.
 3. W wypadku mniejszej wagi, sprawca podlega grzywnie, karze ograniczenia wolności albo pozbawienia wolności do roku.
 Art. 62a. Jeżeli przedmiotem czynu są środki odurzające lub substancje psychotropowe w ilości nieznacznej, przeznaczone na własny użytek sprawcy, postępowanie można umorzyć również przed wydaniem postanowienia o wszczęciu śledztwa lub dochodzenia, jeżeli orzeczenie wobec sprawcy kary byłoby niecelowe ze względu na okoliczności popełnienia czynu oraz stopień jego społecznej szkodliwości.`,
-        plainSummary: 'W polskim prawie każde posiadanie narkotyków (nawet 0.5g marihuany) jest formalnie przestępstwem. Kluczowym instrumentem prawnym jest art. 62a UoPN: przy nieznacznej ilości na własny użytek i braku dystrybucji prokurator lub sąd może całkowicie umorzyć sprawę bez wpisu do Krajowego Rejestru Karnego (KRK).',
+        plainSummary: 'W polskim prawie każde posiadanie narkotyków (nawet 0.5g marihuany) jest formalnie przestępstwem. Kluczowym instrumentem prawnym jest art. 62a UoPN: przy nieznacznej ilości na własny użytek i braku dystrybucji prokurator lub sąd może całkowicie umorzyć sprawę bez wpisu do Krajowego Rejestru Karnego (KRK). Przy ilości znacznej (w orzecznictwie min. kilkadziesiąt/sto porcji) grozi od 1 do 10 lat więzienia.',
         penalties: {
           fine: true,
           restrictionOfLiberty: true,
           imprisonmentMinMonths: 0,
           imprisonmentMaxMonths: 36,
-          summary: 'Kara do 3 lat pozbawienia wolności (wypadek mniejszej wagi do roku). Możliwość całkowitego umorzenia z art. 62a UoPN.',
+          summary: 'Kara do 3 lat pozbawienia wolności. Wypadek mniejszej wagi: do 1 roku. Znaczna ilość (ust. 2): od 1 roku do 10 lat. Możliwość całkowitego umorzenia z art. 62a UoPN.',
         },
         additionalSanctions: [
           'Zastosowanie art. 62a UoPN (umorzenie bez skazania i brak wpisu do KRK)',
-          'Przepadek substancji odurzających',
-          'Nawiązka na cel zapobiegania narkomanii do 50 000 zł',
+          'Przepadek substancji odurzających i przedmiotów służących do ich zażywania',
+          'Nawiązka na cele zapobiegania narkomanii do 50 000 zł (art. 70 ust. 4 UoPN)',
         ],
         isFelony: false,
-        keywords: ['marihuana', 'zioło', 'narkotyki', 'posiadanie narkotyków', 'własny użytek', 'art 62 uopn', 'art 62a', 'umorzenie', 'trawka'],
+        keywords: ['marihuana', 'zioło', 'narkotyki', 'posiadanie narkotyków', 'własny użytek', 'art 62 uopn', 'art 62a', 'umorzenie', 'trawka', 'znaczna ilość', 'amfetamina', 'kokaina'],
+        isOfflinePinned: true,
+      },
+      {
+        id: 'art-56-uopn',
+        number: 56,
+        codePrefix: 'UoPN',
+        title: 'Wprowadzanie do obrotu lub uczestnictwo w obrocie narkotykami',
+        chapter: 'Przepisy karne (Ustawa o przeciwdziałaniu narkomanii)',
+        chapterNumber: 'Rozdział 7 (UoPN)',
+        content: `Art. 56. 1. Kto, wbrew przepisom ustawy, wprowadza do obrotu środki odurzające, substancje psychotropowe (...) albo uczestniczy w takim obrocie, podlega grzywnie i karze pozbawienia wolności od 6 miesięcy do lat 8.
+2. W wypadku mniejszej wagi, sprawca podlega grzywnie, karze ograniczenia wolności albo pozbawienia wolności do roku.
+3. Jeżeli przedmiotem czynu jest znaczna ilość środków odurzających lub substancji psychotropowych, sprawca podlega grzywnie i karze pozbawienia wolności od lat 2 do 15 (od 1 października 2023 r. – dolna granica podwyższona do 2 lat).`,
+        plainSummary: 'Handel hurtowy lub pośrednictwo w obrocie narkotykami między dealerami. Różni się od art. 59 UoPN (udzielanie konsumentowi/sprzedaż detaliczna). Za znaczną ilość hurtową grozi do 15 lat więzienia oraz wysoka grzywna.',
+        penalties: {
+          fine: true,
+          restrictionOfLiberty: true,
+          imprisonmentMinMonths: 6,
+          imprisonmentMaxMonths: 96,
+          summary: 'Pozbawienie wolności od 6 miesięcy do 8 lat i grzywna. W wypadku mniejszej wagi: do 1 roku. Znaczna ilość (ust. 3): od 2 do 15 lat pozbawienia wolności.',
+        },
+        additionalSanctions: [
+          'Przepadek korzyści majątkowej osiągniętej z przestępstwa (art. 45 § 1 k.k.)',
+          'Nawiązka na cele zwalczania narkomanii do 50 000 zł',
+          'Przepadek zabezpieczonych środków i aparatury',
+        ],
+        isFelony: false,
+        keywords: ['handel narkotykami', 'wprowadzanie do obrotu', 'art 56 uopn', 'dealer', 'hurt narkotyki', 'znaczna ilość narkotyków', 'dystrybucja'],
         isOfflinePinned: true,
       },
       {
@@ -929,6 +971,41 @@ Art. 62a. Jeżeli przedmiotem czynu są środki odurzające lub substancje psych
         keywords: ['ukrywanie majątku', 'art 300', 'przepisanie na żonę', 'komornik', 'ucieczka przed komornikiem', 'darowizna przed długami'],
         isOfflinePinned: true,
       },
+      {
+        id: 'art-60-kk',
+        number: 60,
+        codePrefix: 'k.k.',
+        title: 'Nadzwyczajne złagodzenie kary (Dyrektywy wymiaru kary, mały świadek koronny)',
+        chapter: 'Zasady wymiaru kary i środków karnych',
+        chapterNumber: 'Rozdział VI',
+        content: `§ 1. Sąd może zastosować nadzwyczajne złagodzenie kary w wypadkach przewidzianych w ustawie oraz w stosunku do młodocianego, jeżeli przemawiają za tym względy wychowawcze.
+§ 2. Sąd może również zastosować nadzwyczajne złagodzenie kary w szczególnie uzasadnionych wypadkach, kiedy nawet najniższa kara przewidziana za przestępstwo byłaby niewspółmiernie surowa, w szczególności:
+1) jeżeli pokrzywdzony pojednał się ze sprawcą, szkoda została naprawiona albo sprawca i pokrzywdzony uzgodnili sposób naprawienia szkody,
+2) ze względu na postawę sprawcy, zwłaszcza gdy czynił starania o naprawienie szkody albo o jej zapobieżenie,
+3) jeżeli sprawca przestępstwa nieumyślnego lub jego najbliższy poniósł poważny uszczerbek w związku z popełnionym przestępstwem.
+§ 3. Sąd stosuje nadzwyczajne złagodzenie kary, a nawet może warunkowo zawiesić jej wykonanie w stosunku do sprawcy współdziałającego z innymi osobami w popełnieniu przestępstwa, jeżeli ujawni on organom ścigania informacje dotyczące osób uczestniczących w popełnieniu przestępstwa oraz istotne okoliczności jego popełnienia (tzw. mały świadek koronny).
+§ 6. Nadzwyczajne złagodzenie kary polega na wymierzeniu kary poniżej dolnej granicy ustawowego zagrożenia albo kary łagodniejszego rodzaju według następujących zasad:
+1) jeżeli czyn stanowi zbrodnię zagrożoną karą od 3 lat, sąd wymierza karę pozbawienia wolności nie niższą od jednej trzeciej dolnej granicy (od 1 roku),
+2) jeżeli czyn stanowi zbrodnię zagrożoną karą co najmniej 5 lat, sąd wymierza karę nie niższą od 2 lat i 8 miesięcy pozbawienia wolności,
+3) jeżeli czyn stanowi występek, przy czym dolna granica wynosi co najmniej rok, sąd wymierza grzywnę, karę ograniczenia wolności albo pozbawienia wolności (od 1 miesiąca do poniżej roku),
+4) jeżeli dolna granica wynosi poniżej roku, sąd wymierza grzywnę albo karę ograniczenia wolności.`,
+        plainSummary: 'Jedna z najważniejszych instytucji obrończych w polskim procesie karnym. Pozwala sądowi zejść PONIŻEJ ustawowego minimum (np. zamienić grożące więzienie na grzywnę lub prace społeczne, albo skrócić karę za zbrodnię). Stosowana obligatoryjnie przy współpracy z policją (art. 60 § 3 k.k. – mały świadek koronny) lub fakultatywnie przy pojednaniu i naprawieniu szkody (art. 60 § 2 k.k.).',
+        penalties: {
+          fine: true,
+          restrictionOfLiberty: true,
+          imprisonmentMinMonths: 0,
+          imprisonmentMaxMonths: 0,
+          summary: 'Redukcja kary poniżej dolnego progu ustawowego lub zamiana bezwzględnego więzienia na karę wolnościową (grzywna/ograniczenie wolności) na podstawie art. 60 § 6 k.k.',
+        },
+        additionalSanctions: [
+          'Możliwość warunkowego zawieszenia kary nawet przy zbrodni (art. 60 § 5 k.k.)',
+          'Status małego świadka koronnego (art. 60 § 3 i § 4 k.k.)',
+          'Obligatoryjne naprawienie szkody lub nawiązka',
+        ],
+        isFelony: false,
+        keywords: ['nadzwyczajne złagodzenie kary', 'art 60 kk', 'mały świadek koronny', 'złagodzenie kary', 'pojednanie', 'naprawienie szkody', 'art 60', 'złagodzenie wyroku'],
+        isOfflinePinned: true,
+      },
     ];
 
     // Baza orzecznictwa sądowego
@@ -1052,6 +1129,42 @@ Art. 62a. Jeżeli przedmiotem czynu są środki odurzające lub substancje psych
         sanctionImposed: 'Grzywna 2000 zł oraz zakaz prowadzenia wszelkich pojazdów mechanicznych na okres 1 roku.',
         summaryPlain: 'Kierowca złapany bez prawa jazdy MUSI otrzymać zakaz prowadzenia pojazdów (min. 6 miesięcy). Sąd nie ma prawa zrezygnować z zakazu.',
         tags: ['bez prawa jazdy', 'art 94 kw', 'zakaz prowadzenia', 'obligatoryjny zakaz'],
+      },
+      {
+        id: 'sn-207-symetria',
+        signature: 'IV KKN 491/99',
+        court: 'Sąd Najwyższy – Izba Karna',
+        date: '2001-09-13',
+        articleRef: 'Art. 207 § 1 k.k.',
+        title: 'Konflikt symetryczny a brak przestępstwa znęcania się',
+        thesis: 'Nie stanowi przestępstwa znęcania się (art. 207 § 1 k.k.) zachowanie sprawcy w sytuacji, gdy pomiędzy stronami dochodzi do wzajemnych awantur, kłótni, obopólnego naruszania nietykalności i wyzwisk, a żadna ze stron nie ma przewagi nad drugą (tzw. konflikt symetryczny). Przestępstwo znęcania wymaga istnienia relacji dominacji i uległości ofiary.',
+        sanctionImposed: 'Uniewinnienie oskarżonego od zarzutu z art. 207 § 1 k.k.',
+        summaryPlain: 'Jeżeli oboje partnerzy kłócą się, wyzywają i wzajemnie prowokują, nie jest to znęcanie w rozumieniu art. 207 k.k. To kluczowa linia obrony przy bezpodstawnych oskarżeniach rozwodowych.',
+        tags: ['znęcanie', 'art 207', 'konflikt symetryczny', 'niebieska karta', 'uniewinnienie'],
+      },
+      {
+        id: 'sn-60-zlagodzenie',
+        signature: 'I KZP 12/20',
+        court: 'Sąd Najwyższy – Izba Karna',
+        date: '2021-03-25',
+        articleRef: 'Art. 60 § 2 i § 6 k.k.',
+        title: 'Nadzwyczajne złagodzenie kary przy naprawieniu szkody i pojednaniu',
+        thesis: 'Pojednanie się sprawcy z pokrzywdzonym połączone z całkowitym naprawieniem szkody materialnej stanowi samodzielną i szczególnie doniosłą przesłankę zastosowania art. 60 § 2 pkt 1 k.k. W sprawach o występki przeciwko mieniu pozwala to sądowi na zamianę kary pozbawienia wolności na grzywnę lub ograniczenie wolności.',
+        sanctionImposed: 'Złagodzenie kary: zamiast 2 lat pozbawienia wolności orzeczono grzywnę 150 stawek dziennych.',
+        summaryPlain: 'Pełne oddanie pieniędzy i formalna ugoda z pokrzywdzonym dają potężną podstawę do uniknięcia więzienia na mocy art. 60 k.k., nawet gdy przepis przewiduje surową karę.',
+        tags: ['nadzwyczajne złagodzenie', 'art 60 kk', 'naprawienie szkody', 'pojednanie', 'ugoda'],
+      },
+      {
+        id: 'sn-uopn-znaczna',
+        signature: 'I KZP 24/18',
+        court: 'Sąd Najwyższy – Izba Karna',
+        date: '2019-05-30',
+        articleRef: 'Art. 62 ust. 2 i Art. 56 ust. 3 UoPN',
+        title: 'Kryterium „znacznej ilości” środków odurzających',
+        thesis: 'Znaczną ilością środków odurzających lub substancji psychotropowych w rozumieniu ustawy o przeciwdziałaniu narkomanii jest ilość mogąca jednorazowo zaspokoić potrzeby co najmniej kilkudziesięciu (w praktyce od 40–50 do kilkuset) osób uzależnionych, przy uwzględnieniu stężenia czystej substancji aktywnej.',
+        sanctionImposed: 'Zmiana kwalifikacji prawnej ze znacznej ilości (art. 62 ust. 2) na typ podstawowy (art. 62 ust. 1).',
+        summaryPlain: 'Obrona w sprawach narkotykowych zawsze bada stężenie czystego THC lub substancji aktywnej w masie roślinnej – jeśli stężenie jest niskie, łączna liczba porcji może spaść poniżej progu „znacznej ilości”.',
+        tags: ['uopn', 'znaczna ilość', 'narkotyki', 'art 62 ust 2', 'thc'],
       },
     ];
 

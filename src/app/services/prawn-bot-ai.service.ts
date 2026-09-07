@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { LegalDataService } from './legal-data.service';
 import { LegalGuardrailService } from './legal-guardrail.service';
-import { PenalArticle, ThreatAnalysisResult, ChatMessage } from '../models/legal.model';
+import { PenalArticle, ThreatAnalysisResult, ChatMessage, MitigationArt60Simulation } from '../models/legal.model';
 
 @Injectable({
   providedIn: 'root',
@@ -377,6 +377,42 @@ export class PrawnBotAiService {
         'Nigdy nie przyznawaj się do winy za przestępstwo – od początku konsekwentnie składaj wyjaśnienia, że działałeś wyłącznie w celu ratowania życia lub zdrowia.',
         'Zabezpiecz ślady ataku napastnika (uszkodzone drzwi, zniszczone ubrania, obrażenia na ciele).'
       );
+    } else if (isFraud) {
+      const isSignificantValue = testQ.includes('200 000') || testQ.includes('200 tys') || testQ.includes('znacznej wartości') || testQ.includes('milion');
+      riskLevel = isSignificantValue ? 'bardzo wysoki' : 'wysoki';
+      primarySentenceRange = isSignificantValue
+        ? 'Pozbawienie wolności od 1 roku do lat 10 (art. 286 § 1 w zw. z art. 294 § 1 k.k. – mienie znacznej wartości)'
+        : 'Pozbawienie wolności od 6 miesięcy do lat 8 (art. 286 § 1 k.k.)';
+      possibleSanctions.push(
+        isSignificantValue
+          ? 'Kara pozbawienia wolności od 1 roku do 10 lat'
+          : 'Kara pozbawienia wolności od 6 miesięcy do 8 lat',
+        'Wypadek mniejszej wagi (art. 286 § 3 k.k.): grzywna, kara ograniczenia wolności albo pozbawienia wolności do lat 2',
+        'Grzywna orzekana kumulatywnie przy działaniu w celu osiągnięcia korzyści majątkowej (art. 33 § 2 k.k.)',
+        'Obligatoryjny obowiązek naprawienia szkody (art. 46 § 1 k.k.)'
+      );
+      mandatoryMeasures.push(
+        'Obligatoryjny w wyroku skazującym: zwrot całości wyłudzonej kwoty pokrzywdzonym (naprawienie szkody z art. 46 k.k.).',
+        'Możliwy przepadek osiągniętej korzyści majątkowej (art. 45 k.k.) oraz zablokowanie rachunków bankowych przez prokuratora.'
+      );
+      mitigatingFactors.push(
+        'Całkowite lub częściowe zaspokojenie pokrzywdzonego (zwrot środków) przed wniesieniem aktu oskarżenia',
+        'Brak zamiaru bezpośredniego w chwili zawarcia umowy (spór o charakterze czysto cywilnoprawnym)',
+        'Drobna kwota wyłudzenia – szansa na zakwalifikowanie jako wypadek mniejszej wagi (art. 286 § 3 k.k.)',
+        'Dotychczasowa niekaralność i zawarcie porozumienia pojednawczego'
+      );
+      aggravatingFactors.push(
+        'Działanie w zorganizowanej grupie lub proceder wieloosobowy (phishing, fałszywe platformy inwestycyjne)',
+        'Wielu pokrzywdzonych (oszustwa masowe w internecie, fałszywy sklep)',
+        'Szkoda przekraczająca 200 000 zł (art. 294 § 1 k.k.)'
+      );
+      plainExplanation =
+        'Przestępstwo oszustwa (art. 286 k.k.) wymaga udowodnienia tzw. zamiaru bezpośredniego kierunkowego (dolus directus coloratus) – prokurator musi dowieść, że już w momencie zaciągania zobowiązania sprawca wiedział, że nie zwróci pieniędzy. Zwykłe niewywiązanie się z umowy lub niewypłacalność to sprawa cywilna, a nie przestępstwo!';
+      recommendedSteps.push(
+        'Natychmiast zabezpiecz korespondencję, umowy i wyciągi bankowe dowodzące woli wywiązania się z transakcji w chwili jej zawierania.',
+        'Jeżeli zarzut jest bezsporny, zwróć pieniądze pokrzywdzonemu i podpisz ugodę – otwiera to drogę do nadzwyczajnego złagodzenia kary (art. 60 k.k.) lub warunkowego umorzenia.',
+        'Wnoś o kwalifikację z § 3 (wypadek mniejszej wagi), co pozwala orzec grzywnę lub karę ograniczenia wolności zamiast więzienia.'
+      );
     } else if (isStalking) {
       riskLevel = 'wysoki';
       primarySentenceRange = 'Pozbawienie wolności od 6 miesięcy do lat 8 (art. 190a § 1 k.k.)';
@@ -689,6 +725,9 @@ export class PrawnBotAiService {
       return matchedArticles.some((a) => ruling.articleRef.includes(`Art. ${a.number}`));
     });
 
+    // Automatyczna kalkulacja dyrektyw nadzwyczajnego złagodzenia kary (art. 60 k.k.)
+    const art60Mitigation = this.calculateArt60Mitigation(primary, testQ);
+
     return {
       matchedArticles,
       riskLevel,
@@ -700,6 +739,63 @@ export class PrawnBotAiService {
       plainExplanation,
       similarRulings: similarRulings.length > 0 ? similarRulings : [allRulings[0]],
       recommendedSteps,
+      art60Mitigation,
+    };
+  }
+
+  /**
+   * Automatyczny moduł kalkulacyjny nadzwyczajnego złagodzenia kary (art. 60 § 1, 2, 3, 6 k.k.)
+   * Precyzyjnie przelicza redukcję ustawowych widełek na kary wolnościowe lub skrócone pozbawienie wolności.
+   */
+  calculateArt60Mitigation(article: PenalArticle, queryText: string): MitigationArt60Simulation {
+    const minM = article.penalties.imprisonmentMinMonths;
+    const maxM = article.penalties.imprisonmentMaxMonths;
+    const isFelony = article.isFelony || minM >= 36;
+
+    // Przesłanki kwalifikujące
+    const eligibleGrounds: string[] = [
+      'Pojednanie się z pokrzywdzonym i całkowite naprawienie szkody (art. 60 § 2 pkt 1 k.k.)',
+      'Szczególna postawa sprawcy – aktywne starania o zapobieżenie szkodzie (art. 60 § 2 pkt 2 k.k.)',
+      'Sprawca młodociany – jeżeli przemawiają za tym względy wychowawcze (art. 60 § 1 k.k.)',
+      'Współpraca procesowa i ujawnienie współsprawców („mały świadek koronny” – art. 60 § 3 k.k.)',
+    ];
+
+    let mitigatedRange = '';
+    let statutoryRulesSummary = '';
+
+    if (isFelony && minM >= 60) {
+      // Zbrodnia z dolną granicą min. 5 lat (art. 60 § 6 pkt 2 k.k.)
+      mitigatedRange = 'Kara pozbawienia wolności od 2 lat i 8 miesięcy (zamiast minimum 5 lat)';
+      statutoryRulesSummary = 'Zbrodnia zagrożona karą od co najmniej 5 lat: sąd wymierza karę nie niższą od 2 lat i 8 miesięcy pozbawienia wolności (art. 60 § 6 pkt 2 k.k.).';
+    } else if (isFelony) {
+      // Zbrodnia z dolną granicą min. 3 lat (art. 60 § 6 pkt 1 k.k.)
+      mitigatedRange = 'Kara pozbawienia wolności od 1 roku (zamiast minimum 3 lat)';
+      statutoryRulesSummary = 'Zbrodnia z dolną granicą co najmniej 3 lat: sąd wymierza karę pozbawienia wolności nie niższą od 1/3 dolnej granicy, czyli od 1 roku (art. 60 § 6 pkt 1 k.k.). Otwiera to drogę do warunkowego zawieszenia kary (art. 60 § 5 k.k.)!';
+    } else if (minM >= 12) {
+      // Występek z dolną granicą min. 1 roku (art. 60 § 6 pkt 3 k.k.)
+      mitigatedRange = 'Grzywna (od 100 stawek dziennych), kara ograniczenia wolności (prace społeczne) ALBO pozbawienie wolności od 1 miesiąca do 11 miesięcy';
+      statutoryRulesSummary = 'Występek z dolną granicą co najmniej 1 roku: sąd wymierza grzywnę, karę ograniczenia wolności albo karę pozbawienia wolności poniżej 1 roku (art. 60 § 6 pkt 3 k.k.). Pozwala to całkowicie uniknąć więzienia!';
+    } else {
+      // Występek z dolną granicą poniżej 1 roku (art. 60 § 6 pkt 4 k.k.)
+      mitigatedRange = 'Grzywna ALBO kara ograniczenia wolności (prace społeczno-użyteczne)';
+      statutoryRulesSummary = 'Występek z dolną granicą poniżej 1 roku: sąd orzeka wyłącznie grzywnę albo karę ograniczenia wolności (art. 60 § 6 pkt 4 k.k.). Całkowite wyłączenie kary izolacyjnej!';
+    }
+
+    const conditions: string[] = [
+      'Naprawienie wyrządzonej szkody w całości lub w części przed wyrokiem',
+      'Pojednanie z pokrzywdzonym (ugoda przedsądowa lub mediacja z art. 23a k.p.k.)',
+      'Ujawnienie istotnych okoliczności czynu i brak utrudniania postępowania',
+      'Brak działania w warunkach multirecydywy (art. 64 § 2 k.k.)',
+    ];
+
+    return {
+      isApplicable: true,
+      legalBasis: 'Art. 60 § 1, § 2 oraz § 6 Kodeksu Karnego',
+      eligibleGrounds,
+      originalRange: article.penalties.summary,
+      mitigatedRange,
+      statutoryRulesSummary,
+      conditions,
     };
   }
 

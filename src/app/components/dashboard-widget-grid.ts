@@ -32,8 +32,18 @@ import { DashboardWidgetConfig, PenalArticle, ActiveCaseItem } from '../models/l
         <div class="flex items-center gap-2">
           <button
             type="button"
+            (click)="openNotes.emit()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer"
+            title="Otwórz zaszyfrowany Sejf Akt i notatek"
+          >
+            <mat-icon class="text-sm text-amber-400">enhanced_encryption</mat-icon>
+            <span>Sejf Notatek</span>
+          </button>
+
+          <button
+            type="button"
             (click)="toggleAddCaseModal()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all active:scale-[0.98] cursor-pointer shadow-sm"
           >
             <mat-icon class="text-sm">add</mat-icon>
             <span>Nowa Sprawa</span>

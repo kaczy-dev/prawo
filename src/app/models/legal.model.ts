@@ -62,6 +62,16 @@ export interface EncryptedNote {
   isEncrypted: boolean;
 }
 
+export interface MitigationArt60Simulation {
+  isApplicable: boolean;
+  legalBasis: string; // np. 'Art. 60 § 1 i § 6 k.k.'
+  eligibleGrounds: string[]; // np. 'Młodociany sprawca', 'Pojednanie z pokrzywdzonym i naprawienie szkody', 'Świadek koronny / mały świadek koronny (art. 60 § 3 k.k.)'
+  originalRange: string;
+  mitigatedRange: string; // np. 'Grzywna min. 100 stawek dziennych, ograniczenie wolności lub pozbawienie wolności od 1 miesiąca do 1 roku'
+  statutoryRulesSummary: string; // np. 'Jeżeli czyn stanowi występek, a dolna granica ustawowego zagrożenia wynosi co najmniej rok, sąd wymierza grzywnę, karę ograniczenia wolności albo pozbawienia wolności.'
+  conditions: string[];
+}
+
 export interface ThreatAnalysisResult {
   matchedArticles: PenalArticle[];
   riskLevel: 'niski' | 'średni' | 'wysoki' | 'bardzo wysoki';
@@ -73,6 +83,7 @@ export interface ThreatAnalysisResult {
   plainExplanation: string;
   similarRulings: CourtRuling[];
   recommendedSteps: string[];
+  art60Mitigation?: MitigationArt60Simulation;
 }
 
 export interface ChatMessage {

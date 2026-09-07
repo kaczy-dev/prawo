@@ -23,19 +23,13 @@ export interface QuickScenario {
         <!-- Subtelny akcent tożsamościowy -->
         <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/0 via-amber-400/50 to-amber-500/0"></div>
 
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div class="max-w-2xl">
-            <div class="flex items-center gap-2 mb-1.5">
-              <span class="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-semibold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
-                Wykładnia & Kwalifikacja Czynu
-              </span>
-              <span class="text-xs text-slate-500 font-mono">k.k. 2024–2026</span>
-            </div>
             <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight font-serif flex items-center gap-2">
               Kalkulator Zagrożenia Karnego
             </h2>
             <p class="text-xs md:text-sm text-slate-400 mt-1 leading-relaxed">
-              Wprowadź lub podyktuj czyn procesowy. Silnik dokona automatycznej rekonstrukcji znamion, wymiaru kary i środków karnych.
+              Wprowadź czyn procesowy – asystent natychmiast wyznaczy kwalifikację prawną, widełki kary i środki karne.
             </p>
           </div>
 
@@ -150,14 +144,17 @@ export interface QuickScenario {
             }
           </div>
 
-          <!-- Szybkie przykłady z życia (Chips powiązane z filtrem) -->
-          <div class="flex items-center gap-2 mt-2.5 flex-wrap">
-            @for (sc of filteredScenarios(); track sc.label) {
+          <!-- Szybkie przykłady z życia (Dyskretne, jednoliniowe pills) -->
+          <div class="flex items-center gap-1.5 mt-2.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+            <span class="text-slate-500 text-[11px] whitespace-nowrap mr-1 flex items-center gap-1">
+              <mat-icon class="text-xs text-amber-400/80">lightbulb</mat-icon>
+              Przykłady:
+            </span>
+            @for (sc of filteredScenarios().slice(0, 5); track sc.label) {
               <button
                 (click)="onSelectScenario(sc.query)"
-                class="text-xs bg-slate-800/80 hover:bg-slate-700/90 text-slate-300 hover:text-amber-300 border border-slate-700/70 px-2.5 py-1 rounded-lg cursor-pointer transition-colors flex items-center gap-1.5"
+                class="text-xs bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-amber-300 border border-slate-800 hover:border-slate-700 px-2.5 py-1 rounded-lg cursor-pointer transition-colors whitespace-nowrap shrink-0 flex items-center gap-1"
               >
-                <mat-icon class="text-[14px] text-amber-400/80">search</mat-icon>
                 <span>{{ sc.label }}</span>
               </button>
             }
@@ -272,6 +269,63 @@ export interface QuickScenario {
                   {{ res.primarySentenceRange }}
                 </p>
               </div>
+
+              <!-- Moduł Automatycznego Przeliczania Nadzwyczajnego Złagodzenia Kary (Art. 60 k.k.) -->
+              @if (res.art60Mitigation; as mit) {
+                <div class="bg-gradient-to-br from-emerald-950/40 to-slate-950 border border-emerald-500/30 rounded-xl p-4 mb-6 shadow-md relative overflow-hidden">
+                  <div class="flex items-center justify-between gap-2 border-b border-emerald-500/20 pb-3 mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="p-1 rounded bg-emerald-500/20 text-emerald-400">
+                        <mat-icon class="text-base">balance</mat-icon>
+                      </span>
+                      <h4 class="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+                        Nadzwyczajne Złagodzenie Kary (Art. 60 k.k.) – Symulacja Obrony
+                      </h4>
+                    </div>
+                    <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      {{ mit.legalBasis }}
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800">
+                      <span class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">
+                        Wyjściowe zagrożenie kodeksowe:
+                      </span>
+                      <p class="text-xs text-slate-300 font-mono">
+                        {{ mit.originalRange }}
+                      </p>
+                    </div>
+
+                    <div class="bg-emerald-950/50 p-3 rounded-lg border border-emerald-500/40">
+                      <span class="text-[10px] uppercase tracking-wider text-emerald-400 font-semibold block mb-1">
+                        Kara po nadzwyczajnym złagodzeniu (Art. 60 § 6 k.k.):
+                      </span>
+                      <p class="text-xs md:text-sm font-bold text-emerald-200">
+                        {{ mit.mitigatedRange }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p class="text-xs text-slate-300 leading-relaxed bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 mb-3">
+                    <strong class="text-emerald-300">Zasada prawna:</strong> {{ mit.statutoryRulesSummary }}
+                  </p>
+
+                  <div class="space-y-1.5">
+                    <span class="text-[11px] font-semibold text-slate-400 block">
+                      Kluczowe podstawy prawne do powołania w pismach procesowych:
+                    </span>
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-300">
+                      @for (ground of mit.eligibleGrounds; track ground) {
+                        <li class="flex items-start gap-1.5 bg-slate-950/40 px-2 py-1.5 rounded border border-slate-800/80">
+                          <mat-icon class="text-xs text-emerald-400 mt-0.5 shrink-0">check</mat-icon>
+                          <span class="text-[11px] leading-tight">{{ ground }}</span>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+              }
 
               <!-- Licznik Przedawnienia Karalności (Prescription Timer) powiązany z analizowanym czynem -->
               @if (res.matchedArticles.length > 0) {

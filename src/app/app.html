@@ -27,35 +27,11 @@
 
         <!-- Akcje nagłówka widoczne na mobile (Kompaktowy Security & Vault) -->
         <div class="flex items-center gap-1.5 md:hidden">
-          <!-- Szybki status szyfrowania/skarbca -->
-          @if (cryptoService.isAuthenticated()) {
-            <button
-              (click)="lockVault()"
-              class="flex items-center gap-1 bg-amber-500/15 border border-amber-500/40 text-amber-300 text-[11px] px-2 py-1.5 rounded-lg cursor-pointer font-medium"
-              title="Skarbiec otwarty. Kliknij, aby zablokować."
-            >
-              <mat-icon class="text-sm">lock_open</mat-icon>
-              <span>Sejf</span>
-            </button>
-          } @else {
-            <button
-              (click)="openVaultModal()"
-              class="flex items-center gap-1 bg-slate-800 border border-slate-700 text-slate-300 text-[11px] px-2 py-1.5 rounded-lg cursor-pointer"
-              title="Odblokuj skarbiec"
-            >
-              <mat-icon class="text-sm text-slate-400">lock</mat-icon>
-              <span>Sejf</span>
-            </button>
-          }
-
-          <!-- Przycisk menu rozwijanego (Więcej opcji na mobile) -->
-          <button
-            type="button"
-            (click)="isMobileMenuOpen.set(!isMobileMenuOpen())"
-            class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 cursor-pointer"
-            [title]="isMobileMenuOpen() ? 'Zamknij menu' : 'Więcej opcji i modułów'"
-          >
-            <mat-icon class="text-lg">{{ isMobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
+          <button type="button"
+                  (click)="toggleOverflowMenu()"
+                  class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 cursor-pointer"
+                  [title]="overflowMenuOpen ? 'Zamknij dodatkowe opcje' : 'Więcej opcji'">
+            <mat-icon class="text-lg">{{ overflowMenuOpen ? 'close' : 'menu' }}</mat-icon>
           </button>
         </div>
       </div>
@@ -81,17 +57,6 @@
               Ctrl+K
             </kbd>
 
-            <!-- Web Speech API w nagłówku -->
-            <button
-              type="button"
-              (click)="toggleHeaderDictation()"
-              [class]="isHeaderDictating() ? 'text-red-400 animate-pulse bg-red-500/20' : 'text-slate-400 hover:text-amber-300'"
-              class="p-1 sm:p-1.5 rounded-lg transition-colors cursor-pointer"
-              [title]="isHeaderDictating() ? 'Zatrzymaj dyktowanie' : 'Dyktuj zapytanie głosem'"
-            >
-              <mat-icon class="text-base">{{ isHeaderDictating() ? 'mic' : 'mic_none' }}</mat-icon>
-            </button>
-
             @if (quickSearchQuery().trim()) {
               <button
                 type="button"
@@ -115,7 +80,7 @@
         </div>
 
         <!-- Lista szybkich podpowiedzi (Auto-suggest dropdown) -->
-        @if (showQuickSearchDropdown()) {
+        @if (showQuickSearchDropdown() && quickSearchQuery().trim()) {
           <div
             class="absolute left-0 right-0 top-full mt-1.5 bg-slate-900/98 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl p-2 z-50 max-h-72 overflow-y-auto"
           >
@@ -146,13 +111,10 @@
 
       <!-- Statusy bezpieczeństwa, narzędzia kancelaryjne i skarbiec kryptograficzny (Czysty, minimalistyczny Desktop) -->
       <div class="hidden md:flex items-center gap-2 shrink-0">
-        <!-- 100% Offline Status Badge -->
-        <div id="badge-offline-mode" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-emerald-400 text-xs font-mono select-none" title="Aplikacja działa w 100% lokalnie i offline">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span>100% Offline</span>
+        <!-- Status Offline (Dyskretny, bez animowanego pingu) -->
+        <div id="badge-offline-mode" class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-950/80 border border-slate-800/80 text-emerald-400 text-[11px] font-mono select-none" title="Aplikacja działa w 100% lokalnie i offline">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Offline</span>
         </div>
 
         <!-- Paleta Poleceń (Spotlight Ctrl+K) -->
@@ -296,10 +258,10 @@
       </div>
     </div>
 
-    <!-- Pasek Nawigacji Desktop (Spójny, 5 kluczowych obszarów bez zbędnych rozpraszaczy) -->
+    <!-- Pasek Nawigacji Desktop (Spójny, 4 kluczowe obszary kancelaryjne) -->
     <nav id="app-navigation" class="hidden md:flex max-w-7xl mx-auto mt-2.5 items-center justify-between gap-1 overflow-x-auto pb-0.5 border-t border-slate-800/80 pt-2 no-scrollbar">
       <div class="flex items-center gap-1.5">
-        <!-- 1. Kalkulator Sankcji -->
+        <!-- 1. Analiza & Kalkulator -->
         <button
           id="nav-threat-calc"
           (click)="activeTab.set('threat-calc')"
@@ -313,49 +275,35 @@
           <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+1</kbd>
         </button>
 
-        <!-- 2. Sprawy & Dossier -->
-        <button
-          id="nav-cases"
-          (click)="activeTab.set('cases')"
-          [class]="activeTab() === 'cases'
-            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
-            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
-        >
-          <mat-icon class="text-base text-amber-400">folder_shared</mat-icon>
-          <span>Sprawy & Dossier</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+2</kbd>
-        </button>
-
-        <!-- 3. Kodeks Karny & Orzecznictwo -->
+        <!-- 2. Kodeks & Orzecznictwo SN -->
         <button
           id="nav-penal-code"
           (click)="activeTab.set('penal-code')"
-          [class]="activeTab() === 'penal-code' || activeTab() === 'rulings'
+          [class]="activeTab() === 'penal-code' || activeTab() === 'rulings' || activeTab() === 'handbooks' || activeTab() === 'alerts'
             ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
             : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
           class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
         >
           <mat-icon class="text-base text-amber-400">menu_book</mat-icon>
-          <span>Baza Prawa & SN</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+3</kbd>
+          <span>Kodeks & Prawo</span>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+2</kbd>
         </button>
 
-        <!-- 4. Sejf Notatek i Skanów -->
+        <!-- 3. Dossier & Sejf Akt -->
         <button
-          id="nav-notes"
-          (click)="activeTab.set('notes')"
-          [class]="activeTab() === 'notes'
+          id="nav-cases"
+          (click)="activeTab.set('cases')"
+          [class]="activeTab() === 'cases' || activeTab() === 'notes'
             ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
             : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
           class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
         >
-          <mat-icon class="text-base text-amber-400">enhanced_encryption</mat-icon>
-          <span>Sejf Akt</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+4</kbd>
+          <mat-icon class="text-base text-amber-400">folder_shared</mat-icon>
+          <span>Sprawy & Sejf</span>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+3</kbd>
         </button>
 
-        <!-- 5. Asystent Obrończy AI -->
+        <!-- 4. Asystent AI (Czat) -->
         <button
           id="nav-ai-chat"
           (click)="activeTab.set('ai-chat')"
@@ -366,32 +314,26 @@
         >
           <mat-icon class="text-base text-amber-400">smart_toy</mat-icon>
           <span>Asystent AI</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+5</kbd>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+4</kbd>
         </button>
       </div>
 
-      <!-- Podręczniki & Alerty jako pomocnicze akcje -->
-      <div class="flex items-center gap-1.5 shrink-0">
+      <!-- Szybkie przełączniki widoków pomocniczych -->
+      <div class="flex items-center gap-1.5 shrink-0 text-xs">
         <button
-          id="nav-handbooks"
           (click)="activeTab.set('handbooks')"
-          [class]="activeTab() === 'handbooks'
-            ? 'bg-slate-800 text-amber-300 font-semibold border-slate-700'
-            : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-slate-800/60'"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs border transition-colors cursor-pointer"
-          title="Metodyka i podręczniki obrończe"
+          [class]="activeTab() === 'handbooks' ? 'text-amber-300 font-semibold bg-slate-800' : 'text-slate-400 hover:text-slate-200'"
+          class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+          title="Przewodniki obrończe"
         >
           <mat-icon class="text-sm text-amber-400">auto_stories</mat-icon>
           <span>Podręczniki</span>
         </button>
 
         <button
-          id="nav-alerts"
           (click)="activeTab.set('alerts')"
-          [class]="activeTab() === 'alerts'
-            ? 'bg-red-500/20 text-red-300 border-red-500/50 font-bold'
-            : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-slate-800/60'"
-          class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs border transition-colors cursor-pointer"
+          [class]="activeTab() === 'alerts' ? 'text-red-300 font-semibold bg-red-950/40' : 'text-slate-400 hover:text-slate-200'"
+          class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
           title="Alerty nowelizacji kodeksu"
         >
           <mat-icon class="text-sm text-red-400">notifications_active</mat-icon>
@@ -401,13 +343,13 @@
     </nav>
 
     <!-- Rozwijane Menu Mobilne (Drawer / Dropdown dla pozostałych funkcji) -->
-    @if (isMobileMenuOpen()) {
+    @if (overflowMenuOpen()) {
       <div class="md:hidden mt-2 p-3.5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2 animate-fade-in shadow-2xl">
         <div class="text-[10px] font-bold text-amber-400 uppercase tracking-wider px-2">Narzędzia & Podręczniki</div>
         
         <div class="grid grid-cols-2 gap-2">
           <button
-            (click)="openDocumentScannerModal(); isMobileMenuOpen.set(false)"
+            (click)="openDocumentScannerModal(); overflowMenuOpen.set(false)"
             class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex flex-col gap-1 transition-colors cursor-pointer"
           >
             <mat-icon class="text-amber-400 text-lg">document_scanner</mat-icon>
@@ -416,7 +358,7 @@
           </button>
 
           <button
-            (click)="openCumulativeSentenceModal(); isMobileMenuOpen.set(false)"
+            (click)="openCumulativeSentenceModal(); overflowMenuOpen.set(false)"
             class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex flex-col gap-1 transition-colors cursor-pointer"
           >
             <mat-icon class="text-amber-400 text-lg">calculate</mat-icon>
@@ -425,7 +367,7 @@
           </button>
 
           <button
-            (click)="activeTab.set('handbooks'); isMobileMenuOpen.set(false)"
+            (click)="activeTab.set('handbooks'); overflowMenuOpen.set(false)"
             class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex flex-col gap-1 transition-colors cursor-pointer"
           >
             <mat-icon class="text-amber-400 text-lg">auto_stories</mat-icon>
@@ -434,7 +376,7 @@
           </button>
 
           <button
-            (click)="openDocumentExportModal(); isMobileMenuOpen.set(false)"
+            (click)="openDocumentExportModal(); overflowMenuOpen.set(false)"
             class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex flex-col gap-1 transition-colors cursor-pointer"
           >
             <mat-icon class="text-amber-400 text-lg">print</mat-icon>
@@ -445,21 +387,21 @@
 
         <div class="border-t border-slate-800 pt-2 flex items-center justify-between px-1">
           <button
-            (click)="openLegalDictionary(); isMobileMenuOpen.set(false)"
+            (click)="openLegalDictionary(); overflowMenuOpen.set(false)"
             class="text-xs text-amber-300 hover:underline flex items-center gap-1.5 py-1 cursor-pointer"
           >
             <mat-icon class="text-xs">menu_book</mat-icon>
             <span>Słownik Pojęć</span>
           </button>
           <button
-            (click)="activeTab.set('alerts'); isMobileMenuOpen.set(false)"
+            (click)="activeTab.set('alerts'); overflowMenuOpen.set(false)"
             class="text-xs text-red-300 hover:underline flex items-center gap-1.5 py-1 cursor-pointer"
           >
             <mat-icon class="text-xs text-red-400">notifications_active</mat-icon>
             <span>Nowele k.k.</span>
           </button>
           <button
-            (click)="openSyncManager(); isMobileMenuOpen.set(false)"
+            (click)="openSyncManager(); overflowMenuOpen.set(false)"
             class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 py-1 cursor-pointer"
           >
             <mat-icon class="text-xs">sync</mat-icon>
@@ -518,6 +460,7 @@
         <app-penal-code-browser
           (checkThreat)="checkThreatForArticle($event)"
           (createNote)="createNoteForArticle($event)"
+          (openRulingsTab)="activeTab.set('rulings')"
         />
       }
 
@@ -525,6 +468,7 @@
         <app-rulings-browser
           (checkThreat)="checkThreatForRuling($event)"
           (sendToNotes)="createNoteForRuling($event)"
+          (openCodeTab)="activeTab.set('penal-code')"
         />
       }
 
@@ -536,7 +480,10 @@
       }
 
       @case ('notes') {
-        <app-encrypted-notes (requestUnlockVault)="openVaultModal()" />
+        <app-encrypted-notes
+          (requestUnlockVault)="openVaultModal()"
+          (navigateToCases)="activeTab.set('cases')"
+        />
       }
 
       @case ('alerts') {
@@ -630,19 +577,31 @@
       <span class="text-[10px] mt-0.5 tracking-tight">Kalkulator</span>
     </button>
 
-    <!-- 2. Kodeks Karny -->
+    <!-- 2. Kodeks & Orzecznictwo -->
     <button
       (click)="activeTab.set('penal-code')"
-      [class]="activeTab() === 'penal-code' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
+      [class]="(activeTab() === 'penal-code' || activeTab() === 'rulings') ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
       class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
     >
-      <div [class]="activeTab() === 'penal-code' ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+      <div [class]="(activeTab() === 'penal-code' || activeTab() === 'rulings') ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
         <mat-icon class="text-xl">menu_book</mat-icon>
       </div>
       <span class="text-[10px] mt-0.5 tracking-tight">Kodeks</span>
     </button>
 
-    <!-- 3. Asystent AI (Czat) -->
+    <!-- 3. Sprawy & Sejf -->
+    <button
+      (click)="activeTab.set('cases')"
+      [class]="(activeTab() === 'cases' || activeTab() === 'notes') ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+    >
+      <div [class]="(activeTab() === 'cases' || activeTab() === 'notes') ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+        <mat-icon class="text-xl">folder_shared</mat-icon>
+      </div>
+      <span class="text-[10px] mt-0.5 tracking-tight">Sprawy</span>
+    </button>
+
+    <!-- 4. Asystent AI (Czat) -->
     <button
       (click)="activeTab.set('ai-chat')"
       [class]="activeTab() === 'ai-chat' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
@@ -651,31 +610,9 @@
       <div [class]="activeTab() === 'ai-chat' ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
         <mat-icon class="text-xl">smart_toy</mat-icon>
       </div>
-      <span class="text-[10px] mt-0.5 tracking-tight">Czat AI</span>
+      <span class="text-[10px] mt-0.5 tracking-tight">Asystent</span>
     </button>
 
-    <!-- 4. Szyfrowane Notatki -->
-    <button
-      (click)="activeTab.set('notes')"
-      [class]="activeTab() === 'notes' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
-    >
-      <div [class]="activeTab() === 'notes' ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
-        <mat-icon class="text-xl">enhanced_encryption</mat-icon>
-      </div>
-      <span class="text-[10px] mt-0.5 tracking-tight">Sejf</span>
-    </button>
-
-    <!-- 5. Więcej (Otwiera menu dodatkowe) -->
-    <button
-      (click)="isMobileMenuOpen.set(!isMobileMenuOpen())"
-      [class]="isMobileMenuOpen() ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
-    >
-      <div [class]="isMobileMenuOpen() ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
-        <mat-icon class="text-xl">{{ isMobileMenuOpen() ? 'close' : 'more_horiz' }}</mat-icon>
-      </div>
-      <span class="text-[10px] mt-0.5 tracking-tight">Więcej</span>
-    </button>
+    <!-- 5. Więcej -->
   </nav>
 </div>

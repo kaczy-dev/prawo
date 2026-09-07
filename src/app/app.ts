@@ -133,8 +133,16 @@ export class App {
   // Tryb gęstości sali sądowej (Courtroom Dense Mode) dla desktopu
   readonly isCourtroomDense = signal<boolean>(false);
 
+  // Overflow menu state for mobile 
+  readonly overflowMenuOpen = signal<boolean>(false);
+
+  // Toggle overflow menu
+  toggleOverflowMenu() {
+    this.overflowMenuOpen.set(!this.overflowMenuOpen());
+  }
+
   // Stan menu "Więcej" na mobile
-  readonly isMobileMenuOpen = signal<boolean>(false);
+
 
   // Skróty klawiszowe (Ctrl+K -> szukaj, Ctrl+L -> zablokuj skarbiec)
 
@@ -264,6 +272,20 @@ export class App {
       query:
         'Warunkowe umorzenie postępowania karnego dla osoby niekaranej (art. 66 k.k.)',
       artRef: 'Art. 66 k.k.',
+    },
+    {
+      label: 'Nadzwyczajne złagodzenie kary (art. 60 k.k.)',
+      category: 'defense',
+      query:
+        'Nadzwyczajne złagodzenie kary, naprawienie szkody i ugoda z pokrzywdzonym (art. 60 k.k.)',
+      artRef: 'Art. 60 k.k.',
+    },
+    {
+      label: 'Handel narkotykami (art. 56 UoPN)',
+      category: 'drugs',
+      query:
+        'Wprowadzanie do obrotu znacznej ilości środków odurzających (art. 56 ust. 3 UoPN)',
+      artRef: 'Art. 56 UoPN',
     },
   ];
 

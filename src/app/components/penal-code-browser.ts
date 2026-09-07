@@ -395,6 +395,28 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
               <option value="Rozdział XXXV">Rozdział XXXV – Mienie (kradzież art. 278, oszustwo, zniszczenie mienia)</option>
             </select>
 
+            <!-- Tryb Widoku: Przepisy vs Orzecznictwo SN -->
+            <div class="flex items-center rounded-xl p-1 bg-slate-950 border border-slate-700/80 shrink-0">
+              <button
+                type="button"
+                (click)="viewSubMode.set('articles')"
+                [class]="viewSubMode() === 'articles' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-slate-400 hover:text-white'"
+                class="px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <mat-icon class="text-xs">menu_book</mat-icon>
+                <span>Przepisy k.k.</span>
+              </button>
+              <button
+                type="button"
+                (click)="openRulingsTab.emit()"
+                class="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
+                title="Przejdź do bazy orzecznictwa Sądu Najwyższego"
+              >
+                <mat-icon class="text-xs text-amber-400">account_balance</mat-icon>
+                <span>Orzeczenia SN</span>
+              </button>
+            </div>
+
             <!-- Jednolity Schowek / Zakładki (IndexedDB) -->
             <button
               id="btn-filter-read-later"
@@ -1137,10 +1159,12 @@ export class PenalCodeBrowser {
   readonly articleChatHistory = signal<ChatMessage[]>([]);
   readonly currentQuestionInput = signal<string>('');
   readonly isGenerating = signal<boolean>(false);
+  readonly viewSubMode = signal<'articles' | 'rulings'>('articles');
 
   // Zdarzenia wyjściowe do nawigacji w aplikacji
   readonly checkThreat = output<PenalArticle>();
   readonly createNote = output<PenalArticle>();
+  readonly openRulingsTab = output<void>();
 
   // Indeks i nawigacja w Focus Mode
   readonly currentArticleIndex = computed(() => {

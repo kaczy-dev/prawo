@@ -70,3 +70,7 @@ Plan opracowany zgodnie z wytycznymi **frontend-design** (unikalna tożsamość 
 | **Faza 3** | **Funkcje Merytoryczne**: Komparator nowelizacji (Diff-View), wzory pism w sejfie, eksport Dossier Sprawy do PDF. | ✅ Ukończone |
 | **Faza 4** | **Refaktoryzacja Desktop UI & Layout**: Centrowana Command Palette (`Ctrl+K`), wieloszpaltowy workspace 2/3 + 1/3, tryb gęstości sali sądowej (Courtroom Dense Mode), kalkulator kary łącznej (art. 85-86 k.k.), kancelaryjny modal druku A4. | ✅ Ukończone |
 | **Faza 5** | **Weryfikacja Końcowa**: Kompilacja produkcyjna (`npx ng build`), testy jednostkowe Vitest (`npx ng test`), audyt layoutu i ergonomii na sali sądowej. | ✅ Ukończone |
+| **Faza 6** | **De-cluttering & Czysty Layout (Minimalizm Kancelaryjny)**: Redukcja wizualnego szumu, usunięcie podwójnych wyszukiwarek, scalenie 8 zakładek do 4 logicznych obszarów roboczych (Analiza, Kodeks, Dossier, AI), uproszczenie kalkulatora. | ✅ Ukończone |
+| **Faza 7** | **Rozszerzenie Bazy Prawnej & Dyrektywy Sądowe**: Rozbudowa artykułów Kodeksu Karnego (art. 286 k.k. oszustwo, art. 207 k.k. znęcanie, ustawa o przeciwdziałaniu narkomanii art. 56 i 62 UoPN, art. 60 k.k.), automatyczny moduł nadzwyczajnego złagodzenia kary (art. 60 k.k.) w kalkulatorze. | ✅ Ukończone |
+| **Faza 8** | **Lokalny Asystent AI w Przeglądarce (WebGPU / WebLLM)**: Integracja lokalnego modelu językowego w 100% offline w przeglądarce (bezwzględna tajemnica obrończa, zerowy transfer sieciowy). | 📋 Zaplanowane |
+

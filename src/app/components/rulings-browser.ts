@@ -27,9 +27,20 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
               Baza Orzecznictwa i Linii Sądowych
             </h2>
           </div>
-          <span class="text-xs text-slate-300 font-mono bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 self-start md:self-auto">
-            Orzeczeń: <strong class="text-amber-400">{{ filteredRulings().length }}</strong>
-          </span>
+          <div class="flex items-center gap-2 self-start md:self-auto">
+            <button
+              type="button"
+              (click)="openCodeTab.emit()"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer"
+              title="Wróć do przeglądarki artykułów Kodeksu Karnego"
+            >
+              <mat-icon class="text-sm text-amber-400">arrow_back</mat-icon>
+              <span>Kodeks Karny</span>
+            </button>
+            <span class="text-xs text-slate-300 font-mono bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+              Orzeczeń: <strong class="text-amber-400">{{ filteredRulings().length }}</strong>
+            </span>
+          </div>
         </div>
 
         <div class="flex flex-col md:flex-row items-center gap-3">
@@ -260,6 +271,7 @@ export class RulingsBrowser {
 
   readonly checkThreat = output<CourtRuling>();
   readonly sendToNotes = output<CourtRuling>();
+  readonly openCodeTab = output<void>();
 
   constructor() {
     const list = this.legalData.courtRulings();
