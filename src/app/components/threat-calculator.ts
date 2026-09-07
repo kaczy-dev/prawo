@@ -5,6 +5,7 @@ import { PenalArticle, ThreatAnalysisResult } from '../models/legal.model';
 import { SpeechDictationService } from '../services/speech-dictation.service';
 import { LegalDataService } from '../services/legal-data.service';
 import { PrescriptionTimer } from './prescription-timer';
+import { PenaltyDirectivesPanel } from './penalty-directives-panel';
 
 export interface QuickScenario {
   label: string;
@@ -15,7 +16,7 @@ export interface QuickScenario {
 
 @Component({
   selector: 'app-threat-calculator',
-  imports: [CommonModule, MatIconModule, PrescriptionTimer],
+  imports: [CommonModule, MatIconModule, PrescriptionTimer, PenaltyDirectivesPanel],
   template: `
     <section id="section-threat-calc" class="space-y-6">
       <!-- Panel wprowadzania sytuacji (Taste-Skill Anti-Slop: intentional layout, distinct branding) -->
@@ -324,6 +325,13 @@ export interface QuickScenario {
                       }
                     </ul>
                   </div>
+                </div>
+              }
+
+              <!-- Interaktywny Symulator Dyrektyw Kary (Art. 53 i Art. 60 k.k.) -->
+              @if (res.matchedArticles.length > 0) {
+                <div class="mb-6">
+                  <app-penalty-directives-panel [article]="selectedPrescriptionArticle() || res.matchedArticles[0]" />
                 </div>
               }
 

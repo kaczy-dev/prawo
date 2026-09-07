@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ChatMessage } from '../models/legal.model';
 import { PrawnBotAiService } from '../services/prawn-bot-ai.service';
 import { SpeechDictationService } from '../services/speech-dictation.service';
+import { LocalWebLLMService } from '../services/local-web-llm.service';
 
 @Component({
   selector: 'app-legal-chat',
@@ -11,28 +12,44 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
   template: `
     <section id="section-ai-chat" class="space-y-4">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 sm:p-6 shadow-xl flex flex-col h-[calc(100dvh-180px)] md:h-[740px] max-h-[850px]">
-        <!-- Nagłówek czatu z oznaczeniem bezpieczeństwa i głosu -->
+        <!-- Nagłówek czatu z oznaczeniem bezpieczeństwa, trybem silnika i WebGPU -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 shrink-0">
           <div>
-            <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
-              <mat-icon class="text-amber-400">smart_toy</mat-icon>
-              Prawnik z Łuczniczej – Asystent Prawny Kancelarii
-            </h2>
+            <div class="flex items-center gap-2">
+              <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+                <mat-icon class="text-amber-400">smart_toy</mat-icon>
+                Prawnik z Łuczniczej – Asystent Prawny Kancelarii
+              </h2>
+              @if (useWebGPU() && webLLM.status() === 'ready') {
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  WebGPU Aktywny
+                </span>
+              }
+            </div>
             <p class="text-xs text-slate-400 mt-0.5">
-              100% lokalny silnik kwalifikacji prawno-karnej. Obsługuje dyktowanie głosem (Web Speech API).
+              100% lokalny silnik kwalifikacji prawno-karnej. Obsługuje dyktowanie głosem oraz lokalny model WebGPU.
             </p>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <!-- Przełącznik WebGPU Model -->
+            <button
+              type="button"
+              (click)="toggleWebGPUMode()"
+              [class]="useWebGPU()
+                ? 'bg-purple-600/30 text-purple-200 border-purple-500/50'
+                : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'"
+              class="px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+              title="Przełącz między wbudowanym silnikiem a lokalnym modelem WebGPU"
+            >
+              <mat-icon class="text-xs">{{ useWebGPU() ? 'memory' : 'speed' }}</mat-icon>
+              <span>{{ useWebGPU() ? 'Silnik WebGPU' : 'Szybki Silnik Wbudowany' }}</span>
+            </button>
+
             @if (speech.isSupported()) {
               <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-lg flex items-center gap-1">
                 <mat-icon class="text-xs">mic</mat-icon>
-                <span>Dyktowanie aktywne</span>
-              </span>
-            } @else {
-              <span class="text-[11px] bg-slate-800 text-slate-400 border border-slate-700 px-2.5 py-1 rounded-lg flex items-center gap-1" title="Zalecana przeglądarka Chrome lub Edge">
-                <mat-icon class="text-xs text-slate-500">mic_off</mat-icon>
-                <span>Głos niedostępny</span>
+                <span>Dyktowanie</span>
               </span>
             }
             <button
@@ -45,6 +62,30 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
             </button>
           </div>
         </div>
+
+        <!-- Pasek stanu ładowania WebGPU -->
+        @if (useWebGPU() && webLLM.status() === 'downloading') {
+          <div class="bg-purple-950/40 border border-purple-500/30 p-2.5 rounded-xl text-xs space-y-1.5 shrink-0">
+            <div class="flex items-center justify-between text-purple-200">
+              <span class="flex items-center gap-1.5 font-semibold">
+                <mat-icon class="text-xs animate-spin">sync</mat-icon>
+                Ładowanie wag modelu do pamięci karty graficznej (VRAM)...
+              </span>
+              <span class="font-mono">{{ webLLM.downloadProgress().progress }}%</span>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+              <div class="bg-purple-500 h-1.5 transition-all duration-300" [style.width.%]="webLLM.downloadProgress().progress"></div>
+            </div>
+            <p class="text-[10px] text-purple-300/80">{{ webLLM.downloadProgress().text }}</p>
+          </div>
+        }
+
+        @if (useWebGPU() && webLLM.status() === 'webgpu_unsupported') {
+          <div class="bg-amber-950/40 border border-amber-500/30 p-2 rounded-xl text-xs text-amber-200 flex items-center gap-2 shrink-0">
+            <mat-icon class="text-sm text-amber-400 shrink-0">info</mat-icon>
+            <span>Przeglądarka lub sprzęt nie obsługuje WebGPU. Automatycznie aktywowano niezawodny silnik lokalny.</span>
+          </div>
+        }
 
         <!-- Szybkie zapytania "Co mi grozi?" (Quick Prompts Chips) -->
         <div class="py-2.5 px-1 border-b border-slate-800/80 shrink-0">
@@ -240,10 +281,22 @@ export class LegalChat {
   @ViewChild('scrollContainer') private scrollContainer?: ElementRef<HTMLDivElement>;
 
   readonly speech = inject(SpeechDictationService);
+  readonly webLLM = inject(LocalWebLLMService);
   private readonly aiService = inject(PrawnBotAiService);
 
   readonly openCalculator = output<string>();
   readonly inspectArticle = output<string>();
+
+  readonly useWebGPU = signal<boolean>(false);
+
+  async toggleWebGPUMode(): Promise<void> {
+    const nextState = !this.useWebGPU();
+    this.useWebGPU.set(nextState);
+
+    if (nextState && this.webLLM.status() === 'uninitialized') {
+      await this.webLLM.initializeLocalLLM();
+    }
+  }
 
   readonly quickPromptSuggestions = [
     'Co mi grozi za zakłócanie ciszy nocnej?',
@@ -294,7 +347,7 @@ export class LegalChat {
     this.speech.stop();
   }
 
-  sendMessage(customText?: string): void {
+  async sendMessage(customText?: string): Promise<void> {
     if (this.isDictating()) {
       this.speech.stop();
     }
@@ -313,7 +366,26 @@ export class LegalChat {
     this.inputText.set('');
     this.scrollToBottom();
 
-    // Lokalna odpowiedź asystenta prawnBot
+    // Jeśli aktywny jest tryb WebGPU i model jest gotowy
+    if (this.useWebGPU() && this.webLLM.status() === 'ready') {
+      try {
+        const localResponseText = await this.webLLM.generateResponse(textToSend);
+        const webGpuMsg: ChatMessage = {
+          id: `webgpu-msg-${Date.now()}`,
+          sender: 'assistant',
+          timestamp: new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }),
+          text: localResponseText,
+          legalCategoryBadge: 'Lokalny Model WebGPU (Offline)',
+        };
+        this.chatMessages.update((msgs) => [...msgs, webGpuMsg]);
+        this.scrollToBottom();
+        return;
+      } catch (err) {
+        console.warn('WebGPU generation error, falling back to local rule-engine:', err);
+      }
+    }
+
+    // Lokalna odpowiedź asystenta prawnBot (fallback / szybki wbudowany silnik regułowy)
     setTimeout(() => {
       const response = this.aiService.generateChatResponse(textToSend);
       this.chatMessages.update((msgs) => [...msgs, response]);
