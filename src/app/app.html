@@ -122,12 +122,12 @@
           id="btn-open-command-palette"
           type="button"
           (click)="isCommandPaletteOpen.set(true)"
-          class="flex items-center gap-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 hover:border-amber-500/50 text-slate-200 text-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer font-medium active:scale-[0.98]"
+          class="btn-tactile group flex items-center gap-1.5 bg-slate-950 hover:bg-slate-850 border border-slate-700/80 hover:border-amber-400/60 text-slate-200 text-xs px-3 py-1.5 rounded-xl cursor-pointer font-medium"
           title="Otwórz Paletę Poleceń (Ctrl+K)"
         >
-          <mat-icon class="text-xs text-amber-400">terminal</mat-icon>
-          <span class="text-xs">Paleta</span>
-          <kbd class="px-1.5 py-0.5 text-[9px] font-mono text-slate-400 bg-slate-900 border border-slate-700 rounded">Ctrl+K</kbd>
+          <mat-icon class="text-xs text-amber-400 group-hover:scale-115 group-hover:rotate-6 transition-transform duration-200">terminal</mat-icon>
+          <span class="text-xs group-hover:text-amber-200 transition-colors">Paleta</span>
+          <kbd class="px-1.5 py-0.5 text-[9px] font-mono text-slate-400 bg-slate-900 border border-slate-700 rounded group-hover:border-amber-500/40 transition-colors">Ctrl+K</kbd>
         </button>
 
         <!-- Zunifikowane Menu: Narzędzia Kancelaryjne -->
@@ -136,34 +136,35 @@
             id="btn-toggle-tools-menu"
             type="button"
             (click)="isToolsMenuOpen.update(v => !v)"
-            class="flex items-center gap-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 hover:border-amber-500/50 text-slate-200 text-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer font-medium active:scale-[0.98]"
+            class="btn-tactile group flex items-center gap-1.5 bg-slate-950 hover:bg-slate-850 border border-slate-700/80 hover:border-amber-400/60 text-slate-200 text-xs px-3 py-1.5 rounded-xl cursor-pointer font-medium"
             title="Narzędzia kancelaryjne (Skaner OCR, Kara Łączna, Wydruk A4, Słownik)"
           >
-            <mat-icon class="text-xs text-amber-400">construction</mat-icon>
-            <span>Narzędzia</span>
-            <mat-icon class="text-xs text-slate-400 transition-transform" [class.rotate-180]="isToolsMenuOpen()">expand_more</mat-icon>
+            <mat-icon class="text-xs text-amber-400 group-hover:scale-115 group-hover:rotate-12 transition-transform duration-200">construction</mat-icon>
+            <span class="group-hover:text-amber-200 transition-colors">Narzędzia</span>
+            <mat-icon class="text-xs text-slate-400 transition-transform duration-300 ease-out" [class.rotate-180]="isToolsMenuOpen()">expand_more</mat-icon>
           </button>
 
           @if (isToolsMenuOpen()) {
             <div
               (click)="isToolsMenuOpen.set(false)"
-              class="absolute right-0 top-full mt-1.5 w-60 bg-slate-900/98 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl p-2 z-50 space-y-1 animate-fade-in"
+              class="menu-dropdown-pop absolute right-0 top-full mt-2 w-64 bg-[#0e1320]/95 backdrop-blur-xl border border-amber-500/30 rounded-2xl shadow-2xl shadow-black/90 p-2 z-50 space-y-1"
             >
-              <div class="text-[10px] uppercase font-bold text-amber-400 tracking-wider px-2 py-1 border-b border-slate-800">
-                Narzędzia Obrończe
+              <div class="text-[10px] uppercase font-bold text-amber-400 tracking-wider px-2.5 py-1.5 border-b border-amber-500/20 flex items-center justify-between">
+                <span>Narzędzia Obrończe</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
               </div>
 
               <!-- Skaner OCR -->
               <button
                 type="button"
                 (click)="openDocumentScannerModal()"
-                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                class="group w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-200 hover:bg-slate-800/80 hover:translate-x-1 flex items-center gap-2.5 transition-all duration-200 cursor-pointer"
               >
-                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-110 group-hover:bg-amber-500/20 group-hover:rotate-3 transition-all duration-200">
                   <mat-icon class="text-sm">document_scanner</mat-icon>
                 </div>
                 <div>
-                  <div class="font-semibold text-white">Skaner Pism (OCR)</div>
+                  <div class="font-semibold text-white group-hover:text-amber-300 transition-colors">Skaner Pism (OCR)</div>
                   <div class="text-[10px] text-slate-400">Rozpoznawanie z kamery/pliku</div>
                 </div>
               </button>
@@ -172,13 +173,13 @@
               <button
                 type="button"
                 (click)="openCumulativeSentenceModal()"
-                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                class="group w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-200 hover:bg-slate-800/80 hover:translate-x-1 flex items-center gap-2.5 transition-all duration-200 cursor-pointer"
               >
-                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-110 group-hover:bg-amber-500/20 group-hover:rotate-3 transition-all duration-200">
                   <mat-icon class="text-sm">calculate</mat-icon>
                 </div>
                 <div>
-                  <div class="font-semibold text-white">Kara Łączna (art. 85-86)</div>
+                  <div class="font-semibold text-white group-hover:text-amber-300 transition-colors">Kara Łączna (art. 85-86)</div>
                   <div class="text-[10px] text-slate-400">Sumowanie i absorpcja kar</div>
                 </div>
               </button>
@@ -187,13 +188,13 @@
               <button
                 type="button"
                 (click)="openProceduralDeadlinesModal()"
-                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                class="group w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-200 hover:bg-slate-800/80 hover:translate-x-1 flex items-center gap-2.5 transition-all duration-200 cursor-pointer"
               >
-                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-110 group-hover:bg-amber-500/20 group-hover:rotate-3 transition-all duration-200">
                   <mat-icon class="text-sm">schedule</mat-icon>
                 </div>
                 <div>
-                  <div class="font-semibold text-white">Terminy Procesowe (k.p.k.)</div>
+                  <div class="font-semibold text-white group-hover:text-amber-300 transition-colors">Terminy Procesowe (k.p.k.)</div>
                   <div class="text-[10px] text-slate-400">Terminy zawite i reguła świąt</div>
                 </div>
               </button>
@@ -202,13 +203,13 @@
               <button
                 type="button"
                 (click)="openPreventiveMeasuresModal()"
-                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                class="group w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-200 hover:bg-slate-800/80 hover:translate-x-1 flex items-center gap-2.5 transition-all duration-200 cursor-pointer"
               >
-                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-110 group-hover:bg-amber-500/20 group-hover:rotate-3 transition-all duration-200">
                   <mat-icon class="text-sm">gavel</mat-icon>
                 </div>
                 <div>
-                  <div class="font-semibold text-white">Środki Zapobiegawcze</div>
+                  <div class="font-semibold text-white group-hover:text-amber-300 transition-colors">Środki Zapobiegawcze</div>
                   <div class="text-[10px] text-slate-400">Areszt, kaucja, dozór, 24/48h</div>
                 </div>
               </button>
@@ -217,13 +218,13 @@
               <button
                 type="button"
                 (click)="openDocumentExportModal()"
-                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                class="group w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-200 hover:bg-slate-800/80 hover:translate-x-1 flex items-center gap-2.5 transition-all duration-200 cursor-pointer"
               >
-                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-110 group-hover:bg-amber-500/20 group-hover:rotate-3 transition-all duration-200">
                   <mat-icon class="text-sm">print</mat-icon>
                 </div>
                 <div>
-                  <div class="font-semibold text-white">Eksport & Druk A4</div>
+                  <div class="font-semibold text-white group-hover:text-amber-300 transition-colors">Eksport & Druk A4</div>
                   <div class="text-[10px] text-slate-400">Kancelaryjny wydruk pism</div>
                 </div>
               </button>
@@ -232,13 +233,13 @@
               <button
                 type="button"
                 (click)="openLegalDictionary()"
-                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                class="group w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-200 hover:bg-slate-800/80 hover:translate-x-1 flex items-center gap-2.5 transition-all duration-200 cursor-pointer"
               >
-                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <div class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-110 group-hover:bg-amber-500/20 group-hover:rotate-3 transition-all duration-200">
                   <mat-icon class="text-sm">auto_stories</mat-icon>
                 </div>
                 <div>
-                  <div class="font-semibold text-white">Słownik Pojęć</div>
+                  <div class="font-semibold text-white group-hover:text-amber-300 transition-colors">Słownik Pojęć</div>
                   <div class="text-[10px] text-slate-400">Definicje k.k. i k.p.k.</div>
                 </div>
               </button>
@@ -247,13 +248,13 @@
               <button
                 type="button"
                 (click)="openLegalTrustModal()"
-                class="w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-300 hover:bg-slate-800 flex items-center gap-2.5 transition-colors cursor-pointer"
+                class="group w-full text-left px-2.5 py-2 rounded-xl text-xs text-slate-200 hover:text-amber-200 hover:bg-slate-800/80 hover:translate-x-1 flex items-center gap-2.5 transition-all duration-200 cursor-pointer"
               >
-                <div class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <div class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 group-hover:scale-110 group-hover:bg-emerald-500/20 group-hover:rotate-3 transition-all duration-200">
                   <mat-icon class="text-sm">verified_user</mat-icon>
                 </div>
                 <div>
-                  <div class="font-semibold text-white">Nota Prawna & RODO</div>
+                  <div class="font-semibold text-white group-hover:text-emerald-300 transition-colors">Nota Prawna & RODO</div>
                   <div class="text-[10px] text-slate-400">Tajemnica art. 178 k.p.k.</div>
                 </div>
               </button>
@@ -283,21 +284,21 @@
           <button
             id="btn-lock-vault"
             (click)="lockVault()"
-            class="flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer font-semibold active:scale-[0.98]"
+            class="btn-tactile btn-gold-shimmer flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/50 text-amber-300 text-xs px-3.5 py-1.5 rounded-xl cursor-pointer font-semibold shadow-sm"
             title="Skarbiec odblokowany. Kliknij, aby zablokować"
           >
-            <mat-icon class="text-xs">lock_open</mat-icon>
+            <mat-icon class="text-xs text-amber-400">lock_open</mat-icon>
             <span>Sejf Aktywny</span>
           </button>
         } @else {
           <button
             id="btn-unlock-vault"
             (click)="openVaultModal()"
-            class="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer font-medium active:scale-[0.98]"
+            class="btn-tactile group flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-amber-400/50 text-slate-200 text-xs px-3.5 py-1.5 rounded-xl cursor-pointer font-medium shadow-sm"
             title="Kliknij, aby odblokować szyfrowane notatki"
           >
-            <mat-icon class="text-xs text-amber-400">lock</mat-icon>
-            <span>Odblokuj Sejf</span>
+            <mat-icon class="text-xs text-amber-400 group-hover:scale-115 group-hover:-rotate-6 transition-transform duration-200">lock</mat-icon>
+            <span class="group-hover:text-amber-200 transition-colors">Odblokuj Sejf</span>
           </button>
         }
       </div>
@@ -311,13 +312,13 @@
           id="nav-threat-calc"
           (click)="activeTab.set('threat-calc')"
           [class]="activeTab() === 'threat-calc'
-            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.15)] font-bold'
             : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+          class="nav-tab-tactile group flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border cursor-pointer whitespace-nowrap"
         >
-          <mat-icon class="text-base text-amber-400">gavel</mat-icon>
+          <mat-icon class="text-base text-amber-400 group-hover:scale-115 transition-transform duration-200">gavel</mat-icon>
           <span>Kalkulator Sankcji</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+1</kbd>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+1</kbd>
         </button>
 
         <!-- 2. Kodeks & Orzecznictwo SN -->
@@ -325,13 +326,13 @@
           id="nav-penal-code"
           (click)="activeTab.set('penal-code')"
           [class]="activeTab() === 'penal-code' || activeTab() === 'rulings' || activeTab() === 'handbooks' || activeTab() === 'alerts'
-            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.15)] font-bold'
             : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+          class="nav-tab-tactile group flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border cursor-pointer whitespace-nowrap"
         >
-          <mat-icon class="text-base text-amber-400">menu_book</mat-icon>
+          <mat-icon class="text-base text-amber-400 group-hover:scale-115 transition-transform duration-200">menu_book</mat-icon>
           <span>Kodeks & Prawo</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+2</kbd>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+2</kbd>
         </button>
 
         <!-- 3. Dossier & Sejf Akt -->
@@ -339,13 +340,13 @@
           id="nav-cases"
           (click)="activeTab.set('cases')"
           [class]="activeTab() === 'cases' || activeTab() === 'notes'
-            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.15)] font-bold'
             : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+          class="nav-tab-tactile group flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border cursor-pointer whitespace-nowrap"
         >
-          <mat-icon class="text-base text-amber-400">folder_shared</mat-icon>
+          <mat-icon class="text-base text-amber-400 group-hover:scale-115 transition-transform duration-200">folder_shared</mat-icon>
           <span>Sprawy & Sejf</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+3</kbd>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+3</kbd>
         </button>
 
         <!-- 4. Asystent AI (Czat) -->
@@ -353,13 +354,13 @@
           id="nav-ai-chat"
           (click)="activeTab.set('ai-chat')"
           [class]="activeTab() === 'ai-chat'
-            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.15)] font-bold'
             : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+          class="nav-tab-tactile group flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border cursor-pointer whitespace-nowrap"
         >
-          <mat-icon class="text-base text-amber-400">smart_toy</mat-icon>
+          <mat-icon class="text-base text-amber-400 group-hover:scale-115 transition-transform duration-200">smart_toy</mat-icon>
           <span>Asystent AI</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+4</kbd>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+4</kbd>
         </button>
       </div>
 
@@ -367,8 +368,8 @@
       <div class="flex items-center gap-1.5 shrink-0 text-xs">
         <button
           (click)="activeTab.set('handbooks')"
-          [class]="activeTab() === 'handbooks' ? 'text-amber-300 font-semibold bg-slate-800' : 'text-slate-400 hover:text-slate-200'"
-          class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+          [class]="activeTab() === 'handbooks' ? 'text-amber-300 font-semibold bg-slate-800 border-amber-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-850'"
+          class="btn-tactile px-2.5 py-1 rounded-lg border border-transparent transition-all cursor-pointer flex items-center gap-1"
           title="Przewodniki obrończe"
         >
           <mat-icon class="text-sm text-amber-400">auto_stories</mat-icon>
@@ -376,13 +377,23 @@
         </button>
 
         <button
+          (click)="activeTab.set('rulings')"
+          [class]="activeTab() === 'rulings' ? 'text-amber-300 font-semibold bg-slate-800 border-amber-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-850'"
+          class="btn-tactile px-2.5 py-1 rounded-lg border border-transparent transition-all cursor-pointer flex items-center gap-1"
+          title="Baza Orzeczeń Sądu Najwyższego"
+        >
+          <mat-icon class="text-sm text-amber-400">balance</mat-icon>
+          <span>Orzecznictwo</span>
+        </button>
+
+        <button
           (click)="activeTab.set('alerts')"
-          [class]="activeTab() === 'alerts' ? 'text-red-300 font-semibold bg-red-950/40' : 'text-slate-400 hover:text-slate-200'"
-          class="px-2.5 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
-          title="Alerty nowelizacji kodeksu"
+          [class]="activeTab() === 'alerts' ? 'text-red-300 font-semibold bg-slate-800 border-red-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-850'"
+          class="btn-tactile px-2.5 py-1 rounded-lg border border-transparent transition-all cursor-pointer flex items-center gap-1"
+          title="Nowelizacje i zmiany przepisów prawa"
         >
           <mat-icon class="text-sm text-red-400">notifications_active</mat-icon>
-          <span>Nowele</span>
+          <span>Nowele k.k.</span>
         </button>
       </div>
     </nav>
@@ -609,15 +620,15 @@
     <button
       (click)="activeTab.set('threat-calc')"
       [class]="activeTab() === 'threat-calc' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      class="group flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-all cursor-pointer active:scale-90 relative"
       aria-label="Kalkulator sankcji"
     >
-      <div [class]="activeTab() === 'threat-calc' ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
-        <mat-icon class="text-xl">gavel</mat-icon>
+      <div [class]="activeTab() === 'threat-calc' ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'p-1'">
+        <mat-icon class="text-xl group-hover:scale-115 group-active:scale-95 transition-transform duration-200">gavel</mat-icon>
       </div>
       <span class="text-[10px] tracking-tight">Kalkulator</span>
       @if (activeTab() === 'threat-calc') {
-        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></span>
       }
     </button>
 
@@ -625,15 +636,15 @@
     <button
       (click)="activeTab.set('penal-code')"
       [class]="(activeTab() === 'penal-code' || activeTab() === 'rulings') ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      class="group flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-all cursor-pointer active:scale-90 relative"
       aria-label="Kodeks karny i orzecznictwo"
     >
-      <div [class]="(activeTab() === 'penal-code' || activeTab() === 'rulings') ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
-        <mat-icon class="text-xl">menu_book</mat-icon>
+      <div [class]="(activeTab() === 'penal-code' || activeTab() === 'rulings') ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'p-1'">
+        <mat-icon class="text-xl group-hover:scale-115 group-active:scale-95 transition-transform duration-200">menu_book</mat-icon>
       </div>
       <span class="text-[10px] tracking-tight">Kodeks</span>
       @if (activeTab() === 'penal-code' || activeTab() === 'rulings') {
-        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></span>
       }
     </button>
 
@@ -641,15 +652,15 @@
     <button
       (click)="activeTab.set('cases')"
       [class]="(activeTab() === 'cases' || activeTab() === 'notes') ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      class="group flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-all cursor-pointer active:scale-90 relative"
       aria-label="Dossier spraw i notatnik"
     >
-      <div [class]="(activeTab() === 'cases' || activeTab() === 'notes') ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
-        <mat-icon class="text-xl">folder_shared</mat-icon>
+      <div [class]="(activeTab() === 'cases' || activeTab() === 'notes') ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'p-1'">
+        <mat-icon class="text-xl group-hover:scale-115 group-active:scale-95 transition-transform duration-200">folder_shared</mat-icon>
       </div>
       <span class="text-[10px] tracking-tight">Sprawy</span>
       @if (activeTab() === 'cases' || activeTab() === 'notes') {
-        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></span>
       }
     </button>
 
@@ -657,15 +668,15 @@
     <button
       (click)="activeTab.set('ai-chat')"
       [class]="activeTab() === 'ai-chat' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      class="group flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-all cursor-pointer active:scale-90 relative"
       aria-label="Asystent AI"
     >
-      <div [class]="activeTab() === 'ai-chat' ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
-        <mat-icon class="text-xl">smart_toy</mat-icon>
+      <div [class]="activeTab() === 'ai-chat' ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'p-1'">
+        <mat-icon class="text-xl group-hover:scale-115 group-active:scale-95 transition-transform duration-200">smart_toy</mat-icon>
       </div>
       <span class="text-[10px] tracking-tight">Asystent</span>
       @if (activeTab() === 'ai-chat') {
-        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></span>
       }
     </button>
 
@@ -673,15 +684,15 @@
     <button
       (click)="toggleOverflowMenu()"
       [class]="overflowMenuOpen() ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      class="group flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-all cursor-pointer active:scale-90 relative"
       aria-label="Więcej narzędzi i opcji"
     >
-      <div [class]="overflowMenuOpen() ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
-        <mat-icon class="text-xl">dashboard_customize</mat-icon>
+      <div [class]="overflowMenuOpen() ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'p-1'">
+        <mat-icon class="text-xl group-hover:scale-115 group-active:scale-95 transition-transform duration-200">dashboard_customize</mat-icon>
       </div>
       <span class="text-[10px] tracking-tight">Więcej</span>
       @if (overflowMenuOpen()) {
-        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></span>
       }
     </button>
   </nav>
@@ -698,7 +709,7 @@
       aria-label="Przybornik Kancelaryjny"
     >
       <div
-        class="bg-gradient-to-b from-[#141928] via-[#0f1422] to-[#0a0d16] border-t border-amber-500/30 rounded-t-3xl p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-[max(env(safe-area-inset-bottom),1.5rem)] relative"
+        class="bottom-sheet-slide bg-gradient-to-b from-[#141928] via-[#0f1422] to-[#0a0d16] border-t border-amber-500/30 rounded-t-3xl p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-[max(env(safe-area-inset-bottom),1.5rem)] relative"
         (click)="$event.stopPropagation()"
       >
         <!-- Uchwyt do przeciągania (Drag handle) -->
@@ -718,7 +729,7 @@
           <button
             type="button"
             (click)="overflowMenuOpen.set(false)"
-            class="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            class="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer active:scale-95"
             aria-label="Zamknij przybornik"
           >
             <mat-icon class="text-lg">close</mat-icon>

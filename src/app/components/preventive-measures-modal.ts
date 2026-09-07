@@ -19,7 +19,7 @@ export interface BailOption {
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/80 backdrop-blur-md animate-fade-in"
          (click)="onBackdropClick($event)">
-      <div class="relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl border border-amber-500/30 bg-gradient-to-b from-[#141928] via-[#0f1422] to-[#0a0d16] text-slate-100 shadow-2xl shadow-black/80 overflow-hidden"
+      <div class="modal-pop relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl border border-amber-500/30 bg-gradient-to-b from-[#141928] via-[#0f1422] to-[#0a0d16] text-slate-100 shadow-2xl shadow-black/80 overflow-hidden"
            (click)="$event.stopPropagation()">
         
         <!-- Złota wstęga górna -->
@@ -282,10 +282,10 @@ export interface BailOption {
         </div>
 
         <!-- Stopka -->
-        <div class="px-6 py-3 border-t border-slate-800 bg-slate-900/40 flex items-center justify-between text-xs text-slate-400">
+        <div class="px-6 py-3.5 border-t border-slate-800 bg-slate-900/40 flex items-center justify-between text-xs text-slate-400">
           <span>Moduł opracowany wg standardów procedury karnej RP oraz orzecznictwa ETPCz.</span>
           <button (click)="close.emit()"
-                  class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition-colors">
+                  class="btn-tactile px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition-colors cursor-pointer">
             Zamknij
           </button>
         </div>

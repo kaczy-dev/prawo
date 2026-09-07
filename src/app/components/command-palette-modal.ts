@@ -36,7 +36,7 @@ export interface PaletteCommand {
       tabindex="-1"
     >
       <div
-        class="bg-slate-900 border border-amber-500/30 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh] border-t-2 border-t-amber-400"
+        class="modal-pop bg-slate-900 border border-amber-500/30 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh] border-t-2 border-t-amber-400"
         (click)="$event.stopPropagation()"
       >
         <!-- Pasek wyszukiwania Spotlight -->
