@@ -1,5 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { PenalArticle, CourtRuling, LegalAlert, EncryptedNote } from '../models/legal.model';
+import { narcoticsLawArticles } from '../assets/legal-data/narcotics-law';
 import { CryptoService } from './crypto.service';
 import { OfflineSyncService } from './offline-sync.service';
 
@@ -197,6 +198,34 @@ export class LegalDataService {
         ],
         isFelony: false,
         keywords: ['bójka', 'pobicie', 'awantura', 'uderzenie', 'klub', 'cios', 'uszczerbek na zdrowiu'],
+        isOfflinePinned: true,
+      },
+      {
+        id: 'art-207',
+        number: 207,
+        codePrefix: 'k.k.',
+        title: 'Znęcanie się (fizyczne lub psychiczne)',
+        chapter: 'Przestępstwa przeciwko rodzinie i opiece',
+        chapterNumber: 'Rozdział XXVI',
+        content: `§ 1. Kto znęca się fizycznie lub psychicznie nad osobą najbliższą lub nad inną osobą pozostającą w stałym lub przemijającym stosunku zależności od sprawcy, podlega karze pozbawienia wolności od 3 miesięcy do lat 5.
+§ 1a. Kto znęca się fizycznie lub psychicznie nad osobą nieporadną ze względu na jej wiek, stan psychiczny lub fizyczny, podlega karze pozbawienia wolności od 6 miesięcy do lat 8.
+§ 2. Jeżeli czyn określony w § 1 lub 1a połączony jest ze stosowaniem szczególnego okrucieństwa, sprawca podlega karze pozbawienia wolności od roku do lat 10.
+§ 3. Jeżeli następstwem czynu określonego w § 1–2 jest targnięcie się pokrzywdzonego na własne życie, sprawca podlega karze pozbawienia wolności od lat 2 do 15.`,
+        plainSummary: 'Wieloaktowe lub powtarzające się dręczenie fizyczne (bicie, szarpanie, głodzenie) lub psychiczne (poniżanie, wyzwiska, izolowanie, szantaż) osoby bliskiej, zależnej lub nieporadnej. W typie podstawowym grozi od 3 miesięcy do 5 lat więzienia.',
+        penalties: {
+          fine: false,
+          restrictionOfLiberty: false,
+          imprisonmentMinMonths: 3,
+          imprisonmentMaxMonths: 60,
+          summary: 'Pozbawienie wolności od 3 miesięcy do 5 lat. Osoba nieporadna: 6 mies. - 8 lat. Szczególne okrucieństwo: 1 - 10 lat. Następstwo w postaci targnięcia się na życie: 2 - 15 lat.',
+        },
+        additionalSanctions: [
+          'Środki karne: zakaz zbliżania się i kontaktowania z pokrzywdzonym (art. 41a k.k.)',
+          'Nakaz natychmiastowego opuszczenia wspólnie zajmowanego lokalu (art. 39 pkt 2e k.k.)',
+          'Nawiązka oraz zadośćuczynienie za doznaną krzywdę (art. 46 k.k.)',
+        ],
+        isFelony: false,
+        keywords: ['znęcanie', 'przemoc domowa', 'dręczenie', 'osoba najbliższa', 'niebieska karta', 'art 207', 'nakaz opuszczenia lokalu', 'zakaz zbliżania'],
         isOfflinePinned: true,
       },
       {
@@ -1210,8 +1239,19 @@ Art. 62a. Jeżeli przedmiotem czynu są środki odurzające lub substancje psych
         fullDescription: 'Atak fizyczny lub znieważenie ratownika medycznego udzielającego pomocy jest ścigane z urzędu jako przestępstwo z art. 222 lub 226 k.k.',
         practicalImpact: 'Sądy eliminują możliwość warunkowego umarzania postępowań w przypadku agresji wobec załóg karetek pogotowia.',
       },
+      {
+        id: 'alert-uopn-62a-umorzenie',
+        date: '2024-01-15',
+        title: 'Wytyczne prokuratorskie dotyczące stosowania art. 62a UoPN',
+        affectedArticles: ['Art. 62 UoPN', 'Art. 62a UoPN'],
+        severity: 'medium',
+        summary: 'Obligatoryjna ocena możliwości umorzenia postępowania na etapie przedsądowym przy niewielkiej ilości na własny użytek.',
+        fullDescription: 'Zgodnie z ugruntowaną praktyką i wytycznymi PG, w sprawach dotyczących posiadania nieznacznych ilości (np. pojedynczych gramów marihuany bez cech konfekcjonowania), organ dochodzeniowy zobowiązany jest zbadać celowość karania przed sporządzeniem aktu oskarżenia.',
+        practicalImpact: 'Obrona powinna składać wniosek o umorzenie z art. 62a UoPN już na pierwszym przesłuchaniu w charakterze podejrzanego.',
+      },
     ];
 
+    baseArticles.push(...narcoticsLawArticles);
     this.articles.set(baseArticles);
     this.courtRulings.set(baseRulings);
     this.legalAlerts.set(baseAlerts);
