@@ -28,6 +28,7 @@ import { LegalAlerts } from './components/legal-alerts';
 import { VaultModal } from './components/vault-modal';
 import { ReadAloudPlayer } from './components/read-aloud-player';
 import { TextToSpeechService } from './services/text-to-speech.service';
+import { VoiceOrchestratorService } from './services/voice-orchestrator.service';
 import { HandbooksBrowser } from './components/handbooks-browser';
 import { HandbooksDataService } from './services/handbooks-data.service';
 import { DashboardWidgetGrid } from './components/dashboard-widget-grid';
@@ -87,6 +88,7 @@ export class App {
   readonly pdfService = inject(PdfExportService);
   readonly speech = inject(SpeechDictationService);
   readonly tts = inject(TextToSpeechService);
+  readonly voiceOrch = inject(VoiceOrchestratorService);
   readonly widgetsService = inject(DashboardWidgetsService);
   readonly dictService = inject(LegalDictionaryService);
   readonly handbooksData = inject(HandbooksDataService);

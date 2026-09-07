@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { TextToSpeechService } from '../services/text-to-speech.service';
+import { VoiceOrchestratorService } from '../services/voice-orchestrator.service';
 
 @Component({
   selector: 'app-read-aloud-player',
@@ -44,13 +45,26 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
             </div>
 
             <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
                 <span class="text-[10px] font-mono uppercase tracking-wider font-bold bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">
                   Lektor AI (Web Speech)
                 </span>
                 <span class="text-xs text-slate-400 font-mono">
                   Fragment {{ tts.currentChunkIndex() + 1 }} z {{ tts.totalChunks() }} ({{ tts.progressPercent() }}%)
                 </span>
+                <!-- Wskaźnik i przełącznik Barge-in -->
+                <button
+                  type="button"
+                  (click)="voiceOrch.toggleBargeIn()"
+                  [class]="voiceOrch.isBargeInEnabled()
+                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                    : 'bg-slate-800 border-slate-700 text-slate-400'"
+                  class="text-[10px] font-mono px-2 py-0.5 rounded-full border flex items-center gap-1 cursor-pointer transition-colors"
+                  [title]="voiceOrch.isBargeInEnabled() ? 'Barge-in aktywny: zacznij mówić do mikrofonu, by przerwać lektora' : 'Barge-in wyłączony. Kliknij, aby włączyć'"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full" [class]="voiceOrch.isBargeInEnabled() ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'"></span>
+                  <span>Barge-in {{ voiceOrch.isBargeInEnabled() ? 'WŁ' : 'WYŁ' }}</span>
+                </button>
               </div>
               <h4 class="text-sm font-bold truncate text-white mt-0.5" [title]="tts.currentTitle()">
                 {{ tts.currentTitle() }}
@@ -176,6 +190,7 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
 })
 export class ReadAloudPlayer {
   readonly tts = inject(TextToSpeechService);
+  readonly voiceOrch = inject(VoiceOrchestratorService);
   readonly isSpeedMenuOpen = signal<boolean>(false);
   readonly showVoiceSelector = signal<boolean>(false);
 

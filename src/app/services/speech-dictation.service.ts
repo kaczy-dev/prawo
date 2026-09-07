@@ -126,6 +126,13 @@ export class SpeechDictationService {
 
         this.currentInterim.set(interimText);
 
+        // Wyślij zdarzenie do VoiceOrchestratorService dla natychmiastowego Barge-in (<150ms)
+        if (typeof window !== 'undefined' && (interimText.trim() || finalText.trim())) {
+          window.dispatchEvent(new CustomEvent('prawnbot-speech-detected', {
+            detail: { text: interimText || finalText }
+          }));
+        }
+
         if (finalText && this.currentCallback) {
           // Formatowanie znaków interpunkcyjnych w języku polskim
           const formatted = this.formatPunctuation(finalText);
