@@ -236,15 +236,40 @@ export class CommandPaletteModal {
           this.openTemplate.emit('driving');
         },
       },
+      {
+        id: 'tmpl-art60',
+        category: 'template',
+        title: 'Wzór: Wniosek o nadzwyczajne złagodzenie kary (art. 60 § 2 k.k.)',
+        subtitle: 'Pojednanie z pokrzywdzonym, naprawienie szkody i wniosek o karę wolnościową',
+        icon: 'balance',
+        badge: 'Wzór Pisma',
+        action: () => {
+          this.navigateToTab.emit('encrypted-notes');
+          this.openTemplate.emit('art60');
+        },
+      },
+      {
+        id: 'tmpl-uopn62a',
+        category: 'template',
+        title: 'Wzór: Wniosek o umorzenie postępowania z art. 62a UoPN',
+        subtitle: 'Posiadanie nieznacznej ilości na własny użytek – wniosek do prokuratury',
+        icon: 'medication',
+        badge: 'Wzór UoPN',
+        action: () => {
+          this.navigateToTab.emit('encrypted-notes');
+          this.openTemplate.emit('uopn62a');
+        },
+      },
     ];
 
     for (const art of this.legalData.articles()) {
+      const prefix = art.codePrefix || 'k.k.';
       commands.push({
         id: 'art-' + art.id,
         category: 'article',
-        title: `Art. ${art.number}${art.suffix || ''} k.k. – ${art.title}`,
+        title: `Art. ${art.number}${art.suffix || ''} ${prefix} – ${art.title}`,
         subtitle: art.content.slice(0, 80) + '...',
-        badge: art.recentAmendment ? 'Nowela 2024' : 'k.k.',
+        badge: art.recentAmendment ? 'Nowela 2024' : prefix,
         icon: 'gavel',
         action: () => {
           this.selectArticle.emit(art);
