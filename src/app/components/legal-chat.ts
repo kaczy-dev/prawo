@@ -202,6 +202,9 @@ import { CryptoService } from '../services/crypto.service';
                 <!-- Treść wiadomości -->
                 <div class="text-sm leading-relaxed whitespace-pre-wrap font-sans text-slate-200">
                   {{ msg.text }}
+                  @if (isGenerating() && currentGeneratingId() === msg.id) {
+                    <span class="inline-block w-2 h-4 ml-1 bg-amber-400 animate-pulse align-middle rounded-sm shadow-[0_0_8px_#f59e0b]"></span>
+                  }
                 </div>
 
                 <!-- Odesłania do artykułów prawnych -->
@@ -251,6 +254,23 @@ import { CryptoService } from '../services/crypto.service';
                     }
                   </div>
                 }
+              </div>
+            </div>
+          }
+
+          <!-- Bąbelek oczekiwania / myślenia asystenta -->
+          @if (isGenerating() && !currentGeneratingId()) {
+            <div class="flex justify-start w-full animate-fade-in">
+              <div class="bg-slate-950/90 border border-amber-500/30 text-slate-200 rounded-2xl rounded-tl-sm p-4 shadow-xl flex items-center gap-3">
+                <mat-icon class="text-amber-400 animate-spin text-sm">hourglass_top</mat-icon>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs text-amber-300 font-medium">Prawnik z Łuczniczej analizuje przepisy k.k.</span>
+                  <span class="flex gap-1 items-center ml-1">
+                    <span class="w-1.5 h-1.5 bg-amber-400 rounded-full animate-bounce"></span>
+                    <span class="w-1.5 h-1.5 bg-amber-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                    <span class="w-1.5 h-1.5 bg-amber-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                  </span>
+                </div>
               </div>
             </div>
           }
@@ -316,15 +336,29 @@ import { CryptoService } from '../services/crypto.service';
               }
             </div>
 
-            <!-- Przycisk wysłania -->
-            <button
-              id="btn-send-chat-message"
-              (click)="sendMessage()"
-              class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-5 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-amber-950/40 shrink-0 active:scale-95"
-            >
-              <mat-icon class="text-base">send</mat-icon>
-              <span class="hidden sm:inline">Wyślij</span>
-            </button>
+            <!-- Przycisk wysłania lub zatrzymania generowania -->
+            @if (isGenerating()) {
+              <button
+                id="btn-stop-generating"
+                type="button"
+                (click)="stopGenerating()"
+                class="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 font-bold px-4 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shrink-0 active:scale-95"
+                title="Zatrzymaj generowanie odpowiedzi"
+              >
+                <mat-icon class="text-base text-red-400">stop_circle</mat-icon>
+                <span class="hidden sm:inline">Zatrzymaj</span>
+              </button>
+            } @else {
+              <button
+                id="btn-send-chat-message"
+                type="button"
+                (click)="sendMessage()"
+                class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-5 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-amber-950/40 shrink-0 active:scale-95"
+              >
+                <mat-icon class="text-base">send</mat-icon>
+                <span class="hidden sm:inline">Wyślij</span>
+              </button>
+            }
           </div>
 
           <div class="flex items-center justify-between text-[11px] text-slate-500 mt-2 px-1 font-mono">
@@ -498,7 +532,21 @@ export class LegalChat {
     }, 4000);
   }
 
+  readonly isGenerating = signal<boolean>(false);
+  readonly currentGeneratingId = signal<string | null>(null);
+  private abortStreaming = false;
+
+  stopGenerating(): void {
+    this.abortStreaming = true;
+    this.isGenerating.set(false);
+    this.currentGeneratingId.set(null);
+  }
+
   async sendMessage(customText?: string): Promise<void> {
+    if (this.isGenerating()) {
+      return;
+    }
+
     if (this.isDictating()) {
       this.speech.stop();
     }
@@ -517,31 +565,109 @@ export class LegalChat {
     this.inputText.set('');
     this.scrollToBottom();
 
-    // Jeśli aktywny jest tryb WebGPU i model jest gotowy
+    this.isGenerating.set(true);
+    this.currentGeneratingId.set(null);
+    this.abortStreaming = false;
+
+    // 1. Ścieżka WebGPU Model
     if (this.useWebGPU() && this.webLLM.status() === 'ready') {
       try {
-        const localResponseText = await this.webLLM.generateResponse(textToSend);
-        const webGpuMsg: ChatMessage = {
-          id: `webgpu-msg-${Date.now()}`,
-          sender: 'assistant',
-          timestamp: new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }),
-          text: localResponseText,
-          legalCategoryBadge: 'Lokalny Model WebGPU (Offline)',
-        };
-        this.chatMessages.update((msgs) => [...msgs, webGpuMsg]);
-        this.scrollToBottom();
+        const fullResponseText = await this.webLLM.generateResponse(textToSend);
+        await this.streamAssistantResponse(
+          fullResponseText,
+          'Lokalny Model WebGPU (Offline)',
+          [],
+          ['Jakie są terminy przedawnienia?', 'Czy można złożyć wniosek o dozór SDE?']
+        );
         return;
       } catch (err) {
         console.warn('WebGPU generation error, falling back to local rule-engine:', err);
       }
     }
 
-    // Lokalna odpowiedź asystenta prawnBot (fallback / szybki wbudowany silnik regułowy)
-    setTimeout(() => {
+    // 2. Ścieżka lokalnego silnika prawno-karnego (Typewriter Streaming)
+    setTimeout(async () => {
+      if (this.abortStreaming) return;
       const response = this.aiService.generateChatResponse(textToSend);
-      this.chatMessages.update((msgs) => [...msgs, response]);
+
+      await this.streamAssistantResponse(
+        response.text,
+        response.legalCategoryBadge,
+        response.referencedArticles,
+        response.suggestedFollowUps,
+        response.actionQuery
+      );
+    }, 180);
+  }
+
+  /**
+   * Płynne strumieniowanie odpowiedzi asystenta (efekt maszynopisania token po tokenie)
+   */
+  private async streamAssistantResponse(
+    fullText: string,
+    categoryBadge?: string,
+    referencedArticles?: string[],
+    suggestedFollowUps?: string[],
+    actionQuery?: string
+  ): Promise<void> {
+    const assistantMsgId = `assistant-msg-${Date.now()}`;
+    this.currentGeneratingId.set(assistantMsgId);
+
+    const initialAssistantMsg: ChatMessage = {
+      id: assistantMsgId,
+      sender: 'assistant',
+      timestamp: new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }),
+      text: '',
+      legalCategoryBadge: categoryBadge,
+      referencedArticles: [],
+      suggestedFollowUps: [],
+      actionQuery: undefined,
+    };
+
+    this.chatMessages.update((msgs) => [...msgs, initialAssistantMsg]);
+    this.scrollToBottom();
+
+    // Podział tekstu na zwarte kęsy słów (tokeny)
+    const tokens = fullText.split(/(?<=\s+)|(?<=[.,;:!?\n])/g);
+    let accumulatedText = '';
+
+    for (let i = 0; i < tokens.length; i++) {
+      if (this.abortStreaming) {
+        break;
+      }
+
+      accumulatedText += tokens[i];
+
+      // Aktualizujemy treść w bąbelku
+      this.chatMessages.update((msgs) =>
+        msgs.map((m) => (m.id === assistantMsgId ? { ...m, text: accumulatedText } : m))
+      );
+
       this.scrollToBottom();
-    }, 150);
+
+      // Drobne opóźnienie maszynopisania dla naturalnego rytmu
+      const delay = tokens[i].includes('\n') ? 35 : tokens[i].length > 4 ? 18 : 10;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
+    // Na koniec odsłaniamy odesłania do artykułów i sugerowane pytania
+    this.chatMessages.update((msgs) =>
+      msgs.map((m) =>
+        m.id === assistantMsgId
+          ? {
+              ...m,
+              text: accumulatedText,
+              referencedArticles,
+              suggestedFollowUps,
+              actionQuery,
+            }
+          : m
+      )
+    );
+
+    this.isGenerating.set(false);
+    this.currentGeneratingId.set(null);
+    this.scrollToBottom();
   }
 
   resetConversation(): void {
