@@ -638,6 +638,148 @@ export class HandbooksDataService {
       linkedRulingSignatures: ['II KK 175/21', 'I KZP 8/22'],
       quickScenarioQuery: 'zatrzymanie przez policję prawa 48 godzin',
     },
+    {
+      id: 'hb-narkotyki-uopn',
+      title: 'Posiadanie narkotyków i umorzenie z art. 62a UoPN',
+      subtitle: 'Niewielka ilość na własny użytek, definicja „znacznej ilości” i jak uniknąć wpisu do KRK',
+      slug: 'narkotyki-art-62-62a-uopn',
+      difficulty: 'podstawowy',
+      category: 'Procedura i zatrzymanie',
+      readTimeMinutes: 6,
+      icon: 'medication',
+      summary: 'W Polsce każde posiadanie narkotyków jest przestępstwem, ale art. 62a UoPN daje realną szansę na całkowite umorzenie sprawy bez kary i bez wpisu do Krajowego Rejestru Karnego. Poznaj kryteria i linię obrony.',
+      sections: [
+        {
+          heading: '1. Każda ilość jest nielegalna, ale liczy się przeznaczenie',
+          paragraphs: [
+            'W polskim porządku prawnym nie obowiązuje pojęcie „dozwolonej ilości rekreacyjnej”. Posiadanie nawet 0.5 grama marihuany formalnie wypełnia znamiona przestępstwa z art. 62 ust. 1 UoPN, za co grozi do 3 lat więzienia.',
+            'Ustawodawca wprowadził jednak kluczowy wentyl bezpieczeństwa: art. 62a UoPN, który pozwala prokuratorowi lub sądowi umorzyć postępowanie jeszcze przed wszczęciem dochodzenia lub na jego wczesnym etapie.',
+          ],
+        },
+        {
+          heading: '2. Warunki umorzenia na podstawie art. 62a UoPN',
+          paragraphs: [
+            'Aby sprawa została umorzona z art. 62a UoPN, muszą zostać spełnione łącznie trzy warunki: 1) ilość środka musi być nieznaczna (zazwyczaj od ułamka grama do kilku gramów suszu), 2) narkotyk musi być przeznaczony wyłącznie na własny użytek sprawcy (brak wagi dilerskiej, woreczków strunowych, gotówki w drobnych nominałach), 3) orzeczenie kary byłoby niecelowe ze względu na stopień społecznej szkodliwości.',
+          ],
+        },
+        {
+          heading: '3. Co oznacza „znaczna ilość” (art. 62 ust. 2 i art. 56 ust. 3)?',
+          paragraphs: [
+            'Zgodnie z ugruntowaną linią Sądu Najwyższego (m.in. I KZP 24/18) znaczna ilość to taka, która pozwala na jednorazowe odurzenie co najmniej kilkudziesięciu osób (w praktyce orzeczniczej od kilkudziesięciu do kilkuset porcji handlowych). Przy znacznej ilości dolna granica kary to aż 1 rok więzienia, a przy handlu – zbrodnia od 2 do 15 lat.',
+          ],
+        },
+      ],
+      keyRules: [
+        'Złóż wniosek o umorzenie z art. 62a UoPN już podczas pierwszego przesłuchania na policji.',
+        'Wykazuj, że substancja służyła wyłącznie do użytku własnego (brak cech dystrybucji).',
+        'Umorzenie z art. 62a UoPN oznacza brak skazania i czystą kartotekę w KRK.',
+        'Przy większych ilościach żądaj zbadania czystego stężenia substancji aktywnej (THC).',
+      ],
+      mythsAndFacts: [
+        {
+          myth: 'Do 5 gramów marihuany jest w Polsce w 100% legalne i policja nic nie może zrobić.',
+          fact: 'Fałsz! W Polsce nie ma progu legalnego posiadania. Za 0.1 grama zostaniesz zatrzymany. Jedyną drogą jest art. 62a UoPN.',
+        },
+        {
+          myth: 'Umorzenie z art. 62a UoPN oznacza wpis do Krajowego Rejestru Karnego jako przestępca.',
+          fact: 'Nieprawda. Umorzenie to brak wyroku skazującego – zachowujesz w 100% status osoby niekaranej.',
+        },
+      ],
+      caseStudies: [
+        {
+          id: 'cs-uopn-1',
+          title: 'Zatrzymanie z 2 gramami suszu podczas kontroli drogowej',
+          scenario: 'Kamil (22 lata, student, dotąd niekarany) został zatrzymany w trakcie rutynowej kontroli. W schowku miał 1.8g marihuany. Policja zabezpieczyła telefon i przeszukała mieszkanie, gdzie nie znaleziono żadnych innych narkotyków ani wag.',
+          legalDilemma: 'Czy Kamil trafi do więzienia i czy jego nazwisko pojawi się w KRK?',
+          courtResolution: 'Obrońca złożył wniosek o umorzenie z art. 62a UoPN. Prokurator po weryfikacji niekaralności i braku cech handlu umorzył śledztwo. Zabezpieczony susz uległ przepadkowi, a Kamil ma czyste konto w KRK.',
+          practicalTakeaway: 'Szybkie wykazanie niekaralności i jednorazowego charakteru posiadania otwiera prostą drogę do art. 62a UoPN.',
+          relatedArticles: [
+            { code: 'Art. 62 UoPN', label: 'Posiadanie narkotyków' },
+            { code: 'Art. 62a UoPN', label: 'Umorzenie nieznacznej ilości' },
+          ],
+          relatedRulingSignatures: ['I KZP 24/18'],
+          calculatorScenarioQuery: 'posiadanie 2g marihuany na własny użytek art 62a uopn',
+        },
+      ],
+      linkedArticleRefs: [
+        { code: 'Art. 62 UoPN', label: 'Posiadanie narkotyków' },
+        { code: 'Art. 62a UoPN', label: 'Klauzula umorzenia' },
+        { code: 'Art. 56 UoPN', label: 'Obrót narkotykami' },
+      ],
+      linkedRulingSignatures: ['I KZP 24/18'],
+      quickScenarioQuery: 'art 62 uopn marihuana własny użytek umorzenie',
+    },
+    {
+      id: 'hb-oszustwo-286',
+      title: 'Oszustwo (Art. 286 k.k.) – wyłudzenia internetowe, kredyty i BLIK',
+      subtitle: 'Znamiona przestępstwa, zamiar bezpośredni i granica między niewypłacalnością a przestępstwem',
+      slug: 'oszustwo-art-286-kk',
+      difficulty: 'średniozaawansowany',
+      category: 'Mienie i oszustwa',
+      readTimeMinutes: 7,
+      icon: 'receipt_long',
+      summary: 'Gdzie kończy się spór cywilny o niezapłaconą fakturę, a zaczyna odpowiedzialność karna za oszustwo? Dowiedz się, czym jest zamiar bezpośredni kierunkowy (dolus directus coloratus) i jak bronić się przed zarzutem z art. 286 k.k.',
+      sections: [
+        {
+          heading: '1. Kiedy niezapłacenie długu jest przestępstwem oszustwa?',
+          paragraphs: [
+            'Art. 286 § 1 k.k. penalizuje doprowadzenie innej osoby do niekorzystnego rozporządzenia mieniem za pomocą wprowadzenia w błąd, wyzyskania błędu lub niezdolności do należytego pojmowania. Grozi za to od 6 miesięcy do aż 8 lat pozbawienia wolności.',
+            'Kluczowe: samo niewywiązanie się z umowy lub brak środków na zapłacenie faktury NIE jest oszustwem! Aby zaistniało przestępstwo, sprawca musiał mieć z góry powzięty zamiar niewywiązania się z płatności JUŻ W MOMENCIE zawierania umowy.',
+          ],
+        },
+        {
+          heading: '2. Nowoczesne metody: wyłudzenia na kod BLIK i fałszywe sklepy',
+          paragraphs: [
+            'Podszywanie się pod znajomego w komunikatorze i wyłudzanie kodu BLIK stanowi oszustwo kwalifikowane w zbiegu z art. 267 k.k. (nielegalny dostęp do systemu). Sądy powszechne traktują ten proceder jako przestępczość zorganizowaną i rzadko stosują warunkowe zawieszenie kary bez naprawienia szkody.',
+          ],
+        },
+        {
+          heading: '3. Linia obrony: wypadek mniejszej wagi (art. 286 § 3 k.k.) i naprawienie szkody',
+          paragraphs: [
+            'W przypadku mniejszych kwot kluczowym celem obrony jest zakwalifikowanie czynu jako wypadek mniejszej wagi z § 3, co umożliwia orzeczenie samej grzywny lub ograniczenia wolności. Z kolei całkowite naprawienie szkody (art. 46 k.k.) otwiera drogę do nadzwyczajnego złagodzenia z art. 60 k.k.',
+          ],
+        },
+      ],
+      keyRules: [
+        'Brak zamiaru w chwili zawierania umowy wyklucza skazanie za oszustwo z art. 286 k.k.',
+        'Spór o nienależyte wykonanie umowy to domena sądu cywilnego, a nie prokuratora.',
+        'Szybkie oddanie środków pokrzywdzonemu diametralnie zmienia ocenę sądu (art. 60 k.k.).',
+        'Przy kwotach powyżej 200 000 zł grozi odpowiedzialność z art. 294 § 1 k.k. (do 10 lat więzienia).',
+      ],
+      mythsAndFacts: [
+        {
+          myth: 'Każda niezapłacona w terminie faktura lub pożyczka to automatycznie przestępstwo oszustwa.',
+          fact: 'Nie! Jeśli utraciłeś płynność finansową z przyczyn obiektywnych po zawarciu umowy, to sprawa cywilna, a nie karna.',
+        },
+        {
+          myth: 'Jeśli oddam pieniądze po wszczęciu śledztwa, prokurator musi automatycznie umorzyć sprawę.',
+          fact: 'Nie musi, ale naprawienie szkody daje obrońcy potężny argument za warunkowym umorzeniem (art. 66 k.k.) lub łagodną karą.',
+        },
+      ],
+      caseStudies: [
+        {
+          id: 'cs-286-1',
+          title: 'Niezapłacona partia towaru w firmie budowlanej a zarzut oszustwa',
+          scenario: 'Przedsiębiorca Marek zamówił materiały budowlane na kwotę 45 000 zł z odroczonym terminem płatności 30 dni. Przed upływem terminu jego główny kontrahent zbankrutował, przez co Marek stracił płynność i nie uregulował faktury. Dostawca złożył zawiadomienie o popełnieniu przestępstwa z art. 286 § 1 k.k.',
+          legalDilemma: 'Czy Marek dopuścił się oszustwa gospodarczego?',
+          courtResolution: 'Prokuratura umorzyła śledztwo wobec braku znamion czynu zabronionego. Obrońca przedstawił wyciągi bankowe wykazujące, że w chwili zamawiania towaru firma Marka była wypłacalna i liczyła na zapłatę od kontrahenta. Brak było zamiaru bezpośredniego w chwili zawierania umowy.',
+          practicalTakeaway: 'Dowody księgowe z daty transakcji są decydujące dla wykazania czystości intencji gospodarczych.',
+          relatedArticles: [
+            { code: 'Art. 286 § 1 k.k.', label: 'Oszustwo' },
+            { code: 'Art. 286 § 3 k.k.', label: 'Wypadek mniejszej wagi' },
+          ],
+          relatedRulingSignatures: ['II AKa 314/23'],
+          calculatorScenarioQuery: 'art 286 kk oszustwo niezapłacona faktura zamiar bezpośredni',
+        },
+      ],
+      linkedArticleRefs: [
+        { code: 'Art. 286 k.k.', label: 'Oszustwo klasyczne i gospodarcze' },
+        { code: 'Art. 294 k.k.', label: 'Mienie znacznej wartości' },
+        { code: 'Art. 60 k.k.', label: 'Nadzwyczajne złagodzenie przy naprawieniu szkody' },
+      ],
+      linkedRulingSignatures: ['II AKa 314/23'],
+      quickScenarioQuery: 'art 286 kk wyłudzenie oszustwo internetowe',
+    },
   ]);
 
   // Wyszukiwanie i filtrowanie
