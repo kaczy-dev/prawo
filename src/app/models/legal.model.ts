@@ -86,11 +86,14 @@ export interface ThreatAnalysisResult {
   art60Mitigation?: MitigationArt60Simulation;
 }
 
+export type ChatPersona = 'citizen' | 'counsel' | 'interrogator';
+
 export interface ChatMessage {
   id: string;
   sender: 'user' | 'assistant';
   timestamp: string;
   text: string;
+  persona?: ChatPersona;
   referencedArticles?: string[];
   referencedRulings?: string[];
   suggestedFollowUps?: string[];

@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, inject, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, computed, inject, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { ChatMessage, EncryptedNote } from '../models/legal.model';
+import { ChatMessage, EncryptedNote, ChatPersona } from '../models/legal.model';
 import { PrawnBotAiService } from '../services/prawn-bot-ai.service';
 import { SpeechDictationService } from '../services/speech-dictation.service';
 import { LocalWebLLMService } from '../services/local-web-llm.service';
@@ -119,13 +119,72 @@ import { CryptoService } from '../services/crypto.service';
           </div>
         }
 
+        <!-- Przełącznik trybu / persony asystenta (Citizen / Counsel / Interrogator) -->
+        <div class="pt-2.5 pb-1 px-1 border-b border-slate-800/80 shrink-0 flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 text-xs">
+            <span class="text-[11px] text-slate-400 font-semibold flex items-center gap-1">
+              <mat-icon class="text-xs text-amber-400">psychology</mat-icon> Rola asystenta:
+            </span>
+            <div class="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-800/90 shadow-inner">
+              <button
+                type="button"
+                (click)="setPersona('citizen')"
+                [class]="selectedPersona() === 'citizen'
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm font-semibold'
+                  : 'text-slate-400 hover:text-slate-200 border-transparent'"
+                class="px-2.5 py-1 rounded-lg border text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Prosty, zrozumiały język, praktyczne rady dla każdego bez żargonu"
+              >
+                <span>🤝</span>
+                <span>Dla Obywatela</span>
+              </button>
+
+              <button
+                type="button"
+                (click)="setPersona('counsel')"
+                [class]="selectedPersona() === 'counsel'
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm font-semibold'
+                  : 'text-slate-400 hover:text-slate-200 border-transparent'"
+                class="px-2.5 py-1 rounded-lg border text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Twardy język procesowy, weryfikacja błędów k.p.k., tezy SN, taktyka obrony"
+              >
+                <span>⚖️</span>
+                <span>Dla Obrońcy</span>
+              </button>
+
+              <button
+                type="button"
+                (click)="setPersona('interrogator')"
+                [class]="selectedPersona() === 'interrogator'
+                  ? 'bg-red-500/20 text-red-300 border-red-500/40 shadow-sm font-semibold'
+                  : 'text-slate-400 hover:text-slate-200 border-transparent'"
+                class="px-2.5 py-1 rounded-lg border text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Symulacja przesłuchania śledczego: dociekliwe pytania i sprawdzanie spójności wersji"
+              >
+                <span>🚨</span>
+                <span>Symulator Przesłuchania</span>
+              </button>
+            </div>
+          </div>
+
+          <span class="text-[10px] text-slate-500 font-mono hidden sm:inline">
+            @if (selectedPersona() === 'citizen') {
+              Tryb: Prosty język & bezpieczne kroki
+            } @else if (selectedPersona() === 'counsel') {
+              Tryb: Profesjonalna taktyka adwokacka
+            } @else {
+              Tryb: Przygotowanie do zeznań na policji
+            }
+          </span>
+        </div>
+
         <!-- Szybkie zapytania "Co mi grozi?" (Quick Prompts Chips) -->
-        <div class="py-2.5 px-1 border-b border-slate-800/80 shrink-0">
+        <div class="py-2 px-1 border-b border-slate-800/80 shrink-0">
           <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
             <span class="text-[11px] text-slate-400 whitespace-nowrap flex items-center gap-1 mr-1">
               <mat-icon class="text-xs text-amber-400">tips_and_updates</mat-icon> Zadaj pytanie:
             </span>
-            @for (quick of quickPromptSuggestions; track quick) {
+            @for (quick of currentPersonaSuggestions(); track quick) {
               <button
                 type="button"
                 (click)="sendMessage(quick)"
@@ -153,11 +212,19 @@ import { CryptoService } from '../services/crypto.service';
                 <div class="flex items-center justify-between gap-3 text-xs mb-2.5 pb-2 border-b border-slate-800/60 opacity-85">
                   <span class="font-semibold flex items-center gap-1.5 font-serif">
                     @if (msg.sender === 'assistant') {
-                      <mat-icon class="text-xs text-amber-400">balance</mat-icon>
+                      <mat-icon class="text-xs text-amber-400">
+                        {{ msg.persona === 'interrogator' ? 'local_police' : msg.persona === 'counsel' ? 'gavel' : 'balance' }}
+                      </mat-icon>
                       <span class="text-amber-300">Prawnik z Łuczniczej</span>
+                      @if (msg.persona) {
+                        <span class="text-[9px] font-sans px-1.5 py-0.2 rounded-md"
+                          [class]="msg.persona === 'interrogator' ? 'bg-red-500/20 text-red-300 border border-red-500/30' : msg.persona === 'counsel' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-300 border border-slate-700'">
+                          {{ msg.persona === 'interrogator' ? 'Śledczy' : msg.persona === 'counsel' ? 'Obrońca' : 'Obywatel' }}
+                        </span>
+                      }
                     } @else {
                       <mat-icon class="text-xs text-amber-200">person</mat-icon>
-                      <span class="text-slate-300">Prawnik / Użytkownik</span>
+                      <span class="text-slate-300">Pytanie klienta</span>
                     }
                   </span>
                   <div class="flex items-center gap-2">
@@ -400,15 +467,46 @@ export class LegalChat {
     }
   }
 
-  readonly quickPromptSuggestions = [
-    'Co mi grozi za zakłócanie ciszy nocnej?',
-    'Jazda bez uprawnień (art. 94 k.w.)',
-    'Posiadanie marihuany na własny użytek',
-    'Hejt w internecie i opinie google (art. 212 k.k.)',
-    'Porysowanie auta na parkingu (art. 288 k.k.)',
-    'Jazda po 2 piwach (konfiskata auta)',
-    'Płatność cudzą kartą zbliżeniową',
-  ];
+  readonly selectedPersona = signal<ChatPersona>('citizen');
+
+  setPersona(persona: ChatPersona): void {
+    this.selectedPersona.set(persona);
+    const label = persona === 'citizen' ? 'Dla Obywatela' : persona === 'counsel' ? 'Dla Obrońcy' : 'Symulator Przesłuchania';
+    this.showNotification(`Zmieniono rolę asystenta na: ${label}`, 'success');
+  }
+
+  readonly currentPersonaSuggestions = computed(() => {
+    switch (this.selectedPersona()) {
+      case 'counsel':
+        return [
+          'Zarzuty apelacyjne z art. 438 k.p.k.',
+          'Wniosek o umorzenie przed rozprawą (art. 339 k.p.k.)',
+          'Legalność przeszukania i art. 168a k.p.k.',
+          'Nadzwyczajne złagodzenie kary (art. 60 k.k.)',
+          'SDE zamiast więzienia (art. 43a k.k.w.)',
+          'Zbieg przestępstw i kara łączna (art. 85 k.k.)',
+        ];
+      case 'interrogator':
+        return [
+          'Co mówić na pierwszym przesłuchaniu?',
+          'Policja wzywa mnie na świadka, a podejrzewa o czyn',
+          'Czy odmowa odpowiedzi na pytania pogorszy moją sytuację?',
+          'Kiedy prokurator składa wniosek o areszt (art. 249 k.p.k.)?',
+          'Przeszukanie telefonu i komputera przez policję',
+          'Podpisanie protokołu z nieścisłościami',
+        ];
+      default:
+        return [
+          'Co mi grozi za zakłócanie ciszy nocnej?',
+          'Jazda bez uprawnień (art. 94 k.w.)',
+          'Posiadanie marihuany na własny użytek',
+          'Hejt w internecie i opinie google (art. 212 k.k.)',
+          'Porysowanie auta na parkingu (art. 288 k.k.)',
+          'Jazda po 2 piwach (konfiskata auta)',
+          'Płatność cudzą kartą zbliżeniową',
+        ];
+    }
+  });
 
   readonly inputText = signal<string>('');
   readonly chatMessages = signal<ChatMessage[]>([
@@ -575,7 +673,7 @@ export class LegalChat {
         const fullResponseText = await this.webLLM.generateResponse(textToSend);
         await this.streamAssistantResponse(
           fullResponseText,
-          'Lokalny Model WebGPU (Offline)',
+          `Lokalny Model WebGPU (${this.selectedPersona() === 'counsel' ? 'Obrońca' : this.selectedPersona() === 'interrogator' ? 'Śledczy' : 'Obywatel'})`,
           [],
           ['Jakie są terminy przedawnienia?', 'Czy można złożyć wniosek o dozór SDE?']
         );
@@ -585,10 +683,10 @@ export class LegalChat {
       }
     }
 
-    // 2. Ścieżka lokalnego silnika prawno-karnego (Typewriter Streaming)
+    // 2. Ścieżka lokalnego silnika prawno-karnego (Typewriter Streaming z wybraną personą)
     setTimeout(async () => {
       if (this.abortStreaming) return;
-      const response = this.aiService.generateChatResponse(textToSend);
+      const response = this.aiService.generateChatResponse(textToSend, this.selectedPersona());
 
       await this.streamAssistantResponse(
         response.text,
@@ -618,6 +716,7 @@ export class LegalChat {
       sender: 'assistant',
       timestamp: new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }),
       text: '',
+      persona: this.selectedPersona(),
       legalCategoryBadge: categoryBadge,
       referencedArticles: [],
       suggestedFollowUps: [],

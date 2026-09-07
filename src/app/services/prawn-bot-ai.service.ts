@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { LegalDataService } from './legal-data.service';
 import { LegalGuardrailService } from './legal-guardrail.service';
-import { PenalArticle, ThreatAnalysisResult, ChatMessage, MitigationArt60Simulation } from '../models/legal.model';
+import { PenalArticle, ThreatAnalysisResult, ChatMessage, MitigationArt60Simulation, ChatPersona } from '../models/legal.model';
 
 @Injectable({
   providedIn: 'root',
@@ -801,9 +801,12 @@ export class PrawnBotAiService {
 
   /**
    * Czat asystenta prawnego prawnBot – w 100% offline i darmowy.
-   * Odpowiada prostym językiem prawniczym, cytuje artykuły i podaje praktyczne wskazówki.
+   * Obsługuje 3 persony:
+   * - 'citizen' (Dla Obywatela - prosty, zrozumiały język, uspokajający ton, instrukcja co robić)
+   * - 'counsel' (Dla Obrońcy / Adwokata - twardy język procesowy, błędy proceduralne, tezy SN, taktyka obrony)
+   * - 'interrogator' (Symulator Przesłuchania - dociekliwe pytania śledczego, weryfikacja luk w zeznaniach)
    */
-  generateChatResponse(userPrompt: string): ChatMessage {
+  generateChatResponse(userPrompt: string, persona: ChatPersona = 'citizen'): ChatMessage {
     const q = userPrompt.toLowerCase().trim();
     let text = '';
     const referencedArticles: string[] = [];
@@ -1703,15 +1706,39 @@ W czym konkretnie mogę pomóc w Twojej sprawie?`;
       }
     }
 
+    // Zastosowanie persony do wygenerowanej treści odpowiedzi
+    let formattedText = text;
+    if (persona === 'counsel') {
+      formattedText = `### ⚖️ Kancelaryjna Opinia Procesowa (Wykładnia Obrończa)\n\n${text}\n\n---\n**Taktyka Obrończa (art. 6 k.p.k.):**\n- Zweryfikuj legalność zabezpieczenia materiału dowodowego (art. 168a k.p.k. i łańcuch dowodowy).\n- Rozważ wniosek o umorzenie postępowania przed rozprawą (art. 339 § 3 pkt 1 i 2 k.p.k.).\n- Przygotuj argumentację pod dyrektywy wymiaru kary z art. 53 § 1 i 2 k.k.`;
+      if (suggestedFollowUps.length > 0) {
+        suggestedFollowUps = [
+          'Jak sformułować zarzuty apelacyjne (art. 438 k.p.k.)?',
+          'Wniosek o wyłączenie dowodu z naruszeniem procedury',
+          'Linia orzecznicza Sądu Najwyższego w tym zagadnieniu',
+        ];
+      }
+    } else if (persona === 'interrogator') {
+      formattedText = `### 🚨 Symulacja Przesłuchania Śledczego (Pokój Przesłuchań)\n\nZarzucam Ci podejrzenie popełnienia czynu opisanego w zapytaniu. Zanim podejmiesz decyzję, zapoznaj się z zarzutem i kwalifikacją:\n\n${text}\n\n---\n**Pytania Śledczego do podejrzanego / świadka:**\n1. *„Gdzie dokładnie znajdowałeś się w momencie zdarzenia i kto może to bezspornie poświadczyć?”*\n2. *„Czy zdajesz sobie sprawę, że Twoje wcześniejsze wyjaśnienia lub wiadomości w telefonie mogą przeczyć tej wersji?”*\n3. *„Czy działałeś sam, czy z innymi osobami, i kto był inicjatorem tego zachowania?”*\n\n> 🛡️ **Pouczenie Obrońcy:** Masz prawo milczeć (art. 175 § 1 k.p.k.). Odmowa odpowiedzi na powyższe pytania nie może być traktowana jako przyznanie się do winy.`;
+      suggestedFollowUps = [
+        'Jak bezpiecznie odpowiedzieć: „Odmawiam składania wyjaśnień”?',
+        'Co zrobić, gdy policjant wywiera presję psychiczną?',
+        'Żądam obecności adwokata przed odpowiedzią na pytania',
+      ];
+    } else {
+      // Dla Obywatela (citizen) - dodanie przyjaznego podsumowania bez żargonu
+      formattedText = `### 🤝 Przewodnik dla Obywatela (Zrozumiałe Prawo)\n\n${text}\n\n---\n💡 **Złota zasada w tej sytuacji:**\nZachowaj spokój. Nie składaj pochopnych oświadczeń na piśmie pod wpływem emocji. Masz prawo skonsultować się z adwokatem przed jakimkolwiek podpisaniem protokołu.`;
+    }
+
     return {
       id: `msg-${Date.now()}`,
       sender: 'assistant',
       timestamp: new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }),
-      text,
+      text: formattedText,
+      persona,
       referencedArticles: referencedArticles.length > 0 ? referencedArticles : undefined,
       referencedRulings: referencedRulings.length > 0 ? referencedRulings : undefined,
       suggestedFollowUps,
-      legalCategoryBadge,
+      legalCategoryBadge: legalCategoryBadge ? `${legalCategoryBadge} [${persona === 'counsel' ? 'Obrońca' : persona === 'interrogator' ? 'Śledczy' : 'Obywatel'}]` : undefined,
       actionQuery,
     };
   }
