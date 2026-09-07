@@ -14,7 +14,7 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
         role="region"
         aria-label="Odtwarzacz syntezatora mowy lektora"
         aria-live="polite"
-        class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-2xl bg-slate-900/95 backdrop-blur-xl border border-amber-500/40 rounded-2xl shadow-2xl shadow-black/80 p-3 sm:p-4 text-slate-100 transition-all duration-300"
+        class="fixed bottom-20 md:bottom-4 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-2xl bg-slate-900/95 backdrop-blur-xl border border-amber-500/40 rounded-2xl shadow-2xl shadow-black/80 p-3 sm:p-4 text-slate-100 transition-all duration-300"
       >
         <!-- Pasek postępu odczytu aktu prawnego -->
         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">

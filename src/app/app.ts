@@ -25,7 +25,6 @@ import { RulingsBrowser } from './components/rulings-browser';
 import { LegalChat } from './components/legal-chat';
 import { EncryptedNotes } from './components/encrypted-notes';
 import { LegalAlerts } from './components/legal-alerts';
-import { TechnicalDocs } from './components/technical-docs';
 import { VaultModal } from './components/vault-modal';
 import { ReadAloudPlayer } from './components/read-aloud-player';
 import { TextToSpeechService } from './services/text-to-speech.service';
@@ -38,6 +37,9 @@ import { LegalContextTooltip } from './components/legal-context-tooltip';
 import { LegalDictionaryService } from './services/legal-dictionary.service';
 import { OfflineSyncManagerModal } from './components/offline-sync-manager-modal';
 import { OfflineSyncService } from './services/offline-sync.service';
+import { CommandPaletteModal } from './components/command-palette-modal';
+import { CumulativeSentenceModalComponent } from './components/cumulative-sentence-modal';
+import { DocumentExportModalComponent } from './components/document-export-modal';
 
 export type ActiveTab =
   | 'threat-calc'
@@ -46,12 +48,14 @@ export type ActiveTab =
   | 'rulings'
   | 'ai-chat'
   | 'alerts'
-  | 'notes'
-  | 'technical-docs';
+  | 'notes';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
+  host: {
+    '(document:keydown)': 'handleGlobalKeydown($event)',
+  },
   imports: [
     CommonModule,
     MatIconModule,
@@ -63,12 +67,14 @@ export type ActiveTab =
     LegalChat,
     EncryptedNotes,
     LegalAlerts,
-    TechnicalDocs,
     VaultModal,
     ReadAloudPlayer,
     LegalDictionaryModal,
     LegalContextTooltip,
     OfflineSyncManagerModal,
+    CommandPaletteModal,
+    CumulativeSentenceModalComponent,
+    DocumentExportModalComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -104,7 +110,23 @@ export class App {
   // Modal skarbca
   readonly isVaultModalOpen = signal<boolean>(false);
 
-  // Popularne scenariusze czynów zabronionych do natychmiastowego wyszukiwania
+  // Stan modalnej palety poleceń (Spotlight / Ctrl+K)
+  readonly isCommandPaletteOpen = signal<boolean>(false);
+
+  // Modal kalkulatora kary łącznej (art. 85-86 k.k.)
+  readonly isCumulativeSentenceModalOpen = signal<boolean>(false);
+
+  // Modal kancelaryjnego wydruku i eksportu A4
+  readonly isDocumentExportModalOpen = signal<boolean>(false);
+
+  // Tryb gęstości sali sądowej (Courtroom Dense Mode) dla desktopu
+  readonly isCourtroomDense = signal<boolean>(false);
+
+  // Stan menu "Więcej" na mobile
+  readonly isMobileMenuOpen = signal<boolean>(false);
+
+  // Skróty klawiszowe (Ctrl+K -> szukaj, Ctrl+L -> zablokuj skarbiec)
+
   readonly popularScenarios = [
     {
       label: 'Zakłócanie ciszy nocnej (art. 51 k.w.)',
@@ -242,6 +264,31 @@ export class App {
 
   constructor() {
     this.runThreatAnalysis();
+  }
+
+  handleGlobalKeydown(e: KeyboardEvent): void {
+    // Ctrl+K lub Cmd+K - Otwórz modalną Paletę Poleceń (Spotlight)
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      this.isCommandPaletteOpen.update((v) => !v);
+      return;
+    }
+    // Ctrl+Shift+L - Natychmiastowa blokada skarbca
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'l') {
+      e.preventDefault();
+      if (this.cryptoService.isAuthenticated()) {
+        this.lockVault();
+      }
+      return;
+    }
+    // Alt+1..5 - Szybkie skoki po zakładkach na desktopie
+    if (e.altKey && !e.ctrlKey && !e.metaKey) {
+      if (e.key === '1') { e.preventDefault(); this.activeTab.set('threat-calc'); }
+      else if (e.key === '2') { e.preventDefault(); this.activeTab.set('penal-code'); }
+      else if (e.key === '3') { e.preventDefault(); this.activeTab.set('rulings'); }
+      else if (e.key === '4') { e.preventDefault(); this.activeTab.set('ai-chat'); }
+      else if (e.key === '5') { e.preventDefault(); this.activeTab.set('notes'); }
+    }
   }
 
   // --- Integracja Dyktowania Web Speech API w Headerze ---
@@ -429,6 +476,23 @@ export class App {
   // --- Offline Sync & Przedawnienie ---
   openSyncManager(): void {
     this.offlineSync.openModal();
+  }
+
+  // --- Kary Łączne & Eksport A4 ---
+  openCumulativeSentenceModal(): void {
+    this.isCumulativeSentenceModalOpen.set(true);
+  }
+
+  closeCumulativeSentenceModal(): void {
+    this.isCumulativeSentenceModalOpen.set(false);
+  }
+
+  openDocumentExportModal(): void {
+    this.isDocumentExportModalOpen.set(true);
+  }
+
+  closeDocumentExportModal(): void {
+    this.isDocumentExportModalOpen.set(false);
   }
 
   async savePrescriptionNote(data: { title: string; content: string; linkedArticle: string }): Promise<void> {

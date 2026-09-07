@@ -43,7 +43,7 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
             <button
               id="btn-create-new-note"
               (click)="resetNoteForm(); showNoteForm.set(true)"
-              class="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap"
+              class="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-semibold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap"
             >
               <mat-icon class="text-base">add</mat-icon>
               <span>Nowa Notatka</span>
@@ -162,6 +162,47 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
                 placeholder="np. alkomat, konfiskata, linia obrony, świadek"
                 class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
               />
+            </div>
+          </div>
+
+          <!-- Pasek szablonów procesowych -->
+          <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800">
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
+              <span class="text-[11px] text-amber-400 font-semibold whitespace-nowrap flex items-center gap-1 mr-1">
+                <mat-icon class="text-xs">description</mat-icon> Wstaw szablon pisma:
+              </span>
+              <button
+                type="button"
+                (click)="applyTemplate('warunkowe-umorzenie')"
+                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-amber-300 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                title="Wstaw strukturę wniosku o warunkowe umorzenie postępowania (art. 66 k.k.)"
+              >
+                Wniosek o warunkowe umorzenie
+              </button>
+              <button
+                type="button"
+                (click)="applyTemplate('wniosek-dowodowy')"
+                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-amber-300 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                title="Wstaw wniosek dowodowy o dopuszczenie dowodu (art. 169 k.p.k.)"
+              >
+                Wniosek dowodowy (art. 169 k.p.k.)
+              </button>
+              <button
+                type="button"
+                (click)="applyTemplate('zazalenie-zatrzymanie')"
+                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-amber-300 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                title="Wstaw wzór zażalenia na zatrzymanie prawa jazdy / pojazdu"
+              >
+                Zażalenie (zatrzymanie prawa jazdy)
+              </button>
+              <button
+                type="button"
+                (click)="applyTemplate('linia-obrony')"
+                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-amber-300 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                title="Wstaw konspekt memorandum strategii procesowej"
+              >
+                Memorandum linii obrony
+              </button>
             </div>
           </div>
 
@@ -390,6 +431,120 @@ export class EncryptedNotes {
 
     return list;
   });
+
+  insertTemplate(tmpl: string): void {
+    this.showNoteForm.set(true);
+    if (tmpl === 'art66' || tmpl === 'warunkowe-umorzenie') {
+      this.applyTemplate('warunkowe-umorzenie');
+    } else if (tmpl === 'art169' || tmpl === 'wniosek-dowodowy') {
+      this.applyTemplate('wniosek-dowodowy');
+    } else if (tmpl === 'driving' || tmpl === 'zazalenie-zatrzymanie') {
+      this.applyTemplate('zazalenie-zatrzymanie');
+    } else {
+      this.applyTemplate('linia-obrony');
+    }
+  }
+
+  applyTemplate(type: 'warunkowe-umorzenie' | 'wniosek-dowodowy' | 'zazalenie-zatrzymanie' | 'linia-obrony'): void {
+    switch (type) {
+      case 'warunkowe-umorzenie':
+        this.noteTitle.set('Wniosek o warunkowe umorzenie postępowania karnego (art. 66 k.k.)');
+        this.noteCategory.set('Analiza prawna');
+        this.noteLinkedArticle.set('Art. 66 k.k.');
+        this.noteTagsInput.set('warunkowe umorzenie, art. 66 k.k., niekaralność, wniosek');
+        this.noteContent.set(
+`SĄD REJONOWY W: [Miejscowość, Wydział Karny]
+Sygn. akt: [Wpisz sygnaturę akt sprawy]
+
+Podejrzany / Oskarżony: [Imię i Nazwisko]
+Obrońca: [Imię i Nazwisko Adwokata / Radcy]
+
+WNIOSEK O WARUNKOWE UMORZENIE POSTĘPOWANIA KARNEGO
+Działając jako obrońca oskarżonego [Imię Nazwisko], na podstawie art. 66 § 1 i 2 k.k. oraz art. 67 § 1 k.k. wnoszę o:
+
+1. Warunkowe umorzenie postępowania karnego wobec oskarżonego na okres próby wynoszący [1 rok / 2 lata].
+2. Orzeczenie świadczenia pieniężnego na rzecz Funduszu Pomocy Pokrzywdzonym w kwocie [np. 1000 - 3000 zł].
+3. Odstąpienie od orzekania zakazu prowadzenia pojazdów na podstawie art. 67 § 3 k.k.
+
+UZASADNIENIE
+1. Dotychczasowa niekaralność sprawcy za przestępstwo umyślne (brak wpisu w KRK).
+2. Wina i społeczna szkodliwość czynu nie są znaczne: [wskazać okoliczności łagodzące, np. incydentalny charakter, współpraca z policją].
+3. Postawa sprawcy i pozytywna prognoza kryminologiczna: sprawca prowadzi ustabilizowany tryb życia, pracuje zawodowo, posiada pozytywną opinię środowiskową.`
+        );
+        break;
+
+      case 'wniosek-dowodowy':
+        this.noteTitle.set('Wniosek dowodowy o dopuszczenie dowodu (art. 169 k.p.k.)');
+        this.noteCategory.set('Wniosek dowodowy');
+        this.noteLinkedArticle.set('Art. 169 k.p.k.');
+        this.noteTagsInput.set('wniosek dowodowy, kpk, dowody, teza dowodowa');
+        this.noteContent.set(
+`ORGAN PROWADZĄCY: [Prokuratura Rejonowa / Sąd Rejonowy]
+Sygn. akt: [Wpisz sygnaturę]
+
+WNIOSEK DOWODOWY OBROŃCY (art. 169 k.p.k.)
+Działając imieniem oskarżonego, wnoszę o:
+
+1. Dopuszczenie i przeprowadzenie dowodu z:
+   - [ ] Dokumentu / nagrania monitoringu z dnia [...]
+   - [ ] Zeznań świadka: [Imię, nazwisko, adres zamieszkania]
+   - [ ] Opinii biegłego z zakresu [...]
+
+2. TEZA DOWODOWA:
+   Dowód ten powoływany jest na okoliczność wykazania, że [dokładny opis faktu, który ma być udowodniony, np. brak zamiaru bezpośredniego, stan wyższej konieczności, błąd pomiarowy urządzenia].
+
+UZASADNIENIE
+Przeprowadzenie wskazanego dowodu ma kluczowe znaczenie dla rozstrzygnięcia sprawy i nie spowoduje nieuzasadnionej zwłoki w postępowaniu (art. 170 § 1 k.p.k.).`
+        );
+        break;
+
+      case 'zazalenie-zatrzymanie':
+        this.noteTitle.set('Zażalenie na postanowienie o zatrzymaniu prawa jazdy / rzeczy');
+        this.noteCategory.set('Wniosek dowodowy');
+        this.noteLinkedArticle.set('Art. 135 ust. 1 Prd / art. 217 k.p.k.');
+        this.noteTagsInput.set('zażalenie, zatrzymanie prawa jazdy, art. 135 prd, środek przymusu');
+        this.noteContent.set(
+`DO: Sąd Rejonowy w [Miejscowość]
+za pośrednictwem: [Prokuratura / Komenda Policji]
+Sygn. akt: [Sygnatura sprawy]
+
+ZAŻALENIE NA POSTANOWIENIE O ZATRZYMANIU
+Działając w imieniu podejrzanego, zaskarżam w całości postanowienie z dnia [...] w przedmiocie zatrzymania prawa jazdy / rzeczy.
+
+ZARZUTY:
+1. Błąd w ustaleniach faktycznych polegający na przyjęciu, że zachodzi wysokie prawdopodobieństwo orzeczenia środka karnego w postaci zakazu prowadzenia pojazdów.
+2. Naruszenie zasady proporcjonalności: zatrzymanie dokumentu uniemożliwia podejrzanemu wykonywanie jedynego źródła zarobkowania niezbędnego do utrzymania rodziny.
+
+WNIOSEK:
+Wnoszę o uchylenie zaskarżonego postanowienia i niezwłoczny zwrot dokumentu podejrzanemu.`
+        );
+        break;
+
+      case 'linia-obrony':
+        this.noteTitle.set('Memorandum Strategii Procesowej i Linii Obrony');
+        this.noteCategory.set('Sprawa klienta');
+        this.noteTagsInput.set('strategia, linia obrony, analiza ryzyka, memorandum');
+        this.noteContent.set(
+`MEMORANDUM STRATEGICZNE SPRAWY KARNEJ
+Klient: [Imię i Nazwisko / Sygnatura wewnętrzna]
+Zarzut: [Kwalifikacja prawna z k.k. / k.w.]
+
+I. STAN FAKTYCZNY WEDŁUG KLIENTA:
+[Chronologiczny opis zdarzeń ze spotkania z klientem]
+
+II. DOWODY OSKARŻENIA I ICH SŁABE PUNKTY:
+- Dowód A: [np. protokół badania alkomatem – weryfikacja świadectwa wzorcowania i czasu próby]
+- Dowód B: [np. zeznania świadków – sprzeczności w relacjach]
+
+III. PLANOWANE KROKI OBROŃCZE:
+1. Przesłuchanie w postępowaniu przygotowawczym (odmowa składania wyjaśnień vs złożenie wyjaśnień na piśmie).
+2. Wnioski dowodowe w trybie art. 169 k.p.k.
+3. Wariant A: Walka o uniewinnienie lub zmianę kwalifikacji na wypadek mniejszej wagi.
+4. Wariant B: Wniosek o warunkowe umorzenie (art. 66 k.k.) lub konsensualne zakończenie (art. 387 k.p.k.).`
+        );
+        break;
+    }
+  }
 
   isDictatingTitle(): boolean {
     return this.speech.isListening() && this.speech.activeTarget() === 'note-title';

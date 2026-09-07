@@ -395,59 +395,34 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
               <option value="Rozdział XXXV">Rozdział XXXV – Mienie (kradzież art. 278, oszustwo, zniszczenie mienia)</option>
             </select>
 
-            <!-- Filtr 'Read Later' (IndexedDB) -->
+            <!-- Jednolity Schowek / Zakładki (IndexedDB) -->
             <button
               id="btn-filter-read-later"
               (click)="toggleReadLaterFilter()"
               [class]="onlyReadLater()
-                ? 'bg-amber-500 text-slate-950 border-amber-400 font-semibold shadow-md'
-                : 'bg-slate-950 text-slate-300 border-slate-700 hover:text-white hover:border-amber-500/50'"
+                ? 'bg-amber-500 text-slate-950 border-amber-400 font-semibold shadow-md active:scale-[0.98]'
+                : 'bg-slate-950 text-slate-300 border-slate-700 hover:text-white hover:border-amber-500/50 active:scale-[0.98]'"
               class="flex items-center gap-1.5 border px-3.5 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer whitespace-nowrap"
-              title="Pokaż artykuły zapisane do przeczytania w pamięci podręcznej przeglądarki (IndexedDB)"
+              title="Pokaż artykuły zapisane w lokalnym schowku (IndexedDB)"
             >
-              <mat-icon class="text-sm">auto_stories</mat-icon>
-              <span>Read Later ({{ readLaterService.count() }})</span>
+              <mat-icon class="text-sm">bookmark</mat-icon>
+              <span>Zakładki ({{ readLaterService.count() }})</span>
               @if (readLaterService.unreadCount() > 0) {
                 <span class="ml-1 px-1.5 py-0.2 text-[10px] rounded-full bg-red-500 text-white font-bold">
                   {{ readLaterService.unreadCount() }}
                 </span>
               }
             </button>
-
-            <!-- Filtr offline pinned -->
-            <button
-              id="btn-filter-pinned"
-              (click)="onlyPinned.set(!onlyPinned())"
-              [class]="onlyPinned()
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                : 'bg-slate-950 text-slate-400 border-slate-700 hover:text-slate-200'"
-              class="flex items-center gap-1.5 border px-3.5 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer whitespace-nowrap"
-            >
-              <mat-icon class="text-sm">push_pin</mat-icon>
-              <span>Tylko Pinned ({{ pinnedCount() }})</span>
-            </button>
-
-            <!-- Przycisk włączenia Focus Mode z paska narzędzi -->
-            <button
-              id="btn-toolbar-focus-mode"
-              (click)="enterFocusMode()"
-              [disabled]="!selectedArticle()"
-              class="flex items-center gap-1.5 border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 disabled:opacity-40 disabled:cursor-not-allowed px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shadow-sm"
-              title="Przełącz na uproszczony tryb czytania (Focus Mode) o wyższej czytelności i kontraście"
-            >
-              <mat-icon class="text-sm text-amber-400">center_focus_strong</mat-icon>
-              <span>Focus Mode</span>
-            </button>
           </div>
         </div>
 
-        <!-- Informacja o aktywnym filtrze Read Later -->
+        <!-- Informacja o aktywnym filtrze Zakładki -->
         @if (onlyReadLater()) {
           <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3.5 flex items-center justify-between text-xs text-amber-200">
             <div class="flex items-center gap-2">
-              <mat-icon class="text-amber-400 text-base">offline_pin</mat-icon>
+              <mat-icon class="text-amber-400 text-base">bookmark</mat-icon>
               <span>
-                Tryb offline: Wyświetlasz <strong>{{ readLaterService.count() }}</strong> artykułów zapisanych w <strong>IndexedDB</strong> przeglądarki.
+                Zakładki offline: Wyświetlasz <strong>{{ readLaterService.count() }}</strong> artykułów zapisanych w pamięci podręcznej (IndexedDB).
               </span>
             </div>
             <button
@@ -499,27 +474,17 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
                     </mat-icon>
                   </button>
 
-                  <!-- Przycisk Read Later (IndexedDB) -->
+                  <!-- Przycisk Zakładki / Schowek (IndexedDB) -->
                   <button
                     (click)="toggleReadLater(art, $event)"
-                    class="p-1 rounded cursor-pointer transition-colors"
+                    class="p-1 rounded cursor-pointer transition-colors active:scale-95"
                     [class.text-amber-400]="readLaterService.isArticleSaved(art.id)"
                     [class.text-slate-500]="!readLaterService.isArticleSaved(art.id)"
-                    [title]="readLaterService.isArticleSaved(art.id) ? 'Zapisano w Read Later (IndexedDB). Kliknij, aby usunąć' : 'Zapisz na później (IndexedDB)'"
+                    [class.hover:text-slate-300]="!readLaterService.isArticleSaved(art.id)"
+                    [title]="readLaterService.isArticleSaved(art.id) ? 'Zapisano w Zakładkach (IndexedDB). Kliknij, aby usunąć' : 'Dodaj do Zakładek (IndexedDB)'"
                   >
                     <mat-icon class="text-sm">
-                      {{ readLaterService.isArticleSaved(art.id) ? 'bookmark_added' : 'bookmark_add' }}
-                    </mat-icon>
-                  </button>
-
-                  <!-- Przycisk Offline Pin -->
-                  <button
-                    (click)="toggleOfflinePin(art, $event)"
-                    class="text-slate-500 hover:text-amber-400 p-1 rounded cursor-pointer transition-colors"
-                    [title]="art.isOfflinePinned ? 'Przypięty offline' : 'Przypnij offline'"
-                  >
-                    <mat-icon class="text-sm" [class.text-amber-400]="art.isOfflinePinned">
-                      {{ art.isOfflinePinned ? 'push_pin' : 'outlined_flag' }}
+                      {{ readLaterService.isArticleSaved(art.id) ? 'bookmark' : 'bookmark_border' }}
                     </mat-icon>
                   </button>
                 </div>
@@ -580,15 +545,15 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
                 </div>
 
                 <!-- Pasek Narzędziowy -->
-                <div class="flex items-center gap-2 flex-wrap">
-                  <!-- Przełącznik Focus Mode (Uproszczony tryb czytania o wysokim kontraście) -->
+                <div class="flex items-center gap-1.5 flex-wrap sm:flex-nowrap shrink-0">
+                  <!-- Dyskretny Przełącznik Focus Mode (Tryb Skupienia) w prawym rogu paska -->
                   <button
                     id="btn-article-focus-mode"
                     (click)="enterFocusMode()"
-                    class="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold border border-amber-400 text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer shadow-sm"
-                    title="Przełącz na uproszczony tryb czytania (Focus Mode) z podwyższonym kontrastem i dużą czcionką"
+                    class="flex items-center gap-1.5 bg-amber-500/10 hover:bg-amber-500/20 active:scale-[0.98] text-amber-300 font-medium border border-amber-500/30 text-xs px-2.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap"
+                    title="Przełącz na uproszczony tryb czytania (Focus Mode) o wysokim kontraście i powiększonym druku"
                   >
-                    <mat-icon class="text-sm">center_focus_strong</mat-icon>
+                    <mat-icon class="text-sm text-amber-400">center_focus_strong</mat-icon>
                     <span>Tryb Skupienia</span>
                   </button>
 
@@ -598,8 +563,8 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
                     (click)="tts.speakArticle(art)"
                     [class]="tts.isPlaying() && tts.currentTextId() === art.id
                       ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow-sm shadow-amber-500/30'
-                      : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'"
-                    class="flex items-center gap-1.5 border text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+                      : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 active:scale-[0.98]'"
+                    class="flex items-center gap-1.5 border text-xs px-2.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap"
                     [title]="tts.isPlaying() && tts.currentTextId() === art.id ? (tts.isPaused() ? 'Wznów odczyt na głos' : 'Wstrzymaj odczyt na głos') : 'Odsłuchaj artykuł na głos (Lektor Web Speech API)'"
                     aria-label="Odsłuchaj artykuł na głos"
                   >
@@ -615,28 +580,28 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
                       <span>Wznów</span>
                     } @else {
                       <mat-icon class="text-sm">volume_up</mat-icon>
-                      <span>Czytaj na głos</span>
+                      <span>Głos</span>
                     }
                   </button>
 
-                  <!-- Toggle Zapisz w Read Later -->
+                  <!-- Przycisk Zakładki (IndexedDB) -->
                   <button
                     (click)="toggleReadLater(art)"
                     [class]="readLaterService.isArticleSaved(art.id)
                       ? 'bg-amber-500 text-slate-950 font-semibold border-amber-400'
-                      : 'bg-slate-800 hover:bg-slate-700 text-amber-400 border-slate-700'"
-                    class="flex items-center gap-1.5 border text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                    [title]="readLaterService.isArticleSaved(art.id) ? 'Usuń z Read Later' : 'Zapisz do czytania offline w IndexedDB'"
+                      : 'bg-slate-800 hover:bg-slate-700 text-amber-400 border-slate-700 active:scale-[0.98]'"
+                    class="flex items-center gap-1.5 border text-xs px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                    [title]="readLaterService.isArticleSaved(art.id) ? 'Usuń z Zakładek' : 'Zapisz do zakładek offline w IndexedDB'"
                   >
                     <mat-icon class="text-sm">
-                      {{ readLaterService.isArticleSaved(art.id) ? 'bookmark_added' : 'bookmark_add' }}
+                      {{ readLaterService.isArticleSaved(art.id) ? 'bookmark' : 'bookmark_border' }}
                     </mat-icon>
-                    <span>{{ readLaterService.isArticleSaved(art.id) ? 'W Read Later' : 'Zapisz na później' }}</span>
+                    <span>{{ readLaterService.isArticleSaved(art.id) ? 'W Zakładkach' : 'Zakładka' }}</span>
                   </button>
 
                   <button
                     (click)="checkThreat.emit(art)"
-                    class="flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-medium text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                    class="flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 active:scale-[0.98] border border-amber-500/30 text-amber-300 font-medium text-xs px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                     title="Przeanalizuj w kalkulatorze Co mi grozi?"
                   >
                     <mat-icon class="text-sm">gavel</mat-icon>
@@ -645,7 +610,7 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
 
                   <button
                     (click)="pdfService.exportArticleToPdf(art)"
-                    class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                    class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-slate-200 border border-slate-700 text-xs px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                   >
                     <mat-icon class="text-sm">picture_as_pdf</mat-icon>
                     <span>PDF</span>
@@ -653,7 +618,7 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
 
                   <button
                     (click)="createNote.emit(art)"
-                    class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                    class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 active:scale-[0.98] text-slate-200 border border-slate-700 text-xs px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                   >
                     <mat-icon class="text-sm">edit_note</mat-icon>
                     <span>Notatka</span>
@@ -673,6 +638,21 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
                   <mat-icon class="text-sm">menu_book</mat-icon>
                   <span>Treść i Wykładnia</span>
                 </button>
+
+                @if (art.recentAmendment) {
+                  <button
+                    (click)="activeViewTab.set('amendments')"
+                    [class]="activeViewTab() === 'amendments'
+                      ? 'bg-amber-500/20 text-amber-300 font-semibold border-amber-500/50'
+                      : 'text-amber-400/80 hover:text-amber-300 border-transparent'"
+                    class="flex items-center gap-1.5 border px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer"
+                    title="Porównaj brzmienie przed i po nowelizacji"
+                  >
+                    <mat-icon class="text-sm text-amber-400">compare_arrows</mat-icon>
+                    <span>Komparator Nowelizacji</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                  </button>
+                }
 
                 <button
                   (click)="activeViewTab.set('reader')"
@@ -704,6 +684,67 @@ import { TextToSpeechService } from '../services/text-to-speech.service';
                   }
                 </button>
               </div>
+
+              <!-- ================= WIDOK KOMPARATORA NOWELIZACJI ================= -->
+              @if (activeViewTab() === 'amendments' && art.recentAmendment) {
+                <div class="space-y-4 animate-fade-in">
+                  <!-- Nagłówek statusu reformy -->
+                  <div class="bg-amber-950/20 border border-amber-500/40 rounded-xl p-4">
+                    <div class="flex items-center justify-between gap-2 flex-wrap mb-2">
+                      <span class="font-bold flex items-center gap-1.5 text-amber-300 text-sm">
+                        <mat-icon class="text-base text-amber-400">published_with_changes</mat-icon>
+                        Reforma weszła w życie: {{ art.recentAmendment.date }}
+                      </span>
+                      <span class="text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded">
+                        Stan Prawny: Aktualny (2025/2026)
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed font-sans">
+                      {{ art.recentAmendment.description }}
+                    </p>
+                    @if (art.recentAmendment.amendmentSummary) {
+                      <div class="mt-2.5 pt-2 border-t border-amber-500/20 text-xs text-amber-200/90 font-medium">
+                        <strong>Wpływ procesowy obrony:</strong> {{ art.recentAmendment.amendmentSummary }}
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Dwuszpaltowe Porównanie Brzmienia (Diff View) -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Lewa kolumna: Dawne brzmienie -->
+                    <div class="bg-slate-950 border border-red-500/30 rounded-xl p-4 flex flex-col">
+                      <div class="flex items-center justify-between pb-2 mb-3 border-b border-red-500/20 text-xs">
+                        <span class="font-bold text-red-400 flex items-center gap-1">
+                          <mat-icon class="text-sm">history</mat-icon>
+                          Stan prawny sprzed reformy
+                        </span>
+                        <span class="text-[10px] text-slate-500 uppercase">Wersja archiwalna</span>
+                      </div>
+                      <div class="text-xs text-slate-400 font-serif leading-relaxed whitespace-pre-line flex-1 bg-red-950/10 p-3 rounded-lg border border-red-500/10">
+                        {{ art.recentAmendment.previousContent || 'Wcześniejsze brzmienie nie przewidywało tych obostrzeń lub sankcji.' }}
+                      </div>
+                    </div>
+
+                    <!-- Prawa kolumna: Aktualne brzmienie -->
+                    <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-4 flex flex-col">
+                      <div class="flex items-center justify-between pb-2 mb-3 border-b border-emerald-500/20 text-xs">
+                        <span class="font-bold text-emerald-300 flex items-center gap-1">
+                          <mat-icon class="text-sm">verified</mat-icon>
+                          Aktualne brzmienie (obowiązujące)
+                        </span>
+                        <span class="text-[10px] text-emerald-400/80 font-mono">DZIŚ W SĄDZIE</span>
+                      </div>
+                      <div class="text-xs text-slate-200 font-serif leading-relaxed whitespace-pre-line flex-1 bg-emerald-950/15 p-3 rounded-lg border border-emerald-500/20">
+                        {{ art.content }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+                    <span>Zasada stosowania prawa względniejszego dla sprawcy (art. 4 § 1 k.k.): Jeżeli w czasie orzekania obowiązuje ustawa inna niż w czasie popełnienia przestępstwa, stosuje się ustawę nową, chyba że ustawa obowiązująca poprzednio była względniejsza dla sprawcy.</span>
+                  </div>
+                </div>
+              }
 
               <!-- ================= WIDOK 1: TREŚĆ I WYKŁADNIA ================= -->
               @if (activeViewTab() === 'details') {
@@ -1074,7 +1115,6 @@ export class PenalCodeBrowser {
   // Filtry i wyszukiwanie
   readonly searchQuery = signal<string>('');
   readonly selectedChapter = signal<string>('all');
-  readonly onlyPinned = signal<boolean>(false);
   readonly onlyReadLater = signal<boolean>(false);
   readonly selectedArticle = signal<PenalArticle | null>(null);
 
@@ -1086,8 +1126,8 @@ export class PenalCodeBrowser {
   readonly focusContentWidth = signal<'optimal' | 'wide'>('optimal');
   readonly showFocusCommentary = signal<boolean>(true);
 
-  // Zakładka widoku szczegółowego w standardowym widoku: 'details' | 'reader' | 'chat'
-  readonly activeViewTab = signal<'details' | 'reader' | 'chat'>('details');
+  // Zakładka widoku szczegółowego w standardowym widoku: 'details' | 'amendments' | 'reader' | 'chat'
+  readonly activeViewTab = signal<'details' | 'amendments' | 'reader' | 'chat'>('details');
 
   // Stan czytnika (Reader Mode)
   readonly readerFontSize = signal<'sm' | 'base' | 'lg'>('base');
@@ -1261,22 +1301,16 @@ export class PenalCodeBrowser {
     }
   });
 
-  readonly pinnedCount = computed(() => {
-    return this.legalData.articles().filter((a) => a.isOfflinePinned).length;
-  });
-
-  // Lista artykułów z uwzględnieniem filtrów tekstowych, rozdziałów, Pinned oraz Read Later
+  // Lista artykułów z uwzględnieniem filtrów tekstowych, rozdziałów oraz Zakładek (IndexedDB)
   readonly filteredArticles = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
     const chapter = this.selectedChapter();
-    const pinned = this.onlyPinned();
     const readLaterOnly = this.onlyReadLater();
     const savedIds = this.readLaterService.savedIdsSet();
     const all = this.legalData.articles();
 
     return all.filter((art) => {
       if (readLaterOnly && !savedIds.has(art.id)) return false;
-      if (pinned && !art.isOfflinePinned) return false;
       if (chapter !== 'all') {
         if (chapter === 'Kodeks Wykroczeń') {
           if (art.codePrefix !== 'k.w.' && !art.chapter.includes('Wykroczeń')) return false;
@@ -1401,14 +1435,6 @@ export class PenalCodeBrowser {
       await this.readLaterService.removeArticle(art.id);
     } else {
       await this.readLaterService.saveArticle(art);
-    }
-  }
-
-  toggleOfflinePin(art: PenalArticle, event: Event): void {
-    event.stopPropagation();
-    this.legalData.toggleArticleOfflinePin(art.id);
-    if (this.selectedArticle()?.id === art.id) {
-      this.selectedArticle.set({ ...art, isOfflinePinned: !art.isOfflinePinned });
     }
   }
 

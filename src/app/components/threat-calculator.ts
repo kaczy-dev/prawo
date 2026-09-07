@@ -18,28 +18,35 @@ export interface QuickScenario {
   imports: [CommonModule, MatIconModule, PrescriptionTimer],
   template: `
     <section id="section-threat-calc" class="space-y-6">
-      <!-- Panel wprowadzania sytuacji -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-          <div>
-            <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
-              <mat-icon class="text-amber-400">gavel</mat-icon>
-              Kalkulator Zagrożenia Karnego "Co mi grozi?"
+      <!-- Panel wprowadzania sytuacji (Taste-Skill Anti-Slop: intentional layout, distinct branding) -->
+      <div class="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 md:p-7 shadow-2xl relative overflow-hidden">
+        <!-- Subtelny akcent tożsamościowy -->
+        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/0 via-amber-400/50 to-amber-500/0"></div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+          <div class="max-w-2xl">
+            <div class="flex items-center gap-2 mb-1.5">
+              <span class="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-semibold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                Wykładnia & Kwalifikacja Czynu
+              </span>
+              <span class="text-xs text-slate-500 font-mono">k.k. 2024–2026</span>
+            </div>
+            <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight font-serif flex items-center gap-2">
+              Kalkulator Zagrożenia Karnego
             </h2>
-            <p class="text-xs md:text-sm text-slate-400 mt-1">
-              Wpisz lub <strong>podyktuj głosem</strong> zdarzenie (np. <em>jazda po 3 piwach</em>, <em>kradzież za 1200 zł</em>, <em>fałszywy BLIK</em>).
-              Silnik semantyczny prawnBot przeanalizuje kwalifikację prawną, sankcje, nowe przepisy oraz orzeczenia SN.
+            <p class="text-xs md:text-sm text-slate-400 mt-1 leading-relaxed">
+              Wprowadź lub podyktuj czyn procesowy. Silnik dokona automatycznej rekonstrukcji znamion, wymiaru kary i środków karnych.
             </p>
           </div>
 
           @if (threatAnalysis()) {
-            <div class="flex items-center gap-2 flex-wrap self-start md:self-auto no-print">
+            <div class="flex items-center gap-2 flex-wrap self-start md:self-auto no-print shrink-0">
               <button
                 id="btn-print-threat-analysis"
                 type="button"
                 (click)="triggerPrint()"
-                class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 hover:border-slate-500 font-semibold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow-md transition-all cursor-pointer whitespace-nowrap"
-                title="Wydrukuj sformatowaną opinię prawno-karną (Ctrl+P / Drukarka)"
+                class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 font-semibold text-xs px-3.5 py-2.5 rounded-xl shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+                title="Wydrukuj urzędową opinię prawno-karną A4 (Ctrl+P)"
               >
                 <mat-icon class="text-base text-amber-400">print</mat-icon>
                 <span>Drukuj Opinię</span>
@@ -49,11 +56,11 @@ export interface QuickScenario {
                 id="btn-export-analysis-pdf"
                 type="button"
                 (click)="exportPdf.emit()"
-                class="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap"
+                class="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
                 title="Pobierz opinię prawną w formacie pliku PDF"
               >
                 <mat-icon class="text-base">picture_as_pdf</mat-icon>
-                <span>Eksportuj do PDF</span>
+                <span>Eksportuj PDF</span>
               </button>
             </div>
           }
@@ -119,10 +126,10 @@ export interface QuickScenario {
           <button
             id="btn-run-threat-analysis"
             (click)="runAnalysis.emit()"
-            class="flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition-all cursor-pointer whitespace-nowrap shadow-lg shadow-amber-500/20"
+            class="flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition-all cursor-pointer whitespace-nowrap shadow-md shadow-amber-500/25"
           >
-            <mat-icon class="text-lg">gavel</mat-icon>
-            <span>Szukaj i Analizuj</span>
+            <mat-icon class="text-base">gavel</mat-icon>
+            <span>Analizuj Zagrożenie</span>
           </button>
         </div>
 
@@ -156,60 +163,6 @@ export interface QuickScenario {
             }
           </div>
 
-          <!-- Pasek narzędzi dodatkowych: Licznik Przedawnienia Karalności -->
-          <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
-            <button
-              id="btn-toggle-standalone-prescription"
-              type="button"
-              (click)="showStandalonePrescription.set(!showStandalonePrescription())"
-              class="text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5"
-              [class.bg-amber-500/20]="showStandalonePrescription()"
-              [class.border-amber-500/50]="showStandalonePrescription()"
-              [class.text-amber-300]="showStandalonePrescription()"
-              [class.bg-slate-800/70]="!showStandalonePrescription()"
-              [class.border-slate-700/60]="!showStandalonePrescription()"
-              [class.text-slate-300]="!showStandalonePrescription()"
-            >
-              <mat-icon class="text-sm text-amber-400">hourglass_empty</mat-icon>
-              <span>
-                {{ showStandalonePrescription() ? 'Ukryj Licznik Przedawnienia' : 'Licznik Przedawnienia Karalności (art. 101/102 k.k.)' }}
-              </span>
-            </button>
-            <span class="text-[11px] text-slate-500">
-              Ostrzega przed upływem terminów przedawnienia na podstawie daty zdarzenia
-            </span>
-          </div>
-
-          <!-- Samodzielny Licznik Przedawnienia (gdy brak aktywnej analizy zapytania) -->
-          @if (showStandalonePrescription() && !threatAnalysis()) {
-            <div class="mt-4 pt-4 border-t border-slate-800 animate-fade-in space-y-4">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
-                <div class="flex items-center gap-2">
-                  <mat-icon class="text-amber-400 text-sm">tune</mat-icon>
-                  <label for="select-standalone-article" class="text-xs font-semibold text-slate-300">
-                    Wybierz przepis k.k. do zbadania przedawnienia:
-                  </label>
-                </div>
-                <select
-                  id="select-standalone-article"
-                  [value]="standaloneArticleId()"
-                  (change)="standaloneArticleId.set($any($event.target).value)"
-                  class="bg-slate-900 border border-slate-700 text-slate-100 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-amber-500 max-w-full sm:max-w-md"
-                >
-                  @for (art of legalData.articles(); track art.id) {
-                    <option [value]="art.id">
-                      Art. {{ art.number }}{{ art.suffix || '' }} k.k. – {{ art.title }}
-                    </option>
-                  }
-                </select>
-              </div>
-
-              <app-prescription-timer
-                [article]="standaloneArticle()"
-                (createNoteWithPrescription)="savePrescriptionNote.emit($event)"
-              />
-            </div>
-          }
         </div>
       </div>
 
@@ -457,9 +410,9 @@ export interface QuickScenario {
           </div>
 
           <!-- Kolumna Prawa: Orzecznictwo SN i Rekomendowana Strategia (1/3) -->
-          <div class="space-y-6">
+          <div class="space-y-6 lg:sticky lg:top-24 self-start">
             <!-- Karta Rekomendowanych Kroków Obrony -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <div class="bg-slate-900 border border-slate-800/90 rounded-2xl p-5 shadow-xl ring-1 ring-white/5">
               <h3 class="text-sm font-bold text-amber-300 flex items-center gap-2 mb-3">
                 <mat-icon class="text-amber-400 text-base">lightbulb</mat-icon>
                 Rekomendowana Strategia Procesowa:
@@ -468,23 +421,23 @@ export interface QuickScenario {
                 @for (step of res.recommendedSteps; track step; let i = $index) {
                   <li class="flex items-start gap-2 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
                     <span class="font-mono font-bold text-amber-400">{{ i + 1 }}.</span>
-                    <span>{{ step }}</span>
+                    <span class="leading-relaxed">{{ step }}</span>
                   </li>
                 }
               </ol>
             </div>
 
             <!-- Podobne Wyroki i Orzeczenia Sądu Najwyższego -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <div class="bg-slate-900 border border-slate-800/90 rounded-2xl p-5 shadow-xl ring-1 ring-white/5">
               <div class="flex items-center justify-between gap-2 mb-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                   <mat-icon class="text-amber-400 text-base">balance</mat-icon>
                   Precedensy i Wyroki SN:
                 </h3>
-                <span class="text-[11px] text-slate-500 font-mono">{{ res.similarRulings.length }} wyroki</span>
+                <span class="text-[11px] text-slate-400 font-mono">{{ res.similarRulings.length }} wyroki</span>
               </div>
 
-              <div class="space-y-3.5">
+              <div class="space-y-3.5 max-h-[420px] overflow-y-auto pr-1">
                 @for (ruling of res.similarRulings; track ruling.id) {
                   <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-3.5 hover:border-slate-700 transition-colors">
                     <div class="flex items-center justify-between gap-2 mb-1">
@@ -526,14 +479,6 @@ export class ThreatCalculator {
   readonly legalData = inject(LegalDataService);
 
   readonly selectedPrescriptionArticle = signal<PenalArticle | null>(null);
-  readonly showStandalonePrescription = signal<boolean>(false);
-  readonly standaloneArticleId = signal<string>('art-178a');
-
-  readonly standaloneArticle = computed<PenalArticle>(() => {
-    const arts = this.legalData.articles();
-    const found = arts.find((a) => a.id === this.standaloneArticleId());
-    return found || arts[0];
-  });
 
   readonly printDate = new Date().toLocaleDateString('pl-PL', {
     year: 'numeric',

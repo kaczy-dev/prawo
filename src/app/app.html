@@ -1,31 +1,69 @@
 <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-200">
   <!-- Główny Pasek Górny (Kancelaryjny Header) -->
-  <header id="main-header" class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 py-3.5 transition-colors">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
-      <!-- Logo i tożsamość -->
-      <div class="flex items-center gap-3 self-start md:self-auto">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-slate-950 shadow-md shadow-amber-900/20 font-bold">
-          <mat-icon class="text-2xl">gavel</mat-icon>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5 font-serif">
-              prawn<span class="text-amber-400">Bot</span>
-            </h1>
-            <span class="text-[11px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
-              PRO Kancelaria
-            </span>
+  <header id="main-header" class="border-b border-slate-800/80 bg-slate-900/95 backdrop-blur-md sticky top-0 z-40 px-3 sm:px-4 lg:px-8 py-2.5 sm:py-3 transition-colors">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-3">
+      
+      <!-- Górny wiersz na mobile: Logo + szybkie akcje (Słownik, Skarbiec, Więcej) -->
+      <div class="w-full md:w-auto flex items-center justify-between gap-3">
+        <!-- Logo i tożsamość -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 border border-amber-500/40 flex items-center justify-center text-slate-950 shadow-md shadow-amber-950/40 font-bold shrink-0">
+            <mat-icon class="text-xl sm:text-2xl text-amber-200">gavel</mat-icon>
           </div>
-          <p class="text-xs text-slate-400 font-normal">
-            Inteligentny Asystent Prawa Karnego & Baza Orzecznictwa SN
-          </p>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-1 font-serif">
+                prawn<span class="text-amber-400">Bot</span>
+              </h1>
+              <span class="text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded-md uppercase tracking-wider hidden sm:inline-block">
+                Kancelaria
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 font-normal hidden sm:block">
+              Inteligentny Asystent Prawa Karnego & Baza Orzecznictwa SN
+            </p>
+          </div>
+        </div>
+
+        <!-- Akcje nagłówka widoczne na mobile (Kompaktowy Security & Vault) -->
+        <div class="flex items-center gap-1.5 md:hidden">
+          <!-- Szybki status szyfrowania/skarbca -->
+          @if (cryptoService.isAuthenticated()) {
+            <button
+              (click)="lockVault()"
+              class="flex items-center gap-1 bg-amber-500/15 border border-amber-500/40 text-amber-300 text-[11px] px-2 py-1.5 rounded-lg cursor-pointer font-medium"
+              title="Skarbiec otwarty. Kliknij, aby zablokować."
+            >
+              <mat-icon class="text-sm">lock_open</mat-icon>
+              <span>Sejf</span>
+            </button>
+          } @else {
+            <button
+              (click)="openVaultModal()"
+              class="flex items-center gap-1 bg-slate-800 border border-slate-700 text-slate-300 text-[11px] px-2 py-1.5 rounded-lg cursor-pointer"
+              title="Odblokuj skarbiec"
+            >
+              <mat-icon class="text-sm text-slate-400">lock</mat-icon>
+              <span>Sejf</span>
+            </button>
+          }
+
+          <!-- Przycisk menu rozwijanego (Więcej opcji na mobile) -->
+          <button
+            type="button"
+            (click)="isMobileMenuOpen.set(!isMobileMenuOpen())"
+            class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 cursor-pointer"
+            [title]="isMobileMenuOpen() ? 'Zamknij menu' : 'Więcej opcji i modułów'"
+          >
+            <mat-icon class="text-lg">{{ isMobileMenuOpen() ? 'close' : 'menu' }}</mat-icon>
+          </button>
         </div>
       </div>
 
-      <!-- Szybka Wyszukiwarka Globalna "Co mi grozi?" z obsługą Web Speech API -->
-      <div class="w-full md:flex-1 md:max-w-md lg:max-w-xl mx-auto relative my-1 md:my-0">
+      <!-- Szybka Wyszukiwarka Globalna "Co mi grozi?" ze skrótem Ctrl+K i Web Speech API -->
+      <div class="w-full md:flex-1 md:max-w-md lg:max-w-xl mx-auto relative">
         <div class="relative flex items-center">
-          <mat-icon class="absolute left-3 text-amber-400/80 text-lg pointer-events-none">manage_search</mat-icon>
+          <mat-icon class="absolute left-3 text-amber-400/80 text-base sm:text-lg pointer-events-none">manage_search</mat-icon>
           <input
             id="input-global-threat-search"
             type="text"
@@ -33,17 +71,22 @@
             (input)="quickSearchQuery.set($any($event.target).value)"
             (keydown.enter)="executeGlobalSearch()"
             (focus)="showQuickSearchDropdown.set(true)"
-            placeholder="Co mi grozi? Wpisz lub podyktuj czyn..."
-            class="w-full pl-9 pr-28 py-2 bg-slate-950/90 border border-slate-700/90 hover:border-amber-500/50 focus:border-amber-500 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all shadow-inner"
+            placeholder="Co mi grozi? Wpisz czyn..."
+            class="w-full pl-8 sm:pl-9 pr-24 sm:pr-32 py-1.5 sm:py-2 bg-slate-950/90 border border-slate-700 hover:border-amber-500/50 focus:border-amber-500 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all shadow-inner"
           />
 
           <div class="absolute right-1 flex items-center gap-1">
+            <!-- Skrót klawiszowy Ctrl+K (desktop) -->
+            <kbd class="hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-800 border border-slate-700 rounded shadow-sm">
+              Ctrl+K
+            </kbd>
+
             <!-- Web Speech API w nagłówku -->
             <button
               type="button"
               (click)="toggleHeaderDictation()"
               [class]="isHeaderDictating() ? 'text-red-400 animate-pulse bg-red-500/20' : 'text-slate-400 hover:text-amber-300'"
-              class="p-1.5 rounded-lg transition-colors cursor-pointer"
+              class="p-1 sm:p-1.5 rounded-lg transition-colors cursor-pointer"
               [title]="isHeaderDictating() ? 'Zatrzymaj dyktowanie' : 'Dyktuj zapytanie głosem'"
             >
               <mat-icon class="text-base">{{ isHeaderDictating() ? 'mic' : 'mic_none' }}</mat-icon>
@@ -63,7 +106,7 @@
             <button
               id="btn-global-threat-search"
               (click)="executeGlobalSearch()"
-              class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+              class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm"
             >
               <mat-icon class="text-xs">gavel</mat-icon>
               <span class="hidden sm:inline">Szukaj</span>
@@ -74,7 +117,7 @@
         <!-- Lista szybkich podpowiedzi (Auto-suggest dropdown) -->
         @if (showQuickSearchDropdown()) {
           <div
-            class="absolute left-0 right-0 top-full mt-1.5 bg-slate-900/95 backdrop-blur-md border border-slate-700/90 rounded-xl shadow-2xl p-2 z-50 max-h-72 overflow-y-auto"
+            class="absolute left-0 right-0 top-full mt-1.5 bg-slate-900/98 backdrop-blur-md border border-slate-700 rounded-xl shadow-2xl p-2 z-50 max-h-72 overflow-y-auto"
           >
             <div class="flex items-center justify-between px-2 py-1 text-[11px] text-slate-400 border-b border-slate-800 mb-1">
               <span class="font-semibold text-amber-400">Szybkie wyszukiwania "Co mi grozi?":</span>
@@ -101,59 +144,102 @@
         }
       </div>
 
-      <!-- Statusy bezpieczeństwa, sieci i skarbca kryptograficznego -->
-      <div class="flex flex-wrap items-center gap-2.5 self-end md:self-auto">
-        <!-- Status 100% Offline & Bezpieczny -->
-        <div id="badge-offline-mode" class="flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs px-2.5 py-1.5 rounded-lg shadow-sm">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span class="font-medium">100% Local & Offline</span>
+      <!-- Statusy bezpieczeństwa, sieci i skarbca kryptograficznego (Widok Desktop: zbalansowany, zero-overflow) -->
+      <div class="hidden md:flex items-center gap-2 shrink-0">
+        <!-- Zintegrowana pigułka bezpieczeństwa & statusu offline -->
+        <div class="flex items-center bg-slate-950/80 border border-slate-800 rounded-xl p-1 gap-1">
+          <!-- 100% Offline Pill -->
+          <div id="badge-offline-mode" class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/20 text-emerald-300 text-[11px] font-medium select-none" title="Aplikacja działa w 100% lokalnie i offline">
+            <span class="relative flex h-1.5 w-1.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+            </span>
+            <span>Offline</span>
+          </div>
+
+          <!-- Menedżer Synchronizacji -->
+          <button
+            id="btn-network-sync-status"
+            type="button"
+            (click)="openSyncManager()"
+            class="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Stan sieci / kolejka zmian offline"
+          >
+            @if (offlineSync.isSyncing()) {
+              <mat-icon class="text-xs text-amber-400 animate-spin">sync</mat-icon>
+              <span class="text-amber-300">Sync...</span>
+            } @else if (offlineSync.effectiveOnline()) {
+              <mat-icon class="text-xs text-emerald-400">cloud_done</mat-icon>
+              <span>Sieć</span>
+            } @else {
+              <mat-icon class="text-xs text-amber-400">cloud_off</mat-icon>
+              <span class="text-amber-300">Lokalny</span>
+            }
+          </button>
         </div>
 
-        <!-- Status sieci i Menedżer Synchronizacji Offline -->
+        <!-- Paleta Poleceń (Spotlight Ctrl+K) -->
         <button
-          id="btn-network-sync-status"
+          id="btn-open-command-palette"
           type="button"
-          (click)="openSyncManager()"
-          class="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border bg-slate-800/80 border-slate-700/70 text-slate-300 hover:border-slate-600 hover:text-white transition-all cursor-pointer font-medium"
-          title="Kliknij, aby otworzyć Menedżer Synchronizacji Offline-First"
+          (click)="isCommandPaletteOpen.set(true)"
+          class="flex items-center gap-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 hover:border-amber-500/50 text-slate-200 text-xs px-2.5 py-1.5 rounded-xl transition-all cursor-pointer font-medium active:scale-[0.98]"
+          title="Otwórz Paletę Poleceń (Ctrl+K / Cmd+K)"
         >
-          @if (offlineSync.isSyncing()) {
-            <mat-icon class="text-sm text-amber-400 animate-spin">sync</mat-icon>
-            <span class="text-amber-300">Synchronizacja...</span>
-          } @else if (offlineSync.effectiveOnline()) {
-            <mat-icon class="text-sm text-emerald-400">cloud_done</mat-icon>
-            <span class="text-emerald-300">
-              Online
-              @if (offlineSync.pendingCount() > 0) {
-                ({{ offlineSync.pendingCount() }})
-              }
-            </span>
-          } @else {
-            <mat-icon class="text-sm text-amber-400">cloud_off</mat-icon>
-            <span class="text-amber-300">
-              Offline
-              @if (offlineSync.pendingCount() > 0) {
-                <span class="ml-1 px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded-full text-[10px] font-bold">
-                  {{ offlineSync.pendingCount() }}
-                </span>
-              }
-            </span>
-          }
+          <mat-icon class="text-xs text-amber-400">terminal</mat-icon>
+          <span class="text-[11px]">Szukaj</span>
+          <kbd class="px-1 py-0.2 text-[9px] font-mono text-slate-400 bg-slate-900 border border-slate-700 rounded">Ctrl+K</kbd>
         </button>
 
-        <!-- Przycisk Słownika Prawno-Karnego (Offline) -->
+        <!-- Słownik Prawny -->
         <button
           id="btn-open-legal-dictionary"
           type="button"
           (click)="openLegalDictionary()"
-          class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium shadow-sm"
-          title="Otwórz Słownik Pojęć Prawno-Karnych (100% Offline)"
+          class="flex items-center gap-1 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 text-amber-300 text-xs px-2.5 py-1.5 rounded-xl transition-all cursor-pointer font-medium active:scale-[0.98]"
+          title="Słownik Pojęć Prawno-Karnych"
         >
-          <mat-icon class="text-sm text-amber-400">auto_stories</mat-icon>
-          <span>Słownik Prawny</span>
+          <mat-icon class="text-xs text-amber-400">auto_stories</mat-icon>
+          <span class="text-[11px]">Słownik</span>
+        </button>
+
+        <!-- Kalkulator Kary Łącznej (art. 85-86 k.k.) -->
+        <button
+          id="btn-open-cumulative-sentence"
+          type="button"
+          (click)="openCumulativeSentenceModal()"
+          class="flex items-center gap-1 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 hover:border-amber-500/50 text-amber-300 text-xs px-2.5 py-1.5 rounded-xl transition-all cursor-pointer font-medium active:scale-[0.98]"
+          title="Kalkulator Kary Łącznej (art. 85-86 k.k.)"
+        >
+          <mat-icon class="text-xs text-amber-400">calculate</mat-icon>
+          <span class="text-[11px]">Kara Łączna</span>
+        </button>
+
+        <!-- Kancelaryjny Panel Wydruku i Eksportu A4 -->
+        <button
+          id="btn-open-document-export"
+          type="button"
+          (click)="openDocumentExportModal()"
+          class="flex items-center gap-1 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 hover:border-amber-500/50 text-slate-200 text-xs px-2.5 py-1.5 rounded-xl transition-all cursor-pointer font-medium active:scale-[0.98]"
+          title="Kancelaryjny Panel Wydruku i Eksportu A4"
+        >
+          <mat-icon class="text-xs text-amber-400">print</mat-icon>
+          <span class="text-[11px]">Drukuj A4</span>
+        </button>
+
+        <!-- Przełącznik Gęstości Sądowej -->
+        <button
+          id="btn-toggle-courtroom-density"
+          type="button"
+          (click)="isCourtroomDense.update(v => !v)"
+          [class]="isCourtroomDense()
+            ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+            : 'bg-slate-950 hover:bg-slate-800 border-slate-700/80 text-slate-300'"
+          class="flex items-center gap-1 border text-xs px-2.5 py-1.5 rounded-xl transition-all cursor-pointer font-medium active:scale-[0.98]"
+          [title]="isCourtroomDense() ? 'Tryb Sądowy (zwarty) aktywny. Kliknij, aby zmienić na Standardowy' : 'Włącz Tryb Sądowy (zwarty, bez przewijania)'"
+        >
+          <mat-icon class="text-xs">{{ isCourtroomDense() ? 'density_small' : 'density_medium' }}</mat-icon>
+          <span class="text-[11px]">{{ isCourtroomDense() ? 'Zwarty' : 'Standard' }}</span>
         </button>
 
         <!-- Przycisk Skarbca AES-256 -->
@@ -161,128 +247,174 @@
           <button
             id="btn-lock-vault"
             (click)="lockVault()"
-            class="flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium"
-            title="Skarbiec odblokowany. Kliknij, aby zablokować."
+            class="flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer font-semibold active:scale-[0.98]"
+            title="Skarbiec odblokowany. Kliknij, aby zablokować (Ctrl+Shift+L)"
           >
-            <mat-icon class="text-sm">lock_open</mat-icon>
-            <span>Skarbiec AES: Otwarty</span>
+            <mat-icon class="text-xs">lock_open</mat-icon>
+            <span class="text-[11px]">Sejf</span>
           </button>
         } @else {
           <button
             id="btn-unlock-vault"
             (click)="openVaultModal()"
-            class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium"
+            class="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer font-medium active:scale-[0.98]"
             title="Kliknij, aby odblokować szyfrowane notatki"
           >
-            <mat-icon class="text-sm text-slate-400">lock</mat-icon>
-            <span>Odblokuj Skarbiec</span>
+            <mat-icon class="text-xs text-slate-400">lock</mat-icon>
+            <span class="text-[11px]">Sejf</span>
           </button>
         }
       </div>
     </div>
 
-    <!-- Pasek Nawigacji (Tabs) -->
-    <nav id="app-navigation" class="max-w-7xl mx-auto mt-3.5 flex items-center gap-1 overflow-x-auto pb-1 border-t border-slate-800/60 pt-2.5 no-scrollbar">
-      <button
-        id="nav-threat-calc"
-        (click)="activeTab.set('threat-calc')"
-        [class]="activeTab() === 'threat-calc'
-          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
-      >
-        <mat-icon class="text-base text-amber-400">gavel</mat-icon>
-        <span>Co mi grozi? (Kalkulator)</span>
-      </button>
+    <!-- Pasek Nawigacji Desktop (Jednowierszowy, wyrazisty, zintegrowane skróty Alt+1..5) -->
+    <nav id="app-navigation" class="hidden md:flex max-w-7xl mx-auto mt-2.5 items-center justify-between gap-1 overflow-x-auto pb-0.5 border-t border-slate-800/80 pt-2 no-scrollbar">
+      <div class="flex items-center gap-1">
+        <button
+          id="nav-threat-calc"
+          (click)="activeTab.set('threat-calc')"
+          [class]="activeTab() === 'threat-calc'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+        >
+          <mat-icon class="text-base text-amber-400">gavel</mat-icon>
+          <span>Kalkulator Sankcji</span>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+1</kbd>
+        </button>
 
-      <button
-        id="nav-handbooks"
-        (click)="activeTab.set('handbooks')"
-        [class]="activeTab() === 'handbooks'
-          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
-      >
-        <mat-icon class="text-base text-amber-400">auto_stories</mat-icon>
-        <span>Podręczniki Prawa</span>
-      </button>
+        <button
+          id="nav-penal-code"
+          (click)="activeTab.set('penal-code')"
+          [class]="activeTab() === 'penal-code'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+        >
+          <mat-icon class="text-base text-amber-400">menu_book</mat-icon>
+          <span>Kodeks Karny</span>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+2</kbd>
+        </button>
 
-      <button
-        id="nav-penal-code"
-        (click)="activeTab.set('penal-code')"
-        [class]="activeTab() === 'penal-code'
-          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
-      >
-        <mat-icon class="text-base text-amber-400">menu_book</mat-icon>
-        <span>Kodeks Karny</span>
-      </button>
+        <button
+          id="nav-rulings"
+          (click)="activeTab.set('rulings')"
+          [class]="activeTab() === 'rulings'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+        >
+          <mat-icon class="text-base text-amber-400">account_balance</mat-icon>
+          <span>Orzecznictwo SN</span>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+3</kbd>
+        </button>
 
-      <button
-        id="nav-rulings"
-        (click)="activeTab.set('rulings')"
-        [class]="activeTab() === 'rulings'
-          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
-      >
-        <mat-icon class="text-base text-amber-400">account_balance</mat-icon>
-        <span>Orzecznictwo SN</span>
-      </button>
+        <button
+          id="nav-handbooks"
+          (click)="activeTab.set('handbooks')"
+          [class]="activeTab() === 'handbooks'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+        >
+          <mat-icon class="text-base text-amber-400">auto_stories</mat-icon>
+          <span>Podręczniki</span>
+        </button>
 
-      <button
-        id="nav-ai-chat"
-        (click)="activeTab.set('ai-chat')"
-        [class]="activeTab() === 'ai-chat'
-          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
-      >
-        <mat-icon class="text-base text-amber-400">smart_toy</mat-icon>
-        <span>Asystent AI (Głosowy)</span>
-      </button>
+        <button
+          id="nav-ai-chat"
+          (click)="activeTab.set('ai-chat')"
+          [class]="activeTab() === 'ai-chat'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+        >
+          <mat-icon class="text-base text-amber-400">smart_toy</mat-icon>
+          <span>Asystent AI</span>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+4</kbd>
+        </button>
 
-      <button
-        id="nav-notes"
-        (click)="activeTab.set('notes')"
-        [class]="activeTab() === 'notes'
-          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
-      >
-        <mat-icon class="text-base text-amber-400">enhanced_encryption</mat-icon>
-        <span>Szyfrowane Notatki</span>
-      </button>
+        <button
+          id="nav-notes"
+          (click)="activeTab.set('notes')"
+          [class]="activeTab() === 'notes'
+            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-bold'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+        >
+          <mat-icon class="text-base text-amber-400">enhanced_encryption</mat-icon>
+          <span>Sejf Akt</span>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500">Alt+5</kbd>
+        </button>
+      </div>
 
-      <button
-        id="nav-alerts"
-        (click)="activeTab.set('alerts')"
-        [class]="activeTab() === 'alerts'
-          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
-      >
-        <mat-icon class="text-base text-red-400">notifications_active</mat-icon>
-        <span>Alerty o Zmianach</span>
-      </button>
-
-      <button
-        id="nav-technical-docs"
-        (click)="activeTab.set('technical-docs')"
-        [class]="activeTab() === 'technical-docs'
-          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
-      >
-        <mat-icon class="text-base text-slate-400">terminal</mat-icon>
-        <span>Architektura & Docker</span>
-      </button>
+      <div class="flex items-center gap-1 shrink-0">
+        <button
+          id="nav-alerts"
+          (click)="activeTab.set('alerts')"
+          [class]="activeTab() === 'alerts'
+            ? 'bg-red-500/20 text-red-300 border-red-500/50 shadow-sm font-bold'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs border transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+          title="Alerty nowelizacji kodeksu"
+        >
+          <mat-icon class="text-base text-red-400">notifications_active</mat-icon>
+          <span>Nowelizacje</span>
+        </button>
+      </div>
     </nav>
+
+    <!-- Rozwijane Menu Mobilne (Drawer / Dropdown dla pozostałych funkcji) -->
+    @if (isMobileMenuOpen()) {
+      <div class="md:hidden mt-2 p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-1 animate-fade-in shadow-2xl">
+        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider mb-2 px-2">Wszystkie moduły</div>
+        <button
+          (click)="activeTab.set('handbooks'); isMobileMenuOpen.set(false)"
+          class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
+        >
+          <mat-icon class="text-sm text-amber-400">auto_stories</mat-icon>
+          <span>Podręczniki i Metodyka Prawa</span>
+        </button>
+        <button
+          (click)="activeTab.set('rulings'); isMobileMenuOpen.set(false)"
+          class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
+        >
+          <mat-icon class="text-sm text-amber-400">account_balance</mat-icon>
+          <span>Baza Orzecznictwa Sądu Najwyższego</span>
+        </button>
+        <button
+          (click)="activeTab.set('alerts'); isMobileMenuOpen.set(false)"
+          class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-200 hover:bg-slate-800 flex items-center gap-2"
+        >
+          <mat-icon class="text-sm text-red-400">notifications_active</mat-icon>
+          <span>Alerty o Nowelizacjach Kodeksu</span>
+        </button>
+        <div class="border-t border-slate-800 my-1 pt-1 flex items-center justify-between px-2">
+          <button
+            (click)="openLegalDictionary(); isMobileMenuOpen.set(false)"
+            class="text-xs text-amber-300 hover:underline flex items-center gap-1 py-1"
+          >
+            <mat-icon class="text-xs">menu_book</mat-icon>
+            <span>Słownik Pojęć</span>
+          </button>
+          <button
+            (click)="openSyncManager(); isMobileMenuOpen.set(false)"
+            class="text-xs text-slate-400 hover:text-white flex items-center gap-1 py-1"
+          >
+            <mat-icon class="text-xs">sync</mat-icon>
+            <span>Synchronizacja</span>
+          </button>
+        </div>
+      </div>
+    }
   </header>
 
-  <!-- Główny Kontener Zawartości -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8">
+  <!-- Główny Kontener Zawartości z obsługą trybu zwartego dla desktopu -->
+  <main
+    [class]="isCourtroomDense()
+      ? 'flex-1 max-w-7xl w-full mx-auto p-2 sm:p-3 lg:p-4 pb-20 md:pb-6 text-sm [&_.p-6]:p-4 [&_.p-5]:p-3.5 [&_.space-y-6]:space-y-3.5 [&_.space-y-5]:space-y-3'
+      : 'flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 lg:p-8 pb-20 md:pb-8'"
+  >
     @switch (activeTab()) {
       @case ('threat-calc') {
         <app-dashboard-widget-grid
@@ -347,10 +479,6 @@
       @case ('alerts') {
         <app-legal-alerts />
       }
-
-      @case ('technical-docs') {
-        <app-technical-docs />
-      }
     }
   </main>
 
@@ -382,9 +510,99 @@
     <app-legal-dictionary-modal (inspectArticle)="searchInPenalCodeById($event)" />
   }
 
+  <!-- Modal Kalkulatora Kary Łącznej (art. 85-86 k.k.) -->
+  @if (isCumulativeSentenceModalOpen()) {
+    <app-cumulative-sentence-modal (closeModal)="closeCumulativeSentenceModal()" />
+  }
+
+  <!-- Modal Kancelaryjnego Wydruku i Eksportu A4 -->
+  @if (isDocumentExportModalOpen()) {
+    <app-document-export-modal (closeModal)="closeDocumentExportModal()" />
+  }
+
   <!-- Pływający Tooltip Kontekstowy na Zaznaczenie / Dwuklik -->
   <app-legal-context-tooltip />
 
+  <!-- Modal Palety Poleceń (Spotlight Command Palette Ctrl+K) -->
+  @if (isCommandPaletteOpen()) {
+    <app-command-palette-modal
+      (close)="isCommandPaletteOpen.set(false)"
+      (navigateToTab)="activeTab.set($any($event))"
+      (selectArticle)="penalCodeComp()?.selectArticle($event)"
+      (toggleVault)="cryptoService.isAuthenticated() ? lockVault() : openVaultModal()"
+      (openTemplate)="notesComp()?.insertTemplate($event)"
+    />
+  }
+
   <!-- Modal Menedżera Synchronizacji Offline-First -->
   <app-offline-sync-manager-modal />
+
+  <!-- ========================================================================= -->
+  <!-- DEDYKOWANY DOLNY PASEK NAWIGACJI MOBILNEJ (BOTTOM NAVIGATION BAR) -->
+  <!-- ========================================================================= -->
+  <nav
+    id="mobile-bottom-nav"
+    class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/90 px-2 py-1.5 flex items-center justify-around shadow-2xl safe-area-inset-bottom"
+    aria-label="Nawigacja mobilna"
+  >
+    <!-- 1. Kalkulator -->
+    <button
+      (click)="activeTab.set('threat-calc')"
+      [class]="activeTab() === 'threat-calc' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+    >
+      <div [class]="activeTab() === 'threat-calc' ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+        <mat-icon class="text-xl">gavel</mat-icon>
+      </div>
+      <span class="text-[10px] mt-0.5 tracking-tight">Kalkulator</span>
+    </button>
+
+    <!-- 2. Kodeks Karny -->
+    <button
+      (click)="activeTab.set('penal-code')"
+      [class]="activeTab() === 'penal-code' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+    >
+      <div [class]="activeTab() === 'penal-code' ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+        <mat-icon class="text-xl">menu_book</mat-icon>
+      </div>
+      <span class="text-[10px] mt-0.5 tracking-tight">Kodeks</span>
+    </button>
+
+    <!-- 3. Asystent AI (Czat) -->
+    <button
+      (click)="activeTab.set('ai-chat')"
+      [class]="activeTab() === 'ai-chat' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+    >
+      <div [class]="activeTab() === 'ai-chat' ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+        <mat-icon class="text-xl">smart_toy</mat-icon>
+      </div>
+      <span class="text-[10px] mt-0.5 tracking-tight">Czat AI</span>
+    </button>
+
+    <!-- 4. Szyfrowane Notatki -->
+    <button
+      (click)="activeTab.set('notes')"
+      [class]="activeTab() === 'notes' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+    >
+      <div [class]="activeTab() === 'notes' ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+        <mat-icon class="text-xl">enhanced_encryption</mat-icon>
+      </div>
+      <span class="text-[10px] mt-0.5 tracking-tight">Sejf</span>
+    </button>
+
+    <!-- 5. Więcej (Otwiera menu dodatkowe) -->
+    <button
+      (click)="isMobileMenuOpen.set(!isMobileMenuOpen())"
+      [class]="isMobileMenuOpen() ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+    >
+      <div [class]="isMobileMenuOpen() ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+        <mat-icon class="text-xl">{{ isMobileMenuOpen() ? 'close' : 'more_horiz' }}</mat-icon>
+      </div>
+      <span class="text-[10px] mt-0.5 tracking-tight">Więcej</span>
+    </button>
+  </nav>
 </div>

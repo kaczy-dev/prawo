@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { DashboardWidgetsService } from '../services/dashboard-widgets.service';
 import { LegalDataService } from './../services/legal-data.service';
-import { DashboardWidgetConfig, PenalArticle } from '../models/legal.model';
+import { PdfExportService } from '../services/pdf-export.service';
+import { DashboardWidgetConfig, PenalArticle, ActiveCaseItem } from '../models/legal.model';
 
 @Component({
   selector: 'app-dashboard-widget-grid',
@@ -399,6 +400,15 @@ import { DashboardWidgetConfig, PenalArticle } from '../models/legal.model';
                               }
                               <button
                                 type="button"
+                                (click)="exportCaseDossier(c)"
+                                class="text-slate-400 hover:text-amber-400 p-0.5 cursor-pointer flex items-center gap-0.5"
+                                title="Pobierz dossier sprawy i notatki w PDF"
+                              >
+                                <mat-icon class="text-xs text-amber-400">picture_as_pdf</mat-icon>
+                                <span class="text-[9px]">Dossier</span>
+                              </button>
+                              <button
+                                type="button"
                                 (click)="widgetsService.deleteActiveCase(c.id)"
                                 class="text-slate-500 hover:text-red-400 p-0.5 cursor-pointer"
                                 title="Usuń sprawę"
@@ -549,6 +559,7 @@ import { DashboardWidgetConfig, PenalArticle } from '../models/legal.model';
 export class DashboardWidgetGrid {
   readonly widgetsService = inject(DashboardWidgetsService);
   readonly legalData = inject(LegalDataService);
+  readonly pdfService = inject(PdfExportService);
 
   readonly openInCalculator = output<string>();
   readonly openArticleInCode = output<string>();
@@ -601,5 +612,18 @@ export class DashboardWidgetGrid {
 
   openHandbookTopic(slug: string): void {
     this.openHandbook.emit(slug);
+  }
+
+  exportCaseDossier(c: ActiveCaseItem): void {
+    // Pobierz notatki powiązane ze sprawą lub przepisem
+    const allNotes = this.legalData.notes();
+    const linkedNotes = allNotes.filter((n) => {
+      const matchCase = n.title.toLowerCase().includes((c.caseNumber || '').toLowerCase()) ||
+                        n.title.toLowerCase().includes(c.title.toLowerCase());
+      const matchArt = c.linkedArticleRef && n.linkedArticle?.includes(c.linkedArticleRef);
+      return matchCase || matchArt;
+    });
+
+    this.pdfService.exportCaseDossierToPdf(c, linkedNotes);
   }
 }

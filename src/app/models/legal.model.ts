@@ -21,6 +21,8 @@ export interface PenalArticle {
   recentAmendment?: {
     date: string;
     description: string;
+    previousContent?: string;
+    amendmentSummary?: string;
   };
   isOfflinePinned?: boolean;
 }

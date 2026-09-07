@@ -263,6 +263,110 @@ export class PdfExportService {
     doc.save(`Art_${article.number}${article.suffix || ''}_Kodeks_Karny.pdf`);
   }
 
+  /**
+   * Eksport teczki sprawy (Dossier) z metadanymi klienta, zarzutami i notatkami
+   */
+  exportCaseDossierToPdf(activeCase: import('../models/legal.model').ActiveCaseItem, linkedNotes: import('../models/legal.model').EncryptedNote[]): void {
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let currentY = 20;
+
+    // Nagłówek kancelaryjny
+    doc.setFillColor(15, 23, 42); // slate-900
+    doc.rect(0, 0, pageWidth, 28, 'F');
+
+    doc.setTextColor(212, 175, 55); // złoto kancelaryjne
+    doc.setFontSize(10);
+    doc.text('PRAWNBOT – KANCELARIA ADWOKACKA / DOSSIER SPRAWY', 15, 12);
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.text('KARTOTEKA SPRAWY KARNEJ – TAJEMNICA OBROŃCZA', 15, 20);
+
+    doc.setTextColor(148, 163, 184);
+    doc.setFontSize(9);
+    doc.text(`Data: ${new Date().toLocaleDateString('pl-PL')}`, pageWidth - 15, 20, { align: 'right' });
+
+    currentY = 38;
+
+    // Karta sprawy
+    doc.setTextColor(15, 23, 42);
+    doc.setFontSize(16);
+    doc.text(this.sanitizePolish(activeCase.title), 15, currentY);
+    currentY += 8;
+
+    doc.setFontSize(10);
+    doc.setTextColor(71, 85, 105);
+    doc.text(`Klient: ${this.sanitizePolish(activeCase.clientName || 'Brak danych')} | Sygnatura akt: ${this.sanitizePolish(activeCase.caseNumber || 'Brak')}`, 15, currentY);
+    currentY += 6;
+
+    doc.text(`Etap postepowania: ${this.sanitizePolish(activeCase.stage)} | Priorytet: ${this.sanitizePolish(activeCase.priority).toUpperCase()}`, 15, currentY);
+    currentY += 6;
+
+    if (activeCase.linkedArticleRef) {
+      doc.setTextColor(180, 83, 9);
+      doc.text(`Zarzut / Podstawa prawna: ${this.sanitizePolish(activeCase.linkedArticleRef)}`, 15, currentY);
+      currentY += 6;
+    }
+
+    currentY += 2;
+    doc.setDrawColor(203, 213, 225);
+    doc.line(15, currentY, pageWidth - 15, currentY);
+    currentY += 8;
+
+    // Opis sprawy
+    doc.setFontSize(11);
+    doc.setTextColor(15, 23, 42);
+    doc.text('STAN FAKTYCZNY I USTALENIA WSTĘPNE:', 15, currentY);
+    currentY += 6;
+
+    doc.setFontSize(10);
+    doc.setTextColor(51, 65, 85);
+    const splitSummary = doc.splitTextToSize(this.sanitizePolish(activeCase.summary), pageWidth - 30);
+    doc.text(splitSummary, 15, currentY);
+    currentY += splitSummary.length * 5 + 8;
+
+    // Załączone notatki ze spotkań i rozpraw
+    if (linkedNotes.length > 0) {
+      doc.setFontSize(11);
+      doc.setTextColor(15, 23, 42);
+      doc.text(`ZAŁĄCZONE NOTATKI I DOKUMENTY ZE SKARBCU (${linkedNotes.length}):`, 15, currentY);
+      currentY += 7;
+
+      for (const n of linkedNotes) {
+        if (currentY > 250) {
+          doc.addPage();
+          currentY = 20;
+        }
+
+        doc.setFillColor(248, 250, 252);
+        doc.roundedRect(15, currentY, pageWidth - 30, 24, 2, 2, 'F');
+        doc.setDrawColor(226, 232, 240);
+        doc.roundedRect(15, currentY, pageWidth - 30, 24, 2, 2, 'D');
+
+        doc.setFontSize(10);
+        doc.setTextColor(15, 23, 42);
+        doc.text(`• ${this.sanitizePolish(n.title)} (${this.sanitizePolish(n.category)})`, 18, currentY + 6);
+
+        doc.setFontSize(9);
+        doc.setTextColor(71, 85, 105);
+        const excerpt = doc.splitTextToSize(this.sanitizePolish(n.content.substring(0, 150)) + '...', pageWidth - 36);
+        doc.text(excerpt, 18, currentY + 12);
+
+        currentY += 28;
+      }
+    }
+
+    this.addFooter(doc, pageWidth);
+    const safeFilename = `Teczka_Sprawy_${(activeCase.caseNumber || activeCase.title).substring(0, 15).replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    doc.save(safeFilename);
+  }
+
   private addFooter(doc: jsPDF, pageWidth: number): void {
     const pageCount = doc.internal.pages.length - 1;
     for (let i = 1; i <= pageCount; i++) {

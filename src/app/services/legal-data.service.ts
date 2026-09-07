@@ -76,6 +76,9 @@ export class LegalDataService {
         recentAmendment: {
           date: '14 marca 2024 r.',
           description: 'Wejście w życie obligatoryjnego przepadku pojazdów mechanicznych (konfiskaty aut) kierowcom mającym min. 1,5 promila alkoholu we krwi.',
+          previousContent: `§ 1. Kto, znajdując się w stanie nietrzeźwości lub pod wpływem środka odurzającego, prowadzi pojazd mechaniczny w ruchu lądowym, wodnym lub powietrznym, podlega grzywnie, karze ograniczenia wolności albo pozbawienia wolności do lat 2.
+§ 4. Jeżeli sprawca czynu określonego w § 1 był wcześniej prawomocnie skazany (...) podlega karze pozbawienia wolności od 3 miesięcy do lat 5.`,
+          amendmentSummary: 'Zaostrzenie sankcji z lat 2 do 3 w § 1 oraz dodanie § 5 wprowadzającego obligatoryjny przepadek pojazdu mechanicznego (art. 44b k.k.) przy stężeniu powyżej 1,5 promila alkoholu.',
         },
         isOfflinePinned: true,
       },
@@ -105,6 +108,8 @@ export class LegalDataService {
         recentAmendment: {
           date: '1 października 2023 r.',
           description: 'Podwyższenie progu przepołowionego rozgraniczającego wykroczenie od przestępstwa kradzieży z 500 zł na kwotę 800 zł.',
+          previousContent: `Czyn stanowił przestępstwo z art. 278 § 1 k.k. w przypadku szkody przekraczającej kwotę 500 zł (art. 119 § 1 k.w. w brzmieniu sprzed nowelizacji).`,
+          amendmentSummary: 'Zmiana tzw. progu przepołowionego: szkody od 500,01 zł do 800 zł zostały zdepenalizowane jako przestępstwa i są obecnie kwalifikowane wyłącznie jako wykroczenia z art. 119 k.w.',
         },
         isOfflinePinned: true,
       },

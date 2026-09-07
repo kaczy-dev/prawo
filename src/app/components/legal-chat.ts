@@ -10,7 +10,7 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
   imports: [CommonModule, MatIconModule],
   template: `
     <section id="section-ai-chat" class="space-y-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col h-[740px]">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 sm:p-6 shadow-xl flex flex-col h-[calc(100dvh-180px)] md:h-[740px] max-h-[850px]">
         <!-- Nagłówek czatu z oznaczeniem bezpieczeństwa i głosu -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 shrink-0">
           <div>
