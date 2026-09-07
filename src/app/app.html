@@ -307,7 +307,22 @@
     <!-- Pasek Nawigacji Desktop (Spójny, 4 kluczowe obszary kancelaryjne) -->
     <nav id="app-navigation" class="hidden md:flex max-w-7xl mx-auto mt-2.5 items-center justify-between gap-1 overflow-x-auto pb-0.5 border-t border-slate-800/80 pt-2 no-scrollbar">
       <div class="flex items-center gap-1.5">
-        <!-- 1. Analiza & Kalkulator -->
+        <!-- 1. Asystent AI (Główna atrakcja / Flagowy doradca) -->
+        <button
+          id="nav-ai-chat"
+          (click)="activeTab.set('ai-chat')"
+          [class]="activeTab() === 'ai-chat'
+            ? 'bg-amber-500/25 text-amber-200 border-amber-400/70 shadow-[0_0_20px_rgba(245,158,11,0.25)] font-bold'
+            : 'text-slate-300 hover:text-amber-200 hover:bg-slate-800/80 border-slate-700/60'"
+          class="nav-tab-tactile group flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border cursor-pointer whitespace-nowrap relative"
+        >
+          <mat-icon class="text-base text-amber-400 group-hover:scale-115 transition-transform duration-200">smart_toy</mat-icon>
+          <span class="font-bold">Asystent AI</span>
+          <span class="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[9px] px-1.5 py-0.2 rounded-full font-sans tracking-wide uppercase font-semibold">Flagowy</span>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-400 group-hover:text-amber-200 transition-colors">Alt+1</kbd>
+        </button>
+
+        <!-- 2. Analiza & Kalkulator -->
         <button
           id="nav-threat-calc"
           (click)="activeTab.set('threat-calc')"
@@ -318,10 +333,10 @@
         >
           <mat-icon class="text-base text-amber-400 group-hover:scale-115 transition-transform duration-200">gavel</mat-icon>
           <span>Kalkulator Sankcji</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+1</kbd>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+2</kbd>
         </button>
 
-        <!-- 2. Kodeks & Orzecznictwo SN -->
+        <!-- 3. Kodeks & Orzecznictwo SN -->
         <button
           id="nav-penal-code"
           (click)="activeTab.set('penal-code')"
@@ -332,10 +347,10 @@
         >
           <mat-icon class="text-base text-amber-400 group-hover:scale-115 transition-transform duration-200">menu_book</mat-icon>
           <span>Kodeks & Prawo</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+2</kbd>
+          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+3</kbd>
         </button>
 
-        <!-- 3. Dossier & Sejf Akt -->
+        <!-- 4. Dossier & Sejf Akt -->
         <button
           id="nav-cases"
           (click)="activeTab.set('cases')"
@@ -346,20 +361,6 @@
         >
           <mat-icon class="text-base text-amber-400 group-hover:scale-115 transition-transform duration-200">folder_shared</mat-icon>
           <span>Sprawy & Sejf</span>
-          <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+3</kbd>
-        </button>
-
-        <!-- 4. Asystent AI (Czat) -->
-        <button
-          id="nav-ai-chat"
-          (click)="activeTab.set('ai-chat')"
-          [class]="activeTab() === 'ai-chat'
-            ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.15)] font-bold'
-            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
-          class="nav-tab-tactile group flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs border cursor-pointer whitespace-nowrap"
-        >
-          <mat-icon class="text-base text-amber-400 group-hover:scale-115 transition-transform duration-200">smart_toy</mat-icon>
-          <span>Asystent AI</span>
           <kbd class="hidden lg:inline-block text-[9px] font-mono text-slate-500 group-hover:text-slate-400 transition-colors">Alt+4</kbd>
         </button>
       </div>
@@ -616,7 +617,23 @@
     class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a0d16]/95 backdrop-blur-xl border-t border-amber-500/20 px-1 py-1 flex items-center justify-around shadow-2xl pb-[max(env(safe-area-inset-bottom),0.5rem)]"
     aria-label="Nawigacja mobilna"
   >
-    <!-- 1. Kalkulator -->
+    <!-- 1. Asystent AI (Czat - Główna atrakcja) -->
+    <button
+      (click)="activeTab.set('ai-chat')"
+      [class]="activeTab() === 'ai-chat' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
+      class="group flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-all cursor-pointer active:scale-90 relative"
+      aria-label="Asystent AI"
+    >
+      <div [class]="activeTab() === 'ai-chat' ? 'bg-amber-500/20 p-1 rounded-xl text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]' : 'p-1'">
+        <mat-icon class="text-xl group-hover:scale-115 group-active:scale-95 transition-transform duration-200">smart_toy</mat-icon>
+      </div>
+      <span class="text-[10px] tracking-tight">Asystent</span>
+      @if (activeTab() === 'ai-chat') {
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></span>
+      }
+    </button>
+
+    <!-- 2. Kalkulator -->
     <button
       (click)="activeTab.set('threat-calc')"
       [class]="activeTab() === 'threat-calc' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
@@ -632,7 +649,7 @@
       }
     </button>
 
-    <!-- 2. Kodeks & Orzecznictwo -->
+    <!-- 3. Kodeks & Orzecznictwo -->
     <button
       (click)="activeTab.set('penal-code')"
       [class]="(activeTab() === 'penal-code' || activeTab() === 'rulings') ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
@@ -648,7 +665,7 @@
       }
     </button>
 
-    <!-- 3. Sprawy & Sejf -->
+    <!-- 4. Sprawy & Sejf -->
     <button
       (click)="activeTab.set('cases')"
       [class]="(activeTab() === 'cases' || activeTab() === 'notes') ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
@@ -660,22 +677,6 @@
       </div>
       <span class="text-[10px] tracking-tight">Sprawy</span>
       @if (activeTab() === 'cases' || activeTab() === 'notes') {
-        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></span>
-      }
-    </button>
-
-    <!-- 4. Asystent AI (Czat) -->
-    <button
-      (click)="activeTab.set('ai-chat')"
-      [class]="activeTab() === 'ai-chat' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="group flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-all cursor-pointer active:scale-90 relative"
-      aria-label="Asystent AI"
-    >
-      <div [class]="activeTab() === 'ai-chat' ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'p-1'">
-        <mat-icon class="text-xl group-hover:scale-115 group-active:scale-95 transition-transform duration-200">smart_toy</mat-icon>
-      </div>
-      <span class="text-[10px] tracking-tight">Asystent</span>
-      @if (activeTab() === 'ai-chat') {
         <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full shadow-[0_0_8px_#f59e0b]"></span>
       }
     </button>

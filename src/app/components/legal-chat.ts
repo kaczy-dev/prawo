@@ -1,10 +1,14 @@
 import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, inject, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { ChatMessage } from '../models/legal.model';
+import { ChatMessage, EncryptedNote } from '../models/legal.model';
 import { PrawnBotAiService } from '../services/prawn-bot-ai.service';
 import { SpeechDictationService } from '../services/speech-dictation.service';
 import { LocalWebLLMService } from '../services/local-web-llm.service';
+import { TextToSpeechService } from '../services/text-to-speech.service';
+import { PdfExportService } from '../services/pdf-export.service';
+import { LegalDataService } from '../services/legal-data.service';
+import { CryptoService } from '../services/crypto.service';
 
 @Component({
   selector: 'app-legal-chat',
@@ -34,6 +38,17 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
+            <!-- Eksport zapisu do PDF -->
+            <button
+              type="button"
+              (click)="exportConversationPdf()"
+              class="btn-tactile bg-slate-950 hover:bg-slate-850 text-slate-300 hover:text-amber-300 border border-slate-800 hover:border-amber-500/40 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+              title="Pobierz protokół konsultacji prawnej w formacie PDF A4"
+            >
+              <mat-icon class="text-xs text-amber-400">picture_as_pdf</mat-icon>
+              <span>Drukuj Protokół PDF</span>
+            </button>
+
             <!-- Przełącznik WebGPU Model -->
             <button
               type="button"
@@ -41,7 +56,7 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
               [class]="useWebGPU()
                 ? 'bg-purple-600/30 text-purple-200 border-purple-500/50 shadow-sm'
                 : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700'"
-              class="px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
+              class="btn-tactile px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
               title="Przełącz między wbudowanym silnikiem a lokalnym modelem WebGPU"
             >
               <mat-icon class="text-xs">{{ useWebGPU() ? 'memory' : 'speed' }}</mat-icon>
@@ -56,7 +71,7 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
             }
             <button
               (click)="resetConversation()"
-              class="text-xs text-slate-400 hover:text-slate-200 bg-slate-950 hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1 active:scale-95"
+              class="btn-tactile text-xs text-slate-400 hover:text-slate-200 bg-slate-950 hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1"
               title="Wyczyść historię rozmowy"
             >
               <mat-icon class="text-xs">restart_alt</mat-icon>
@@ -86,6 +101,21 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
           <div class="bg-amber-950/40 border border-amber-500/30 p-2 rounded-xl text-xs text-amber-200 flex items-center gap-2 shrink-0">
             <mat-icon class="text-sm text-amber-400 shrink-0">info</mat-icon>
             <span>Przeglądarka lub sprzęt nie obsługuje WebGPU. Automatycznie aktywowano niezawodny silnik lokalny.</span>
+          </div>
+        }
+
+        <!-- Powiadomienie o akcjach (kopiowanie, sejf, PDF) -->
+        @if (actionNotification(); as notif) {
+          <div
+            class="px-3.5 py-2 rounded-xl text-xs flex items-center gap-2 shrink-0 transition-all animate-fade-in shadow-md"
+            [class]="notif.type === 'success'
+              ? 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-200'
+              : 'bg-amber-950/80 border border-amber-500/40 text-amber-200'"
+          >
+            <mat-icon class="text-sm" [class.text-emerald-400]="notif.type === 'success'" [class.text-amber-400]="notif.type === 'warn'">
+              {{ notif.type === 'success' ? 'check_circle' : 'warning' }}
+            </mat-icon>
+            <span class="font-medium">{{ notif.text }}</span>
           </div>
         }
 
@@ -130,7 +160,35 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
                       <span class="text-slate-300">Prawnik / Użytkownik</span>
                     }
                   </span>
-                  <span class="font-mono text-[10px] text-slate-500">{{ msg.timestamp }}</span>
+                  <div class="flex items-center gap-2">
+                    @if (msg.sender === 'assistant') {
+                      <button
+                        type="button"
+                        (click)="speakMessage(msg)"
+                        class="p-1 rounded text-slate-400 hover:text-amber-300 hover:bg-slate-800 transition-colors cursor-pointer"
+                        [title]="tts.isPlaying() && tts.currentTextId() === msg.id ? 'Zatrzymaj lektora' : 'Odsłuchaj opinię na głos (Lektor mowy)'"
+                      >
+                        <mat-icon class="text-xs">{{ tts.isPlaying() && tts.currentTextId() === msg.id ? 'volume_off' : 'volume_up' }}</mat-icon>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="copyMessageText(msg)"
+                        class="p-1 rounded text-slate-400 hover:text-amber-300 hover:bg-slate-800 transition-colors cursor-pointer"
+                        title="Kopiuj treść do schowka"
+                      >
+                        <mat-icon class="text-xs">content_copy</mat-icon>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="saveResponseToVault(msg)"
+                        class="p-1 rounded text-slate-400 hover:text-amber-300 hover:bg-slate-800 transition-colors cursor-pointer"
+                        title="Zapisz jako notatkę w zaszyfrowanym Sejfie Akt"
+                      >
+                        <mat-icon class="text-xs">enhanced_encryption</mat-icon>
+                      </button>
+                    }
+                    <span class="font-mono text-[10px] text-slate-500">{{ msg.timestamp }}</span>
+                  </div>
                 </div>
 
                 <!-- Etykieta kategorii prawnej (jeśli wykryto) -->
@@ -287,12 +345,17 @@ export class LegalChat {
 
   readonly speech = inject(SpeechDictationService);
   readonly webLLM = inject(LocalWebLLMService);
+  readonly tts = inject(TextToSpeechService);
+  readonly pdfService = inject(PdfExportService);
+  readonly legalData = inject(LegalDataService);
+  readonly cryptoService = inject(CryptoService);
   private readonly aiService = inject(PrawnBotAiService);
 
   readonly openCalculator = output<string>();
   readonly inspectArticle = output<string>();
 
   readonly useWebGPU = signal<boolean>(false);
+  readonly actionNotification = signal<{ text: string; type: 'success' | 'warn' } | null>(null);
 
   async toggleWebGPUMode(): Promise<void> {
     const nextState = !this.useWebGPU();
@@ -350,6 +413,89 @@ export class LegalChat {
 
   stopDictation(): void {
     this.speech.stop();
+  }
+
+  speakMessage(msg: ChatMessage): void {
+    if (!this.tts.isSupported()) {
+      this.showNotification('Synteza mowy (TTS) nie jest wspierana w tej przeglądarce.', 'warn');
+      return;
+    }
+
+    if (this.tts.isPlaying() && this.tts.currentTextId() === msg.id) {
+      this.tts.stop();
+      return;
+    }
+
+    const cleanText = msg.text.replace(/\*\*/g, '').replace(/###\s*/g, '').replace(/---\s*/g, '');
+    this.tts.startPlayback(
+      msg.id,
+      msg.legalCategoryBadge || 'Opinia Prawna AI',
+      'Prawnik z Łuczniczej (Lektor Mowy)',
+      cleanText
+    );
+  }
+
+  async copyMessageText(msg: ChatMessage): Promise<void> {
+    const cleanText = msg.text.replace(/\*\*/g, '');
+    try {
+      await navigator.clipboard.writeText(cleanText);
+      this.showNotification('Treść porady skopiowana do schowka', 'success');
+    } catch {
+      this.showNotification('Nie udało się skopiować tekstu do schowka.', 'warn');
+    }
+  }
+
+  async saveResponseToVault(msg: ChatMessage): Promise<void> {
+    if (!this.cryptoService.isAuthenticated()) {
+      this.showNotification('Sejf akt jest zablokowany. Odblokuj Sejf hasłem w prawym górnym rogu.', 'warn');
+      return;
+    }
+
+    try {
+      const cleanContent = msg.text.replace(/\*\*/g, '');
+      const firstLine = cleanContent.split('\n')[0] || 'Porada Prawna AI';
+      const title = firstLine.slice(0, 48) + (firstLine.length > 48 ? '...' : '');
+
+      await this.legalData.saveNote({
+        title: `Konsultacja AI: ${title}`,
+        content: cleanContent,
+        category: 'Analiza prawna',
+        linkedArticle: msg.referencedArticles?.[0] || 'Porada karna AI',
+        tags: ['asystent-ai', 'konsultacja-karna', msg.legalCategoryBadge || 'k.k.'].filter(Boolean),
+      });
+
+      this.showNotification('Pomyślnie zapisano poradę w zaszyfrowanym Sejfie Akt (AES-256)', 'success');
+    } catch (e: any) {
+      this.showNotification(e?.message || 'Błąd zapisu do sejfu.', 'warn');
+    }
+  }
+
+  exportConversationPdf(): void {
+    const messagesToExport = this.chatMessages().map((m) => ({
+      sender: m.sender,
+      text: m.text,
+      timestamp: m.timestamp,
+      legalCategoryBadge: m.legalCategoryBadge,
+    }));
+
+    if (messagesToExport.length === 0) {
+      this.showNotification('Brak wiadomości do wyeksportowania.', 'warn');
+      return;
+    }
+
+    try {
+      this.pdfService.exportChatConversationToPdf(messagesToExport);
+      this.showNotification('Pobrano protokół konsultacji prawnej PDF A4', 'success');
+    } catch (e: any) {
+      this.showNotification('Błąd generowania dokumentu PDF: ' + (e?.message || ''), 'warn');
+    }
+  }
+
+  private showNotification(text: string, type: 'success' | 'warn'): void {
+    this.actionNotification.set({ text, type });
+    setTimeout(() => {
+      this.actionNotification.set(null);
+    }, 4000);
   }
 
   async sendMessage(customText?: string): Promise<void> {
@@ -417,6 +563,7 @@ export class LegalChat {
   private scrollToBottom(): void {
     setTimeout(() => {
       if (this.scrollContainer?.nativeElement) {
+        this.scrollContainer.nativeElement.scrollHeight;
         this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
       }
     }, 50);

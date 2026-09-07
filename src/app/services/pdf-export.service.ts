@@ -367,6 +367,82 @@ export class PdfExportService {
     doc.save(safeFilename);
   }
 
+  /**
+   * Eksport protokołu / zapisu konsultacji z Asystentem AI do formatu PDF A4
+   */
+  exportChatConversationToPdf(messages: { sender: 'user' | 'assistant'; text: string; timestamp: string; legalCategoryBadge?: string }[]): void {
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let currentY = 20;
+
+    // Nagłówek kancelaryjny
+    doc.setFillColor(15, 23, 42); // slate-900
+    doc.rect(0, 0, pageWidth, 28, 'F');
+
+    doc.setTextColor(245, 158, 11); // amber-500
+    doc.setFontSize(10);
+    doc.text('PRAWNIK Z ŁUCZNICZEJ – ASYSTENT PRAWA KARNEGO AI', 15, 12);
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(13);
+    doc.text('PROTOKÓŁ KONSULTACJI PRAWNO-KARNEJ OFFLINE', 15, 20);
+
+    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(9);
+    const dateStr = `Data: ${new Date().toLocaleDateString('pl-PL')} ${new Date().toLocaleTimeString('pl-PL')}`;
+    doc.text(dateStr, pageWidth - 15, 20, { align: 'right' });
+
+    currentY = 38;
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Zapis rozmowy z inteligentnym asystentem prawno-karnym (przetwarzanie lokalne AES-256 / Zero-Cloud).', 15, currentY);
+    currentY += 8;
+
+    for (const msg of messages) {
+      if (currentY > 260) {
+        doc.addPage();
+        currentY = 20;
+      }
+
+      const isUser = msg.sender === 'user';
+      const senderLabel = isUser ? 'KLIENT / PYTANIE:' : 'ASYSTENT PRAWNY (PRAWNIK Z ŁUCZNICZEJ):';
+
+      doc.setFontSize(10);
+      if (isUser) {
+        doc.setTextColor(180, 83, 9); // amber-700
+      } else {
+        doc.setTextColor(15, 23, 42); // slate-900
+      }
+      doc.text(`[${msg.timestamp}] ${senderLabel}${msg.legalCategoryBadge ? ` [${this.sanitizePolish(msg.legalCategoryBadge)}]` : ''}`, 15, currentY);
+      currentY += 5;
+
+      doc.setFontSize(9);
+      doc.setTextColor(51, 65, 85);
+      // Usunięcie znaczników markdown (pogrubień, gwiazdek) dla czytelności PDF
+      const cleanText = msg.text.replace(/\*\*/g, '').replace(/###\s*/g, '').replace(/---\s*/g, '');
+      const lines = doc.splitTextToSize(this.sanitizePolish(cleanText), pageWidth - 30);
+
+      for (const line of lines) {
+        if (currentY > 275) {
+          doc.addPage();
+          currentY = 20;
+        }
+        doc.text(line, 15, currentY);
+        currentY += 4.5;
+      }
+      currentY += 4;
+    }
+
+    this.addFooter(doc, pageWidth);
+    doc.save(`Konsultacja_Prawna_AI_${new Date().toISOString().split('T')[0]}.pdf`);
+  }
+
   private addFooter(doc: jsPDF, pageWidth: number): void {
     const pageCount = doc.internal.pages.length - 1;
     for (let i = 1; i <= pageCount; i++) {

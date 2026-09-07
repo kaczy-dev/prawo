@@ -106,8 +106,8 @@ export class App {
   readonly rulingsComp = viewChild(RulingsBrowser);
   readonly notesComp = viewChild(EncryptedNotes);
 
-  // Aktywna zakładka
-  readonly activeTab = signal<ActiveTab>('threat-calc');
+  // Aktywna zakładka (Domyślnie: Główny Asystent AI)
+  readonly activeTab = signal<ActiveTab>('ai-chat');
 
   // Stan kalkulatora "Co mi grozi?" oraz wyszukiwarki globalnej
   readonly threatQuery = signal<string>(
@@ -336,10 +336,10 @@ export class App {
     }
     // Alt+1..5 - Szybkie skoki po zakładkach na desktopie
     if (e.altKey && !e.ctrlKey && !e.metaKey) {
-      if (e.key === '1') { e.preventDefault(); this.activeTab.set('threat-calc'); }
-      else if (e.key === '2') { e.preventDefault(); this.activeTab.set('penal-code'); }
-      else if (e.key === '3') { e.preventDefault(); this.activeTab.set('rulings'); }
-      else if (e.key === '4') { e.preventDefault(); this.activeTab.set('ai-chat'); }
+      if (e.key === '1') { e.preventDefault(); this.activeTab.set('ai-chat'); }
+      else if (e.key === '2') { e.preventDefault(); this.activeTab.set('threat-calc'); }
+      else if (e.key === '3') { e.preventDefault(); this.activeTab.set('penal-code'); }
+      else if (e.key === '4') { e.preventDefault(); this.activeTab.set('cases'); }
       else if (e.key === '5') { e.preventDefault(); this.activeTab.set('notes'); }
     }
   }

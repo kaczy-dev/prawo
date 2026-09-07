@@ -1626,22 +1626,81 @@ ${analysis.recommendedSteps.map((step, idx) => `${idx + 1}. ${step}`).join('\n')
         'Czy sprawa trafi do rejestru skazanych KRK?',
       ];
     } else {
-      // Domyślna odpowiedź doradcy prawnego Prawnik z Łuczniczej
-      text = `Jestem **Prawnik z Łuczniczej** – Twoim asystentem prawa karnego. Działam w 100% lokalnie i bezpiecznie na Twoim urządzeniu, gwarantując pełną poufność danych.
+      // DYNAMICZNY SILNIK ANALIZY DLA WSZYSTKICH INNYCH ZAPYTAŃ ZWIĄZANYCH Z PRZEPISAMI I CZYNAMI
+      const fallbackAnalysis = this.analyzeSituation(userPrompt);
+      if (fallbackAnalysis.matchedArticles.length > 0) {
+        const mainArt = fallbackAnalysis.matchedArticles[0];
+        const codeType = mainArt.codePrefix || 'k.k.';
+        legalCategoryBadge = `${codeType === 'k.w.' ? 'Kodeks Wykroczeń' : codeType === 'UoPN' ? 'Ustawa Narkotykowa' : 'Kodeks Karny'} (${mainArt.title})`;
+        actionQuery = userPrompt;
+
+        for (const a of fallbackAnalysis.matchedArticles) {
+          referencedArticles.push(`Art. ${a.number}${a.suffix || ''} ${a.codePrefix || 'k.k.'}`);
+        }
+        for (const r of fallbackAnalysis.similarRulings.slice(0, 2)) {
+          referencedRulings.push(r.signature);
+        }
+
+        const riskColorBadge =
+          fallbackAnalysis.riskLevel === 'bardzo wysoki'
+            ? '🔴 BARDZO WYSOKIE'
+            : fallbackAnalysis.riskLevel === 'wysoki'
+              ? '🟠 WYSOKIE'
+              : fallbackAnalysis.riskLevel === 'średni'
+                ? '🟡 ŚREDNIE'
+                : '🟢 NISKIE';
+
+        text = `**Analiza prawno-karna zagadnienia: „${userPrompt}”**
+
+- **Ocena ryzyka:** ${riskColorBadge}
+- **Podstawa prawna:** ${fallbackAnalysis.matchedArticles.map((a) => `**Art. ${a.number}${a.suffix || ''} ${a.codePrefix || 'k.k.'}** – *${a.title}*`).join(', ')}
+
+---
+
+### 1. Zagrożenie ustawowe i charakterystyka czynu:
+- **Wymiar kary:** ${fallbackAnalysis.primarySentenceRange}
+- **Komentarz:** ${fallbackAnalysis.plainExplanation}
+${fallbackAnalysis.possibleSanctions.map((s) => `- ${s}`).join('\n')}
+
+---
+
+### 2. Kluczowe środki i okoliczności:
+${fallbackAnalysis.mandatoryMeasures.length > 0 ? fallbackAnalysis.mandatoryMeasures.map((m) => `⚠️ ${m}`).join('\n\n') : 'Brak obligatoryjnych środków o zaostrzonym rygorze.'}
+
+---
+
+### 3. Okoliczności łagodzące (argumentacja obrończa):
+${fallbackAnalysis.mitigatingFactors.map((f) => `✔️ ${f}`).join('\n')}
+
+---
+
+### 4. Zalecana strategia postępowania:
+${fallbackAnalysis.recommendedSteps.map((step, idx) => `${idx + 1}. ${step}`).join('\n')}`;
+
+        suggestedFollowUps = [
+          'Jakie dowody przedstawić na swoją korzyść?',
+          'Czy w tej sprawie przysługuje warunkowe umorzenie?',
+          'Jakie są koszty postępowania sądowego?',
+          'Co mówić podczas przesłuchania na policji?',
+        ];
+      } else {
+        // Domyślna odpowiedź doradcy prawnego Prawnik z Łuczniczej
+        text = `Jestem **Prawnik z Łuczniczej** – Twoim asystentem prawa karnego. Działam w 100% lokalnie i bezpiecznie na Twoim urządzeniu, gwarantując pełną poufność danych.
 
 Mogę pomóc Ci w:
-- **Analizie "Co mi grozi?"**: Wpisz sytuację życiową (np. *jazda po 2 piwach*, *kradzież w markecie*, *płatność znalezioną kartą*), a przedstawię sankcje, przepisy i linię obrony.
-- **Wyjaśnianiu trudnych pojęć prostym językiem**: recydywa, obrona konieczna, warunkowe umorzenie, dozór elektroniczny, zatarcie skazania.
+- **Analizie "Co mi grozi?"**: Wpisz sytuację życiową (np. *jazda po 2 piwach*, *kradzież w markecie*, *płatność znalezioną kartą*, *podrobienie podpisu*), a przedstawię sankcje, przepisy i linię obrony.
+- **Wyjaśnianiu trudnych pojęć prostym językiem**: recydywa, obrona konieczna, warunkowe umorzenie, dozór elektroniczny (SDE), zatarcie skazania.
 - **Wyszukiwaniu orzecznictwa Sądu Najwyższego**: tezy, sygnatury i precedensy.
 - **Sprawdzaniu zmian przepisów**: m.in. konfiskata aut od 2024 r., próg 800 zł przy kradzieży.
 
 W czym konkretnie mogę pomóc w Twojej sprawie?`;
-      suggestedFollowUps = [
-        'Co grozi za jazdę po alkoholu?',
-        'Co to jest wypadek mniejszej wagi?',
-        'Jakie są prawa osoby zatrzymanej?',
-        'Kiedy sąd może zawiesić wykonanie kary?',
-      ];
+        suggestedFollowUps = [
+          'Co grozi za jazdę po alkoholu?',
+          'Co to jest wypadek mniejszej wagi?',
+          'Jakie są prawa osoby zatrzymanej?',
+          'Kiedy sąd może zawiesić wykonanie kary?',
+        ];
+      }
     }
 
     return {
