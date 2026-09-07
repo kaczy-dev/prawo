@@ -341,75 +341,6 @@
         </button>
       </div>
     </nav>
-
-    <!-- Rozwijane Menu Mobilne (Drawer / Dropdown dla pozostałych funkcji) -->
-    @if (overflowMenuOpen()) {
-      <div class="md:hidden mt-2 p-3.5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2 animate-fade-in shadow-2xl">
-        <div class="text-[10px] font-bold text-amber-400 uppercase tracking-wider px-2">Narzędzia & Podręczniki</div>
-        
-        <div class="grid grid-cols-2 gap-2">
-          <button
-            (click)="openDocumentScannerModal(); overflowMenuOpen.set(false)"
-            class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex flex-col gap-1 transition-colors cursor-pointer"
-          >
-            <mat-icon class="text-amber-400 text-lg">document_scanner</mat-icon>
-            <span class="text-xs font-semibold text-white">Skaner OCR</span>
-            <span class="text-[10px] text-slate-400">Pisma z kamery</span>
-          </button>
-
-          <button
-            (click)="openCumulativeSentenceModal(); overflowMenuOpen.set(false)"
-            class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex flex-col gap-1 transition-colors cursor-pointer"
-          >
-            <mat-icon class="text-amber-400 text-lg">calculate</mat-icon>
-            <span class="text-xs font-semibold text-white">Kara Łączna</span>
-            <span class="text-[10px] text-slate-400">Art. 85-86 k.k.</span>
-          </button>
-
-          <button
-            (click)="activeTab.set('handbooks'); overflowMenuOpen.set(false)"
-            class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex flex-col gap-1 transition-colors cursor-pointer"
-          >
-            <mat-icon class="text-amber-400 text-lg">auto_stories</mat-icon>
-            <span class="text-xs font-semibold text-white">Podręczniki</span>
-            <span class="text-[10px] text-slate-400">Metodyka prawa</span>
-          </button>
-
-          <button
-            (click)="openDocumentExportModal(); overflowMenuOpen.set(false)"
-            class="p-2.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl text-left flex flex-col gap-1 transition-colors cursor-pointer"
-          >
-            <mat-icon class="text-amber-400 text-lg">print</mat-icon>
-            <span class="text-xs font-semibold text-white">Drukuj A4</span>
-            <span class="text-[10px] text-slate-400">Pisma i opinie</span>
-          </button>
-        </div>
-
-        <div class="border-t border-slate-800 pt-2 flex items-center justify-between px-1">
-          <button
-            (click)="openLegalDictionary(); overflowMenuOpen.set(false)"
-            class="text-xs text-amber-300 hover:underline flex items-center gap-1.5 py-1 cursor-pointer"
-          >
-            <mat-icon class="text-xs">menu_book</mat-icon>
-            <span>Słownik Pojęć</span>
-          </button>
-          <button
-            (click)="activeTab.set('alerts'); overflowMenuOpen.set(false)"
-            class="text-xs text-red-300 hover:underline flex items-center gap-1.5 py-1 cursor-pointer"
-          >
-            <mat-icon class="text-xs text-red-400">notifications_active</mat-icon>
-            <span>Nowele k.k.</span>
-          </button>
-          <button
-            (click)="openSyncManager(); overflowMenuOpen.set(false)"
-            class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 py-1 cursor-pointer"
-          >
-            <mat-icon class="text-xs">sync</mat-icon>
-            <span>Synchronizacja</span>
-          </button>
-        </div>
-      </div>
-    }
   </header>
 
   <!-- Główny Kontener Zawartości z obsługą trybu zwartego dla desktopu -->
@@ -558,61 +489,263 @@
   <app-offline-sync-manager-modal />
 
   <!-- ========================================================================= -->
+  <!-- MOBILNY PŁYWAJĄCY PRZYCISK SZYBKIEJ AKCJI (FAB) -->
+  <!-- ========================================================================= -->
+  @if (activeTab() === 'cases' || activeTab() === 'notes') {
+    <button
+      type="button"
+      (click)="activeTab.set('notes'); notesComp()?.showNoteForm?.set(true)"
+      class="md:hidden fixed right-4 bottom-20 z-30 w-13 h-13 rounded-full bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 text-slate-950 font-bold shadow-xl shadow-amber-950/70 border border-amber-400/60 flex items-center justify-center cursor-pointer active:scale-90 transition-transform focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+      title="Nowa notatka sprawy lub dyktowanie głosem"
+      aria-label="Nowa notatka lub dyktowanie głosem"
+    >
+      <mat-icon class="text-2xl text-slate-950 font-bold">add</mat-icon>
+    </button>
+  }
+
+  <!-- ========================================================================= -->
   <!-- DEDYKOWANY DOLNY PASEK NAWIGACJI MOBILNEJ (BOTTOM NAVIGATION BAR) -->
   <!-- ========================================================================= -->
   <nav
     id="mobile-bottom-nav"
-    class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/90 px-2 py-1.5 flex items-center justify-around shadow-2xl safe-area-inset-bottom"
+    class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0a0d16]/95 backdrop-blur-xl border-t border-amber-500/20 px-1 py-1 flex items-center justify-around shadow-2xl pb-[max(env(safe-area-inset-bottom),0.5rem)]"
     aria-label="Nawigacja mobilna"
   >
     <!-- 1. Kalkulator -->
     <button
       (click)="activeTab.set('threat-calc')"
       [class]="activeTab() === 'threat-calc' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      aria-label="Kalkulator sankcji"
     >
-      <div [class]="activeTab() === 'threat-calc' ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+      <div [class]="activeTab() === 'threat-calc' ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
         <mat-icon class="text-xl">gavel</mat-icon>
       </div>
-      <span class="text-[10px] mt-0.5 tracking-tight">Kalkulator</span>
+      <span class="text-[10px] tracking-tight">Kalkulator</span>
+      @if (activeTab() === 'threat-calc') {
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+      }
     </button>
 
     <!-- 2. Kodeks & Orzecznictwo -->
     <button
       (click)="activeTab.set('penal-code')"
       [class]="(activeTab() === 'penal-code' || activeTab() === 'rulings') ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      aria-label="Kodeks karny i orzecznictwo"
     >
-      <div [class]="(activeTab() === 'penal-code' || activeTab() === 'rulings') ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+      <div [class]="(activeTab() === 'penal-code' || activeTab() === 'rulings') ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
         <mat-icon class="text-xl">menu_book</mat-icon>
       </div>
-      <span class="text-[10px] mt-0.5 tracking-tight">Kodeks</span>
+      <span class="text-[10px] tracking-tight">Kodeks</span>
+      @if (activeTab() === 'penal-code' || activeTab() === 'rulings') {
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+      }
     </button>
 
     <!-- 3. Sprawy & Sejf -->
     <button
       (click)="activeTab.set('cases')"
       [class]="(activeTab() === 'cases' || activeTab() === 'notes') ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      aria-label="Dossier spraw i notatnik"
     >
-      <div [class]="(activeTab() === 'cases' || activeTab() === 'notes') ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+      <div [class]="(activeTab() === 'cases' || activeTab() === 'notes') ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
         <mat-icon class="text-xl">folder_shared</mat-icon>
       </div>
-      <span class="text-[10px] mt-0.5 tracking-tight">Sprawy</span>
+      <span class="text-[10px] tracking-tight">Sprawy</span>
+      @if (activeTab() === 'cases' || activeTab() === 'notes') {
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+      }
     </button>
 
     <!-- 4. Asystent AI (Czat) -->
     <button
       (click)="activeTab.set('ai-chat')"
       [class]="activeTab() === 'ai-chat' ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
-      class="flex flex-col items-center justify-center flex-1 py-1 px-1 transition-colors cursor-pointer"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      aria-label="Asystent AI"
     >
-      <div [class]="activeTab() === 'ai-chat' ? 'bg-amber-500/15 p-1 rounded-xl' : 'p-1'">
+      <div [class]="activeTab() === 'ai-chat' ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
         <mat-icon class="text-xl">smart_toy</mat-icon>
       </div>
-      <span class="text-[10px] mt-0.5 tracking-tight">Asystent</span>
+      <span class="text-[10px] tracking-tight">Asystent</span>
+      @if (activeTab() === 'ai-chat') {
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+      }
     </button>
 
-    <!-- 5. Więcej -->
+    <!-- 5. Więcej / Narzędzia (Otwiera Bottom Sheet) -->
+    <button
+      (click)="toggleOverflowMenu()"
+      [class]="overflowMenuOpen() ? 'text-amber-400 font-bold' : 'text-slate-400 hover:text-slate-200'"
+      class="flex flex-col items-center justify-center flex-1 py-1 px-1 min-h-[48px] transition-colors cursor-pointer active:scale-95 relative"
+      aria-label="Więcej narzędzi i opcji"
+    >
+      <div [class]="overflowMenuOpen() ? 'bg-amber-500/15 p-1 rounded-xl text-amber-300' : 'p-1'">
+        <mat-icon class="text-xl">dashboard_customize</mat-icon>
+      </div>
+      <span class="text-[10px] tracking-tight">Więcej</span>
+      @if (overflowMenuOpen()) {
+        <span class="absolute top-0.5 w-4 h-0.5 bg-amber-400 rounded-full"></span>
+      }
+    </button>
   </nav>
+
+  <!-- ========================================================================= -->
+  <!-- MOBILNY BOTTOM SHEET: PRZYBORNIK KANCELARYJNY -->
+  <!-- ========================================================================= -->
+  @if (overflowMenuOpen()) {
+    <div
+      class="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col justify-end transition-opacity animate-fade-in"
+      (click)="overflowMenuOpen.set(false)"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Przybornik Kancelaryjny"
+    >
+      <div
+        class="bg-gradient-to-b from-[#141928] via-[#0f1422] to-[#0a0d16] border-t border-amber-500/30 rounded-t-3xl p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-[max(env(safe-area-inset-bottom),1.5rem)] relative"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- Uchwyt do przeciągania (Drag handle) -->
+        <div class="w-12 h-1.5 bg-slate-600/80 rounded-full mx-auto -mt-1 mb-2"></div>
+
+        <!-- Nagłówek Bottom Sheet -->
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="p-1.5 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              <mat-icon class="text-base">handyman</mat-icon>
+            </span>
+            <div>
+              <h3 class="font-serif font-bold text-white text-sm tracking-wide">Przybornik Kancelaryjny</h3>
+              <p class="text-[11px] text-slate-400">Szybkie narzędzia i moduły pomocnicze</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            (click)="overflowMenuOpen.set(false)"
+            class="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label="Zamknij przybornik"
+          >
+            <mat-icon class="text-lg">close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Siatka 6 narzędzi kancelaryjnych -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <!-- Skaner OCR -->
+          <button
+            type="button"
+            (click)="openDocumentScannerModal(); overflowMenuOpen.set(false)"
+            class="p-3 bg-[#0d111c] border border-slate-700/80 hover:border-amber-500/40 rounded-2xl text-left flex flex-col gap-1.5 transition-all cursor-pointer active:scale-[0.97]"
+          >
+            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <mat-icon class="text-lg">document_scanner</mat-icon>
+            </div>
+            <span class="text-xs font-bold text-white">Skaner Pism (OCR)</span>
+            <span class="text-[10px] text-slate-400">Aparat i pliki</span>
+          </button>
+
+          <!-- Kara Łączna -->
+          <button
+            type="button"
+            (click)="openCumulativeSentenceModal(); overflowMenuOpen.set(false)"
+            class="p-3 bg-[#0d111c] border border-slate-700/80 hover:border-amber-500/40 rounded-2xl text-left flex flex-col gap-1.5 transition-all cursor-pointer active:scale-[0.97]"
+          >
+            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <mat-icon class="text-lg">calculate</mat-icon>
+            </div>
+            <span class="text-xs font-bold text-white">Kara Łączna</span>
+            <span class="text-[10px] text-slate-400">Art. 85-86 k.k.</span>
+          </button>
+
+          <!-- Drukuj A4 & PDF -->
+          <button
+            type="button"
+            (click)="openDocumentExportModal(); overflowMenuOpen.set(false)"
+            class="p-3 bg-[#0d111c] border border-slate-700/80 hover:border-amber-500/40 rounded-2xl text-left flex flex-col gap-1.5 transition-all cursor-pointer active:scale-[0.97]"
+          >
+            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <mat-icon class="text-lg">print</mat-icon>
+            </div>
+            <span class="text-xs font-bold text-white">Drukuj A4 & PDF</span>
+            <span class="text-[10px] text-slate-400">Opinie i pisma</span>
+          </button>
+
+          <!-- Słownik Pojęć -->
+          <button
+            type="button"
+            (click)="openLegalDictionary(); overflowMenuOpen.set(false)"
+            class="p-3 bg-[#0d111c] border border-slate-700/80 hover:border-amber-500/40 rounded-2xl text-left flex flex-col gap-1.5 transition-all cursor-pointer active:scale-[0.97]"
+          >
+            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <mat-icon class="text-lg">menu_book</mat-icon>
+            </div>
+            <span class="text-xs font-bold text-white">Słownik Pojęć</span>
+            <span class="text-[10px] text-slate-400">Definicje k.k.</span>
+          </button>
+
+          <!-- Podręczniki Obrońcy -->
+          <button
+            type="button"
+            (click)="activeTab.set('handbooks'); overflowMenuOpen.set(false)"
+            class="p-3 bg-[#0d111c] border border-slate-700/80 hover:border-amber-500/40 rounded-2xl text-left flex flex-col gap-1.5 transition-all cursor-pointer active:scale-[0.97]"
+          >
+            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+              <mat-icon class="text-lg">auto_stories</mat-icon>
+            </div>
+            <span class="text-xs font-bold text-white">Podręczniki</span>
+            <span class="text-[10px] text-slate-400">Strategie obrony</span>
+          </button>
+
+          <!-- Nowele k.k. -->
+          <button
+            type="button"
+            (click)="activeTab.set('alerts'); overflowMenuOpen.set(false)"
+            class="p-3 bg-[#0d111c] border border-slate-700/80 hover:border-red-500/40 rounded-2xl text-left flex flex-col gap-1.5 transition-all cursor-pointer active:scale-[0.97]"
+          >
+            <div class="w-8 h-8 rounded-xl bg-red-500/15 text-red-400 border border-red-500/30 flex items-center justify-center">
+              <mat-icon class="text-lg">notifications_active</mat-icon>
+            </div>
+            <span class="text-xs font-bold text-white">Nowele k.k.</span>
+            <span class="text-[10px] text-slate-400">Zmiany przepisów</span>
+          </button>
+        </div>
+
+        <!-- Stopka Bottom Sheet: Sejf i Synchronizacja -->
+        <div class="border-t border-slate-800/80 pt-3 flex items-center justify-between gap-2">
+          <!-- Sejf -->
+          @if (cryptoService.isAuthenticated()) {
+            <button
+              type="button"
+              (click)="lockVault(); overflowMenuOpen.set(false)"
+              class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-semibold cursor-pointer active:scale-95"
+            >
+              <mat-icon class="text-sm">lock_open</mat-icon>
+              <span>Zablokuj Sejf</span>
+            </button>
+          } @else {
+            <button
+              type="button"
+              (click)="openVaultModal(); overflowMenuOpen.set(false)"
+              class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 text-xs font-medium cursor-pointer active:scale-95"
+            >
+              <mat-icon class="text-sm text-amber-400">lock</mat-icon>
+              <span>Odblokuj Sejf</span>
+            </button>
+          }
+
+          <!-- Synchronizacja -->
+          <button
+            type="button"
+            (click)="openSyncManager(); overflowMenuOpen.set(false)"
+            class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white text-xs cursor-pointer active:scale-95"
+          >
+            <mat-icon class="text-sm text-slate-400">sync</mat-icon>
+            <span>Synchronizacja</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

@@ -12,38 +12,54 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
   imports: [CommonModule, MatIconModule],
   template: `
     <section id="section-notes" class="space-y-6">
-      <!-- Nagłówek i status skarbca -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-2 mb-1 flex-wrap">
-            <h2 class="text-lg font-bold text-white flex items-center gap-2">
-              <mat-icon class="text-amber-400">lock</mat-icon>
-              Lokalny Notatnik Kancelaryjny (Szyfrowanie AES-256-GCM)
+      <!-- Nagłówek i status skarbca (Warm Obsidian & Gilded Seal Header) -->
+      <div class="relative overflow-hidden bg-gradient-to-b from-[#141928] via-[#0f1422] to-[#0a0d16] border border-amber-500/25 rounded-2xl p-5 sm:p-6 shadow-2xl shadow-black/60 flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all">
+        <!-- Złota linia akcentująca u góry karty -->
+        <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+
+        <div class="relative z-10 max-w-2xl">
+          <div class="flex items-center gap-2.5 mb-2 flex-wrap">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-900/30 border border-amber-500/40 flex items-center justify-center text-amber-300 shadow-inner shrink-0">
+              <mat-icon class="text-lg">lock</mat-icon>
+            </div>
+            <h2 class="text-lg sm:text-xl font-serif font-bold text-white tracking-wide flex items-center gap-2 drop-shadow-sm">
+              Notatnik Kancelaryjny <span class="text-amber-400 font-sans font-normal text-xs sm:text-sm tracking-normal">(AES-256-GCM)</span>
             </h2>
+
+            <!-- Pieczęć kryptograficzna / Stan Sejfu -->
             @if (cryptoService.isAuthenticated()) {
-              <span class="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1 font-mono">
-                <mat-icon class="text-xs">verified_user</mat-icon>
-                AES-GCM Aktywny
+              <span
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-950/70 border border-emerald-400/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.15)]"
+                title="Kryptograficzny skarbiec odblokowany. Szyfrowanie po stronie klienta."
+                role="status"
+              >
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>AES-GCM Sejf Aktywny</span>
               </span>
             } @else {
-              <span class="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-0.5 rounded-full border border-amber-500/30 flex items-center gap-1">
-                <mat-icon class="text-xs">lock_open</mat-icon>
-                Tryb bez hasła
+              <span
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-950/60 border border-amber-500/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.15)]"
+                title="Notatnik działa w lokalnej pamięci. Kliknij 'Odblokuj Sejf', aby zaszyfrować dane hasłem."
+                role="status"
+              >
+                <mat-icon class="text-xs text-amber-400">lock_open</mat-icon>
+                <span>Tryb lokalny jawny</span>
               </span>
             }
           </div>
-          <p class="text-xs md:text-sm text-slate-400">
-            Wszystkie notatki spraw, dane klientów i strategie obrony są szyfrowane lokalnie w przeglądarce.
-            Obsługuje <strong>dyktowanie głosem (Web Speech API)</strong> z formatowaniem polskiej terminologii prawnej.
+          <p class="text-xs sm:text-sm text-slate-300/90 leading-relaxed">
+            Wszystkie tezy obrończe, notatki ze spotkań oraz dane objęte tajemnicą adwokacką są przetwarzane w 100% lokalnie.
+            Wbudowane <strong class="text-amber-300 font-semibold">inteligentne dyktowanie głosem (Web Speech API)</strong> automatycznie formatuje terminologię k.k. i k.p.k.
           </p>
         </div>
 
-        <div class="flex items-center gap-2.5">
+        <div class="relative z-10 flex items-center gap-3 shrink-0">
           <button
             type="button"
             (click)="navigateToCases.emit()"
-            class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer"
+            class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-[#111624] hover:bg-[#1a2136] text-slate-200 border border-slate-700/80 hover:border-amber-500/40 transition-all cursor-pointer shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             title="Powrót do dossier i aktywnych spraw"
+            aria-label="Powrót do dossier i aktywnych spraw"
           >
             <mat-icon class="text-sm text-amber-400">arrow_back</mat-icon>
             <span>Dossier Spraw</span>
@@ -52,8 +68,10 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
           @if (!showNoteForm()) {
             <button
               id="btn-create-new-note"
+              type="button"
               (click)="resetNoteForm(); showNoteForm.set(true)"
-              class="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold text-xs md:text-sm px-4 py-2 rounded-xl shadow-lg shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap"
+              class="flex items-center gap-2 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 active:scale-[0.98] text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-amber-500/25 border border-amber-300/40 transition-all cursor-pointer whitespace-nowrap focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+              aria-label="Utwórz nową notatkę procesową"
             >
               <mat-icon class="text-base">add</mat-icon>
               <span>Nowa Notatka</span>
@@ -62,59 +80,82 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
         </div>
       </div>
 
-      <!-- Formularz tworzenia / edycji notatki -->
+      <!-- Formularz tworzenia / edycji notatki (Judicial Docket Form) -->
       @if (showNoteForm()) {
-        <div class="bg-slate-900 border border-amber-500/30 rounded-2xl p-6 shadow-2xl space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h3 class="text-sm font-bold text-amber-300 flex items-center gap-2">
-              <mat-icon class="text-base">edit_note</mat-icon>
-              {{ editingNoteId() ? 'Edycja Notatki Sprawy' : 'Tworzenie Nowej Notatki Kancelaryjnej' }}
-            </h3>
+        <div class="relative overflow-hidden bg-gradient-to-b from-[#141828] to-[#0d101a] border border-amber-500/35 rounded-2xl p-5 sm:p-7 shadow-2xl shadow-black/70 space-y-5 animate-fade-in">
+          <!-- Dekoracyjny pasek aktowy -->
+          <div class="flex items-center justify-between border-b border-amber-500/20 pb-3.5">
+            <div class="flex items-center gap-2.5">
+              <div class="p-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300">
+                <mat-icon class="text-base">edit_note</mat-icon>
+              </div>
+              <h3 class="text-sm sm:text-base font-serif font-bold text-amber-200 tracking-wide">
+                {{ editingNoteId() ? 'Edycja Notatki Sprawy' : 'Sporządzanie Nowego Dokumentu / Notatki' }}
+              </h3>
+            </div>
             <button
+              type="button"
               (click)="resetNoteForm()"
-              class="text-slate-400 hover:text-slate-200 text-xs flex items-center gap-1 cursor-pointer"
+              class="text-slate-300 hover:text-white text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-800/80 transition-colors cursor-pointer border border-transparent hover:border-slate-700 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+              aria-label="Anuluj edycję notatki"
             >
               <mat-icon class="text-sm">close</mat-icon>
-              Anuluj
+              <span>Anuluj</span>
             </button>
           </div>
 
-          <!-- Banner informacyjny o aktywnym dyktowaniu -->
+          <!-- Banner informacyjny o aktywnym dyktowaniu (Acoustic Indicator) -->
           @if (speech.isListening() && (speech.activeTarget() === 'note-title' || speech.activeTarget() === 'note-content')) {
-            <div class="p-3 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-between gap-3 text-xs text-amber-200 animate-pulse">
-              <div class="flex items-center gap-2.5">
-                <span class="relative flex h-3 w-3">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                </span>
+            <div
+              class="p-3.5 rounded-xl bg-gradient-to-r from-red-950/60 via-amber-950/50 to-red-950/60 border border-amber-500/40 flex items-center justify-between gap-3 text-xs text-amber-200 shadow-lg shadow-black/40"
+              role="region"
+              aria-live="polite"
+              aria-label="Panel dyktowania mowy"
+            >
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1">
+                  <span class="w-1 h-3.5 bg-red-500 rounded-full animate-pulse"></span>
+                  <span class="w-1 h-5 bg-amber-400 rounded-full animate-pulse delay-75"></span>
+                  <span class="w-1 h-3.5 bg-red-500 rounded-full animate-pulse delay-150"></span>
+                </div>
                 <div>
-                  <span class="font-bold">Dyktowanie do {{ speech.activeTarget() === 'note-title' ? 'tytułu' : 'treści notatki' }}...</span>
-                  <span class="ml-2 italic text-slate-200">„{{ speech.currentInterim() || 'Mów do mikrofonu...' }}”</span>
+                  <div class="font-bold text-amber-300 flex items-center gap-1.5">
+                    <span>Rejestracja mowy w toku: {{ speech.activeTarget() === 'note-title' ? 'Tytuł / Sygnatura' : 'Treść merytoryczna' }}</span>
+                  </div>
+                  <div class="italic text-slate-100 mt-0.5 max-w-xl truncate">
+                    „{{ speech.currentInterim() || 'Mów do mikrofonu (polski słownik prawny)...' }}”
+                  </div>
                 </div>
               </div>
               <button
+                type="button"
                 (click)="speech.stop()"
-                class="px-2.5 py-1 bg-red-500/30 hover:bg-red-500/50 text-red-200 rounded-lg border border-red-500/40 cursor-pointer text-xs flex items-center gap-1"
+                class="px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded-lg border border-red-400/50 cursor-pointer text-xs font-semibold flex items-center gap-1 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
+                aria-label="Zatrzymaj dyktowanie głosem"
               >
                 <mat-icon class="text-xs">stop</mat-icon>
-                Zatrzymaj
+                <span>Zakończ</span>
               </button>
             </div>
           }
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Tytuł notatki z dyktowaniem -->
-            <div class="md:col-span-2">
-              <div class="flex items-center justify-between mb-1">
-                <label for="input-note-title" class="text-xs font-semibold text-slate-300">
-                  Tytuł notatki / Sygnatura sprawy:
+            <div class="md:col-span-2 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <label for="input-note-title" class="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                  <span>Tytuł notatki / Sygnatura akt:</span>
+                  <span class="text-amber-400">*</span>
                 </label>
                 <button
                   type="button"
                   (click)="toggleTitleDictation()"
-                  [class]="isDictatingTitle() ? 'text-red-400 font-bold animate-pulse' : 'text-slate-400 hover:text-amber-300'"
-                  class="text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
-                  title="Dyktuj tytuł notatki"
+                  [class]="isDictatingTitle()
+                    ? 'text-red-400 font-bold bg-red-950/50 border border-red-500/40 px-2 py-0.5 rounded-md'
+                    : 'text-slate-300 hover:text-amber-300 px-2 py-0.5 rounded-md hover:bg-slate-800'"
+                  class="text-[11px] flex items-center gap-1 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                  title="Dyktuj tytuł notatki za pomocą mikrofonu"
+                  aria-label="Dyktuj tytuł notatki"
                 >
                   <mat-icon class="text-xs">{{ isDictatingTitle() ? 'mic' : 'mic_none' }}</mat-icon>
                   <span>{{ isDictatingTitle() ? 'Słucham...' : 'Dyktuj tytuł' }}</span>
@@ -126,18 +167,18 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
                 [value]="noteTitle()"
                 (input)="noteTitle.set($any($event.target).value)"
                 placeholder="np. Kowalski Jan – Obrona z art. 178a k.k., badanie alkomatem"
-                class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                class="w-full bg-[#0a0d16] border border-slate-700 hover:border-amber-500/50 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/30 transition-all shadow-inner"
               />
             </div>
 
             <!-- Kategoria -->
-            <div>
-              <label for="select-note-category" class="block text-xs font-semibold text-slate-300 mb-1">Kategoria:</label>
+            <div class="space-y-1.5">
+              <label for="select-note-category" class="block text-xs font-semibold text-slate-200">Kategoria aktowa:</label>
               <select
                 id="select-note-category"
                 [value]="noteCategory()"
                 (change)="noteCategory.set($any($event.target).value)"
-                class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500 cursor-pointer"
+                class="w-full bg-[#0a0d16] border border-slate-700 hover:border-amber-500/50 focus:border-amber-400 rounded-xl px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/30 cursor-pointer transition-all shadow-inner"
               >
                 <option value="Sprawa klienta">Sprawa klienta</option>
                 <option value="Analiza prawna">Analiza prawna</option>
@@ -149,106 +190,123 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Powiązany artykuł -->
-            <div>
-              <label for="input-note-linked-art" class="block text-xs font-semibold text-slate-300 mb-1">Powiązany artykuł k.k.:</label>
+            <div class="space-y-1.5">
+              <label for="input-note-linked-art" class="block text-xs font-semibold text-slate-200">Powiązany artykuł k.k. / k.p.k.:</label>
               <input
                 id="input-note-linked-art"
                 type="text"
                 [value]="noteLinkedArticle()"
                 (input)="noteLinkedArticle.set($any($event.target).value)"
                 placeholder="np. Art. 178a § 1 k.k."
-                class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                class="w-full bg-[#0a0d16] border border-slate-700 hover:border-amber-500/50 focus:border-amber-400 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/30 transition-all shadow-inner"
               />
             </div>
 
             <!-- Tagi -->
-            <div class="md:col-span-2">
-              <label for="input-note-tags" class="block text-xs font-semibold text-slate-300 mb-1">Tagi (oddzielone przecinkami):</label>
+            <div class="md:col-span-2 space-y-1.5">
+              <label for="input-note-tags" class="block text-xs font-semibold text-slate-200">Tagi wyszukiwawcze (oddzielone przecinkami):</label>
               <input
                 id="input-note-tags"
                 type="text"
                 [value]="noteTagsInput()"
                 (input)="noteTagsInput.set($any($event.target).value)"
-                placeholder="np. alkomat, konfiskata, linia obrony, świadek"
-                class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                placeholder="np. alkomat, konfiskata pojazdu, linia obrony, świadek kluczowy"
+                class="w-full bg-[#0a0d16] border border-slate-700 hover:border-amber-500/50 focus:border-amber-400 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/30 transition-all shadow-inner"
               />
             </div>
           </div>
 
-          <!-- Pasek szablonów procesowych -->
-          <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800">
-            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
-              <span class="text-[11px] text-amber-400 font-semibold whitespace-nowrap flex items-center gap-1 mr-1">
-                <mat-icon class="text-xs">description</mat-icon> Wstaw szablon pisma:
+          <!-- Pasek szablonów procesowych ("Docket Stamps" Bar) -->
+          <div class="p-3 bg-[#0a0d16] rounded-xl border border-amber-500/20 shadow-inner">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-serif font-semibold text-amber-300 flex items-center gap-1.5">
+                <mat-icon class="text-xs text-amber-400">history_edu</mat-icon>
+                <span>Przybornik Pism Procesowych (Wstaw Szablon):</span>
               </span>
+              <span class="text-[10px] text-slate-400 hidden sm:inline">Gotowa struktura wniosków i memorandów</span>
+            </div>
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 text-xs">
               <button
                 type="button"
                 (click)="applyTemplate('warunkowe-umorzenie')"
-                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-amber-300 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                class="px-3 py-1.5 rounded-lg bg-[#14192b] hover:bg-[#1d243d] border border-amber-500/30 hover:border-amber-400 text-slate-200 hover:text-amber-200 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
                 title="Wstaw strukturę wniosku o warunkowe umorzenie postępowania (art. 66 k.k.)"
               >
-                Wniosek o warunkowe umorzenie
+                <mat-icon class="text-xs text-amber-400">verified</mat-icon>
+                <span>Warunkowe umorzenie (art. 66)</span>
               </button>
+
               <button
                 type="button"
                 (click)="applyTemplate('wniosek-dowodowy')"
-                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-amber-300 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                class="px-3 py-1.5 rounded-lg bg-[#14192b] hover:bg-[#1d243d] border border-amber-500/30 hover:border-amber-400 text-slate-200 hover:text-amber-200 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
                 title="Wstaw wniosek dowodowy o dopuszczenie dowodu (art. 169 k.p.k.)"
               >
-                Wniosek dowodowy (art. 169 k.p.k.)
+                <mat-icon class="text-xs text-amber-400">inventory</mat-icon>
+                <span>Wniosek dowodowy (art. 169 k.p.k.)</span>
               </button>
+
               <button
                 type="button"
                 (click)="applyTemplate('zazalenie-zatrzymanie')"
-                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-amber-300 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                class="px-3 py-1.5 rounded-lg bg-[#14192b] hover:bg-[#1d243d] border border-amber-500/30 hover:border-amber-400 text-slate-200 hover:text-amber-200 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
                 title="Wstaw wzór zażalenia na zatrzymanie prawa jazdy / pojazdu"
               >
-                Zażalenie (zatrzymanie prawa jazdy)
+                <mat-icon class="text-xs text-amber-400">warning_amber</mat-icon>
+                <span>Zażalenie (zatrzymanie prawa jazdy)</span>
               </button>
+
               <button
                 type="button"
                 (click)="applyTemplate('nadzwyczajne-zlagodzenie')"
-                class="px-2.5 py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/40 text-emerald-200 hover:text-emerald-100 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                class="px-3 py-1.5 rounded-lg bg-emerald-950/50 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-200 hover:text-emerald-100 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
                 title="Wstaw wniosek o nadzwyczajne złagodzenie kary (art. 60 § 2 k.k.)"
               >
-                Nadzwyczajne złagodzenie (art. 60 k.k.)
+                <mat-icon class="text-xs text-emerald-400">trending_down</mat-icon>
+                <span>Nadzwyczajne złagodzenie (art. 60)</span>
               </button>
+
               <button
                 type="button"
                 (click)="applyTemplate('umorzenie-narkotyki')"
-                class="px-2.5 py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-500/40 text-emerald-200 hover:text-emerald-100 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                class="px-3 py-1.5 rounded-lg bg-emerald-950/50 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-200 hover:text-emerald-100 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
                 title="Wstaw wniosek o umorzenie z art. 62a UoPN (posiadanie nieznacznej ilości)"
               >
-                Umorzenie z art. 62a UoPN
+                <mat-icon class="text-xs text-emerald-400">eco</mat-icon>
+                <span>Umorzenie art. 62a UoPN</span>
               </button>
+
               <button
                 type="button"
                 (click)="applyTemplate('linia-obrony')"
-                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-amber-300 text-xs whitespace-nowrap cursor-pointer transition-colors"
+                class="px-3 py-1.5 rounded-lg bg-[#14192b] hover:bg-[#1d243d] border border-amber-500/30 hover:border-amber-400 text-slate-200 hover:text-amber-200 text-xs whitespace-nowrap cursor-pointer transition-all active:scale-[0.97] shadow-sm flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
                 title="Wstaw konspekt memorandum strategii procesowej"
               >
-                Memorandum linii obrony
+                <mat-icon class="text-xs text-amber-400">shield</mat-icon>
+                <span>Memorandum linii obrony</span>
               </button>
             </div>
           </div>
 
           <!-- Treść notatki z dyktowaniem Web Speech API -->
-          <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label for="textarea-note-content" class="text-xs font-semibold text-slate-300">
-                Treść notatki / Ustalenia ze spotkania / Tezy dowodowe:
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="textarea-note-content" class="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                <span>Treść merytoryczna / Ustalenia z klientem / Tezy obrończe:</span>
+                <span class="text-amber-400">*</span>
               </label>
               <div class="flex items-center gap-2">
                 <button
                   type="button"
                   (click)="toggleContentDictation()"
                   [class]="isDictatingContent()
-                    ? 'bg-red-600 text-white animate-pulse shadow-md shadow-red-500/40'
-                    : 'bg-slate-800 text-slate-300 hover:text-amber-300 hover:bg-slate-700 border border-slate-700'"
-                  class="px-2.5 py-1 rounded-lg text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    ? 'bg-red-600 hover:bg-red-500 text-white animate-pulse shadow-md shadow-red-500/40 border border-red-300/50'
+                    : 'bg-[#14192b] hover:bg-[#1e253e] text-slate-200 hover:text-amber-300 border border-slate-700/80 hover:border-amber-500/50'"
+                  class="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
                   [title]="isDictatingContent() ? 'Zatrzymaj dyktowanie' : 'Dyktuj treść notatki głosem (Web Speech API)'"
+                  aria-label="Dyktuj treść notatki głosem"
                 >
-                  <mat-icon class="text-xs">{{ isDictatingContent() ? 'mic' : 'mic_none' }}</mat-icon>
+                  <mat-icon class="text-xs text-amber-400">{{ isDictatingContent() ? 'mic' : 'mic_none' }}</mat-icon>
                   <span>{{ isDictatingContent() ? 'Zatrzymaj dyktowanie' : 'Dyktuj głosem (pl-PL)' }}</span>
                 </button>
               </div>
@@ -257,124 +315,149 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
             <div class="relative">
               <textarea
                 id="textarea-note-content"
-                rows="8"
+                rows="9"
                 [value]="noteContent()"
                 (input)="noteContent.set($any($event.target).value)"
                 placeholder="Wpisz treść lub naciśnij 'Dyktuj głosem' i dyktuj swobodnie. System automatycznie rozpoznaje komendy: 'kropka', 'przecinek', 'nowy akapit', 'artykuł 178a', 'paragraf 1'..."
-                class="w-full bg-slate-950 border border-slate-700/80 rounded-xl p-3.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 font-sans leading-relaxed transition-colors"
+                class="w-full bg-[#0a0d16] border border-slate-700 hover:border-amber-500/50 focus:border-amber-400 rounded-xl p-4 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/30 font-sans leading-relaxed transition-all shadow-inner"
               ></textarea>
             </div>
 
-            <div class="flex flex-wrap items-center justify-between gap-2 mt-1 text-[11px] text-slate-400">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400 pt-1">
               <div class="flex items-center gap-1.5">
                 <mat-icon class="text-xs text-amber-400">tips_and_updates</mat-icon>
-                <span>Komendy głosowe: <em>„kropka”</em>, <em>„przecinek”</em>, <em>„nowy akapit”</em>, <em>„artykuł [nr]”</em>, <em>„paragraf [nr]”</em></span>
+                <span>Komendy głosowe: <em class="text-slate-300">„kropka”</em>, <em class="text-slate-300">„przecinek”</em>, <em class="text-slate-300">„nowy akapit”</em>, <em class="text-slate-300">„artykuł [nr]”</em>, <em class="text-slate-300">„paragraf [nr]”</em></span>
               </div>
-              <span class="font-mono text-slate-500">{{ noteContent().length }} znaków</span>
+              <span class="font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">{{ noteContent().length }} znaków</span>
             </div>
           </div>
 
-          <!-- Przyciski akcji -->
-          <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+          <!-- Przyciski akcji (Tactile Action Buttons) -->
+          <div class="flex items-center justify-end gap-3 pt-3 border-t border-amber-500/20">
             <button
+              type="button"
               (click)="resetNoteForm()"
-              class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+              class="px-4 py-2.5 bg-[#111624] hover:bg-[#1a2136] text-slate-300 hover:text-white text-xs font-semibold rounded-xl border border-slate-700/80 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             >
               Anuluj
             </button>
             <button
               id="btn-save-note"
+              type="button"
               (click)="saveCurrentNote()"
               [disabled]="!noteTitle().trim() || !noteContent().trim()"
-              class="px-5 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-amber-500/20 transition-all cursor-pointer flex items-center gap-1.5"
+              class="px-5 py-2.5 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-amber-500/25 border border-amber-300/40 transition-all cursor-pointer flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             >
-              <mat-icon class="text-xs">save</mat-icon>
+              <mat-icon class="text-sm">save</mat-icon>
               <span>Zapisz w Skarbcu</span>
             </button>
           </div>
         </div>
       }
 
-      <!-- Filtry notatek -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-          <span class="text-xs text-slate-400 font-semibold whitespace-nowrap">Kategoria:</span>
+      <!-- Filtry i wyszukiwarka notatek (Judicial Docket Filters) -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 bg-gradient-to-r from-[#101423] to-[#0c0f1a] p-3.5 rounded-xl border border-slate-800/90 shadow-md">
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+          <span class="text-xs font-semibold text-slate-300 whitespace-nowrap flex items-center gap-1 mr-1">
+            <mat-icon class="text-xs text-amber-400">filter_alt</mat-icon>
+            <span>Kategoria:</span>
+          </span>
           <button
+            type="button"
             (click)="selectedCategoryFilter.set('all')"
-            [class]="selectedCategoryFilter() === 'all' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'"
-            class="text-xs px-2.5 py-1 rounded-lg border transition-colors cursor-pointer whitespace-nowrap"
+            [class]="selectedCategoryFilter() === 'all'
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-semibold'
+              : 'bg-[#0a0d16] text-slate-300 border-slate-800 hover:text-white hover:border-slate-700'"
+            class="text-xs px-3 py-1.5 rounded-lg border transition-all cursor-pointer whitespace-nowrap focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
           >
             Wszystkie ({{ legalData.notes().length }})
           </button>
           <button
+            type="button"
             (click)="selectedCategoryFilter.set('Sprawa klienta')"
-            [class]="selectedCategoryFilter() === 'Sprawa klienta' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'"
-            class="text-xs px-2.5 py-1 rounded-lg border transition-colors cursor-pointer whitespace-nowrap"
+            [class]="selectedCategoryFilter() === 'Sprawa klienta'
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-semibold'
+              : 'bg-[#0a0d16] text-slate-300 border-slate-800 hover:text-white hover:border-slate-700'"
+            class="text-xs px-3 py-1.5 rounded-lg border transition-all cursor-pointer whitespace-nowrap focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
           >
             Sprawy klienta
           </button>
           <button
+            type="button"
             (click)="selectedCategoryFilter.set('Analiza prawna')"
-            [class]="selectedCategoryFilter() === 'Analiza prawna' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'"
-            class="text-xs px-2.5 py-1 rounded-lg border transition-colors cursor-pointer whitespace-nowrap"
+            [class]="selectedCategoryFilter() === 'Analiza prawna'
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-semibold'
+              : 'bg-[#0a0d16] text-slate-300 border-slate-800 hover:text-white hover:border-slate-700'"
+            class="text-xs px-3 py-1.5 rounded-lg border transition-all cursor-pointer whitespace-nowrap focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
           >
             Analizy prawne
           </button>
           <button
+            type="button"
             (click)="selectedCategoryFilter.set('Wniosek dowodowy')"
-            [class]="selectedCategoryFilter() === 'Wniosek dowodowy' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'"
-            class="text-xs px-2.5 py-1 rounded-lg border transition-colors cursor-pointer whitespace-nowrap"
+            [class]="selectedCategoryFilter() === 'Wniosek dowodowy'
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm font-semibold'
+              : 'bg-[#0a0d16] text-slate-300 border-slate-800 hover:text-white hover:border-slate-700'"
+            class="text-xs px-3 py-1.5 rounded-lg border transition-all cursor-pointer whitespace-nowrap focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
           >
             Wnioski dowodowe
           </button>
         </div>
 
-        <div class="relative w-full sm:w-64">
-          <mat-icon class="absolute left-2.5 top-2 text-slate-500 text-sm">search</mat-icon>
+        <div class="relative w-full sm:w-72">
+          <mat-icon class="absolute left-3 top-2.5 text-amber-400/80 text-sm pointer-events-none">search</mat-icon>
           <input
             type="text"
             [value]="notesSearchQuery()"
             (input)="notesSearchQuery.set($any($event.target).value)"
-            placeholder="Szukaj w notatkach..."
-            class="w-full pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+            placeholder="Szukaj w aktach i notatkach..."
+            class="w-full pl-9 pr-3.5 py-1.5 bg-[#0a0d16] border border-slate-700 hover:border-amber-500/50 focus:border-amber-400 rounded-lg text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/30 transition-all shadow-inner"
+            aria-label="Wyszukaj w notatkach kancelaryjnych"
           />
         </div>
       </div>
 
-      <!-- Siatka notatek -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Siatka notatek (Warm Obsidian Judicial Dossier Cards) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         @for (note of filteredNotes(); track note.id) {
-          <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-xl transition-all flex flex-col justify-between">
+          <div class="group relative overflow-hidden bg-gradient-to-b from-[#131828] to-[#0c0f1a] border border-slate-800 hover:border-amber-500/40 rounded-2xl p-5 sm:p-6 shadow-xl hover:shadow-2xl hover:shadow-black/60 transition-all flex flex-col justify-between">
+            <!-- Akcentowa złota krawędź lewa -->
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-500/60 via-amber-600/30 to-transparent group-hover:from-amber-400 group-hover:via-amber-500 transition-all"></div>
+
             <div>
-              <div class="flex items-center justify-between gap-2 border-b border-slate-800 pb-3 mb-3">
-                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-800 text-amber-400">
-                  {{ note.category }}
+              <div class="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-3 mb-3.5">
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#0a0d16] border border-amber-500/30 text-amber-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  <span>{{ note.category }}</span>
                 </span>
-                <span class="text-[11px] text-slate-500 font-mono">
-                  {{ note.updatedAt }}
+                <span class="text-[11px] text-slate-400 font-mono flex items-center gap-1">
+                  <mat-icon class="text-xs text-slate-500">schedule</mat-icon>
+                  <span>{{ note.updatedAt }}</span>
                 </span>
               </div>
 
-              <h4 class="text-sm md:text-base font-bold text-white mb-2 leading-snug">
+              <h4 class="text-sm sm:text-base font-serif font-bold text-white group-hover:text-amber-200 transition-colors mb-2.5 leading-snug">
                 {{ note.title }}
               </h4>
 
               @if (note.linkedArticle) {
                 <div class="mb-3">
-                  <span class="text-xs bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded border border-amber-500/20 font-mono">
-                    {{ note.linkedArticle }}
+                  <span class="inline-flex items-center gap-1 text-xs bg-amber-500/10 text-amber-300 px-2.5 py-0.5 rounded-md border border-amber-500/30 font-mono font-medium shadow-sm">
+                    <mat-icon class="text-xs">gavel</mat-icon>
+                    <span>{{ note.linkedArticle }}</span>
                   </span>
                 </div>
               }
 
-              <p class="text-xs text-slate-300 whitespace-pre-line line-clamp-4 mb-4 leading-relaxed bg-slate-950/50 p-3 rounded-xl border border-slate-800/60">
+              <!-- Blok treści notatki imitujący wyciąg z akt sprawy -->
+              <p class="text-xs sm:text-sm text-slate-300 whitespace-pre-line line-clamp-5 mb-4 leading-relaxed bg-[#0a0d16]/90 p-3.5 rounded-xl border border-slate-800/80 shadow-inner font-sans selection:bg-amber-500/30">
                 {{ note.content }}
               </p>
 
               @if (note.tags.length > 0) {
-                <div class="flex flex-wrap gap-1 mb-4">
+                <div class="flex flex-wrap gap-1.5 mb-4">
                   @for (tag of note.tags; track tag) {
-                    <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">
+                    <span class="text-[10px] bg-[#101423] text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md font-mono">
                       #{{ tag }}
                     </span>
                   }
@@ -382,28 +465,35 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
               }
             </div>
 
-            <!-- Akcje: Eksport do PDF, Edycja, Usunięcie -->
-            <div class="flex items-center justify-between gap-2 pt-3 border-t border-slate-800">
+            <!-- Pasek akcji: Eksport do PDF, Edycja, Usunięcie -->
+            <div class="flex items-center justify-between gap-2 pt-3.5 border-t border-slate-800/80">
               <button
+                type="button"
                 (click)="exportNoteToPdf(note)"
-                class="flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                class="flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 hover:border-amber-400/60 text-amber-200 text-xs font-semibold px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-sm active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                title="Pobierz oficjalny odpis notatki w formacie PDF"
+                aria-label="Pobierz odpis notatki w formacie PDF"
               >
-                <mat-icon class="text-sm">picture_as_pdf</mat-icon>
+                <mat-icon class="text-sm text-amber-400">picture_as_pdf</mat-icon>
                 <span>Eksportuj do PDF</span>
               </button>
 
-              <div class="flex items-center gap-1">
+              <div class="flex items-center gap-1.5">
                 <button
+                  type="button"
                   (click)="editNote(note)"
-                  class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-800 cursor-pointer"
-                  title="Edytuj"
+                  class="text-slate-300 hover:text-amber-300 p-2 rounded-xl hover:bg-slate-800/80 border border-transparent hover:border-slate-700 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
+                  title="Edytuj treść notatki"
+                  aria-label="Edytuj treść notatki"
                 >
                   <mat-icon class="text-sm">edit</mat-icon>
                 </button>
                 <button
+                  type="button"
                   (click)="deleteNote(note.id)"
-                  class="text-slate-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-slate-800 cursor-pointer"
-                  title="Usuń"
+                  class="text-slate-400 hover:text-red-400 p-2 rounded-xl hover:bg-red-950/40 border border-transparent hover:border-red-900/50 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
+                  title="Usuń notatkę z sejfu"
+                  aria-label="Usuń notatkę z sejfu"
                 >
                   <mat-icon class="text-sm">delete</mat-icon>
                 </button>
@@ -411,8 +501,12 @@ import { SpeechDictationService } from '../services/speech-dictation.service';
             </div>
           </div>
         } @empty {
-          <div class="md:col-span-2 text-center py-12 text-slate-500 text-sm bg-slate-900/40 rounded-2xl border border-dashed border-slate-800">
-            Brak zapisanych notatek. Utwórz pierwszą notatkę sprawy lub podyktuj ją głosem za pomocą przycisku powyżej.
+          <div class="md:col-span-2 text-center py-14 px-4 text-slate-400 text-sm bg-[#0c0f1a]/80 rounded-2xl border border-dashed border-amber-500/25 shadow-inner">
+            <mat-icon class="text-3xl text-amber-400/60 mb-2">inventory_2</mat-icon>
+            <p class="font-serif font-bold text-base text-slate-200 mb-1">Brak zapisanych notatek w dossier</p>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">
+              Utwórz nową notatkę sprawy lub podyktuj ustalenia z klientem za pomocą przycisku <strong class="text-amber-300">„Nowa Notatka”</strong> powyżej.
+            </p>
           </div>
         }
       </div>

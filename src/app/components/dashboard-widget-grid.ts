@@ -10,30 +10,33 @@ import { DashboardWidgetConfig, PenalArticle, ActiveCaseItem } from '../models/l
   selector: 'app-dashboard-widget-grid',
   imports: [CommonModule, MatIconModule],
   template: `
-    <div id="dashboard-widget-system" class="space-y-4 mb-6">
-      <!-- Pasek Pulpitu (Czysty, kancelaryjny styl Taste-Skill) -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
-            <mat-icon class="text-xl">dashboard</mat-icon>
+    <div id="dashboard-widget-system" class="space-y-5 mb-6">
+      <!-- Pasek Pulpitu (Warm Obsidian & Gilded Seal Desktop Header) -->
+      <div class="relative overflow-hidden bg-gradient-to-b from-[#141928] via-[#0f1422] to-[#0a0d16] border border-amber-500/25 rounded-2xl p-5 sm:p-6 shadow-2xl shadow-black/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all">
+        <!-- Złota linia akcentująca u góry karty -->
+        <div class="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-900/30 border border-amber-500/40 text-amber-300 flex items-center justify-center shadow-inner shrink-0">
+            <mat-icon class="text-2xl">dashboard</mat-icon>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-base sm:text-lg font-bold text-white tracking-wide font-serif">
-                Pulpit Kancelaryjny & Sprawy
+              <h2 class="text-lg sm:text-xl font-serif font-bold text-white tracking-wide">
+                Pulpit Kancelaryjny & Aktywne Sprawy
               </h2>
             </div>
-            <p class="text-xs text-slate-400">
+            <p class="text-xs sm:text-sm text-slate-300/90 mt-0.5 leading-relaxed">
               Podręczne dossier: przypięte artykuły Kodeksu Karnego, aktywne sprawy oraz historia analiz.
             </p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2.5 shrink-0">
           <button
             type="button"
             (click)="openNotes.emit()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer"
+            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#111624] hover:bg-[#1a2136] text-slate-200 hover:text-white border border-slate-700/80 hover:border-amber-500/40 text-xs font-semibold transition-all active:scale-[0.98] cursor-pointer shadow-sm focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
             title="Otwórz zaszyfrowany Sejf Akt i notatek"
           >
             <mat-icon class="text-sm text-amber-400">enhanced_encryption</mat-icon>
@@ -43,7 +46,7 @@ import { DashboardWidgetConfig, PenalArticle, ActiveCaseItem } from '../models/l
           <button
             type="button"
             (click)="toggleAddCaseModal()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all active:scale-[0.98] cursor-pointer shadow-sm"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-xs transition-all active:scale-[0.98] cursor-pointer shadow-lg shadow-amber-500/20 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
           >
             <mat-icon class="text-sm">add</mat-icon>
             <span>Nowa Sprawa</span>
@@ -58,14 +61,14 @@ import { DashboardWidgetConfig, PenalArticle, ActiveCaseItem } from '../models/l
         @for (widget of visibleWidgets(); track widget.id) {
           <div
             [id]="'widget-' + widget.id"
-            class="bg-slate-900/85 border border-slate-800/90 rounded-2xl shadow-xl flex flex-col overflow-hidden transition-all duration-200 hover:border-slate-700/90"
+            class="bg-gradient-to-b from-[#121624] via-[#0d101b] to-[#090b14] border border-slate-800/90 hover:border-amber-500/30 rounded-2xl shadow-xl flex flex-col overflow-hidden transition-all duration-200 judicial-card-hover"
             [class.col-span-full]="widget.colSpan === 2 && widgetsService.preferences().columns > 1"
           >
             <!-- Pasek Nagłówka Widżetu -->
-            <div class="px-4 py-3.5 border-b border-slate-800/80 bg-slate-950/60 flex items-center justify-between gap-3">
+            <div class="px-4 py-3.5 border-b border-slate-800/80 bg-[#090c15]/80 flex items-center justify-between gap-3">
               <div class="flex items-center gap-2.5">
                 <mat-icon class="text-amber-400 text-lg">{{ widget.icon }}</mat-icon>
-                <h3 class="text-xs sm:text-sm font-bold text-slate-100 tracking-wide">
+                <h3 class="text-xs sm:text-sm font-serif font-bold text-slate-100 tracking-wide">
                   {{ widget.title }}
                 </h3>
                 @if (widget.id === 'pinned-articles') {

@@ -11,14 +11,16 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
   imports: [CommonModule, MatIconModule],
   template: `
     <section id="section-ai-chat" class="space-y-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 sm:p-6 shadow-xl flex flex-col h-[calc(100dvh-180px)] md:h-[740px] max-h-[850px]">
+      <div class="bg-gradient-to-b from-slate-900/95 to-slate-950/95 border border-slate-800/90 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col h-[calc(100dvh-180px)] md:h-[760px] max-h-[860px] relative overflow-hidden">
+        <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+
         <!-- Nagłówek czatu z oznaczeniem bezpieczeństwa, trybem silnika i WebGPU -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 shrink-0">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4 shrink-0">
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2">
+              <h2 class="text-lg md:text-xl font-bold text-white flex items-center gap-2 font-serif tracking-tight">
                 <mat-icon class="text-amber-400">smart_toy</mat-icon>
-                Prawnik z Łuczniczej – Asystent Prawny Kancelarii
+                Prawnik z <span class="text-amber-300">Łuczniczej</span> – Asystent Prawny
               </h2>
               @if (useWebGPU() && webLLM.status() === 'ready') {
                 <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
@@ -26,7 +28,7 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
                 </span>
               }
             </div>
-            <p class="text-xs text-slate-400 mt-0.5">
+            <p class="text-xs text-slate-400 mt-0.5 font-sans">
               100% lokalny silnik kwalifikacji prawno-karnej. Obsługuje dyktowanie głosem oraz lokalny model WebGPU.
             </p>
           </div>
@@ -37,9 +39,9 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
               type="button"
               (click)="toggleWebGPUMode()"
               [class]="useWebGPU()
-                ? 'bg-purple-600/30 text-purple-200 border-purple-500/50'
-                : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'"
-              class="px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+                ? 'bg-purple-600/30 text-purple-200 border-purple-500/50 shadow-sm'
+                : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200 hover:border-slate-700'"
+              class="px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
               title="Przełącz między wbudowanym silnikiem a lokalnym modelem WebGPU"
             >
               <mat-icon class="text-xs">{{ useWebGPU() ? 'memory' : 'speed' }}</mat-icon>
@@ -47,14 +49,14 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
             </button>
 
             @if (speech.isSupported()) {
-              <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-lg flex items-center gap-1">
+              <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-xl flex items-center gap-1 font-mono">
                 <mat-icon class="text-xs">mic</mat-icon>
                 <span>Dyktowanie</span>
               </span>
             }
             <button
               (click)="resetConversation()"
-              class="text-xs text-slate-400 hover:text-slate-200 bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+              class="text-xs text-slate-400 hover:text-slate-200 bg-slate-950 hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1 active:scale-95"
               title="Wyczyść historię rozmowy"
             >
               <mat-icon class="text-xs">restart_alt</mat-icon>
@@ -114,47 +116,47 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
             >
               <div
                 [class]="msg.sender === 'user'
-                  ? 'bg-amber-500/20 border border-amber-500/30 text-amber-100 max-w-[85%] sm:max-w-xl rounded-2xl rounded-tr-sm p-4'
-                  : 'bg-slate-950 border border-slate-800 text-slate-200 max-w-[95%] sm:max-w-2xl rounded-2xl rounded-tl-sm p-4 shadow-md'"
+                  ? 'bg-gradient-to-br from-amber-500/20 via-amber-600/15 to-slate-900 border border-amber-500/35 text-amber-50 max-w-[85%] sm:max-w-xl rounded-2xl rounded-tr-sm p-4 sm:p-5 shadow-lg'
+                  : 'bg-slate-950/90 border border-slate-800/90 hover:border-slate-700/80 text-slate-200 max-w-[95%] sm:max-w-2xl rounded-2xl rounded-tl-sm p-4 sm:p-5 shadow-xl relative'"
               >
                 <!-- Nagłówek wiadomości -->
-                <div class="flex items-center justify-between gap-3 text-xs mb-2 opacity-75">
-                  <span class="font-semibold flex items-center gap-1">
+                <div class="flex items-center justify-between gap-3 text-xs mb-2.5 pb-2 border-b border-slate-800/60 opacity-85">
+                  <span class="font-semibold flex items-center gap-1.5 font-serif">
                     @if (msg.sender === 'assistant') {
                       <mat-icon class="text-xs text-amber-400">balance</mat-icon>
-                      <span>Prawnik z Łuczniczej</span>
+                      <span class="text-amber-300">Prawnik z Łuczniczej</span>
                     } @else {
-                      <mat-icon class="text-xs text-amber-300">person</mat-icon>
-                      <span>Prawnik / Użytkownik</span>
+                      <mat-icon class="text-xs text-amber-200">person</mat-icon>
+                      <span class="text-slate-300">Prawnik / Użytkownik</span>
                     }
                   </span>
-                  <span class="font-mono text-[10px]">{{ msg.timestamp }}</span>
+                  <span class="font-mono text-[10px] text-slate-500">{{ msg.timestamp }}</span>
                 </div>
 
                 <!-- Etykieta kategorii prawnej (jeśli wykryto) -->
                 @if (msg.legalCategoryBadge) {
-                  <div class="mb-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+                  <div class="mb-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold font-mono">
                     <mat-icon class="text-xs text-amber-400">gavel</mat-icon>
                     <span>{{ msg.legalCategoryBadge }}</span>
                   </div>
                 }
 
                 <!-- Treść wiadomości -->
-                <div class="text-sm leading-relaxed whitespace-pre-wrap font-sans">
+                <div class="text-sm leading-relaxed whitespace-pre-wrap font-sans text-slate-200">
                   {{ msg.text }}
                 </div>
 
                 <!-- Odesłania do artykułów prawnych -->
                 @if (msg.referencedArticles && msg.referencedArticles.length > 0) {
-                  <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center gap-1.5 text-xs">
-                    <span class="text-slate-400 flex items-center gap-1 text-[11px]">
+                  <div class="mt-3.5 pt-2.5 border-t border-slate-800/80 flex flex-wrap items-center gap-1.5 text-xs">
+                    <span class="text-slate-400 flex items-center gap-1 text-[11px] font-mono">
                       <mat-icon class="text-xs text-amber-400">menu_book</mat-icon> Powiązane przepisy:
                     </span>
                     @for (art of msg.referencedArticles; track art) {
                       <button
                         type="button"
                         (click)="inspectArticle.emit(art)"
-                        class="bg-slate-900 hover:bg-slate-800 text-amber-300 hover:text-amber-200 border border-slate-700/80 px-2 py-0.5 rounded text-[11px] font-mono cursor-pointer transition-colors"
+                        class="bg-slate-900 hover:bg-slate-800 text-amber-300 hover:text-white border border-slate-700/80 hover:border-amber-500/40 px-2.5 py-1 rounded-lg text-[11px] font-mono cursor-pointer transition-colors active:scale-95"
                         title="Kliknij, aby otworzyć przepis w Kodeksie Karnym"
                       >
                         {{ art }}
@@ -217,8 +219,8 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
         }
 
         <!-- Pasek wprowadzania zapytania z mikrofonem -->
-        <div class="pt-3 border-t border-slate-800 shrink-0">
-          <div class="flex items-center gap-2">
+        <div class="pt-3 border-t border-slate-800/80 shrink-0">
+          <div class="flex items-center gap-2.5">
             <!-- Przycisk Web Speech API dyktowania -->
             <button
               id="btn-chat-speech-dictation"
@@ -226,8 +228,8 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
               (click)="toggleChatDictation()"
               [class]="isDictating()
                 ? 'bg-red-600 text-white animate-pulse shadow-lg shadow-red-500/30'
-                : 'bg-slate-800 text-slate-300 hover:text-amber-300 hover:bg-slate-700'"
-              class="p-3 rounded-xl border border-slate-700 transition-all cursor-pointer flex items-center justify-center shrink-0"
+                : 'bg-slate-950 text-slate-300 hover:text-amber-300 hover:bg-slate-800 border-slate-800 hover:border-amber-500/40'"
+              class="p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-center shrink-0 active:scale-95"
               [title]="isDictating() ? 'Zatrzymaj dyktowanie' : 'Dyktuj zapytanie prawnicze głosem (Web Speech API)'"
             >
               <mat-icon class="text-lg">{{ isDictating() ? 'mic' : 'mic_none' }}</mat-icon>
@@ -242,13 +244,13 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
                 (input)="inputText.set($any($event.target).value)"
                 (keydown.enter)="sendMessage()"
                 placeholder="Wpisz lub podyktuj pytanie: np. 'Co grozi za art. 278 k.k.?', 'Czy grozi konfiskata auta?'..."
-                class="w-full bg-slate-950 border border-slate-700/90 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+                class="w-full bg-slate-950/90 border border-slate-700/80 hover:border-slate-600 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all shadow-inner"
               />
               @if (inputText()) {
                 <button
                   type="button"
                   (click)="inputText.set('')"
-                  class="absolute right-3 top-3 text-slate-400 hover:text-white p-0.5 rounded cursor-pointer"
+                  class="absolute right-3 top-3 text-slate-400 hover:text-white p-0.5 rounded cursor-pointer transition-colors"
                   title="Wyczyść"
                 >
                   <mat-icon class="text-base">close</mat-icon>
@@ -260,16 +262,19 @@ import { LocalWebLLMService } from '../services/local-web-llm.service';
             <button
               id="btn-send-chat-message"
               (click)="sendMessage()"
-              class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-amber-500/20 shrink-0"
+              class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold px-5 py-3 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-amber-950/40 shrink-0 active:scale-95"
             >
               <mat-icon class="text-base">send</mat-icon>
               <span class="hidden sm:inline">Wyślij</span>
             </button>
           </div>
 
-          <div class="flex items-center justify-between text-[11px] text-slate-500 mt-2 px-1">
-            <span>Działa w 100% offline bez wysyłania danych do chmury.</span>
-            <span>Skróty dyktowania: „kropka”, „przecinek”, „artykuł”, „paragraf”.</span>
+          <div class="flex items-center justify-between text-[11px] text-slate-500 mt-2 px-1 font-mono">
+            <span class="flex items-center gap-1">
+              <mat-icon class="text-[12px] text-emerald-400">lock</mat-icon>
+              100% offline (lokalne przetwarzanie w pamięci RAM/VRAM)
+            </span>
+            <span class="hidden md:inline">Skróty dyktowania: „kropka”, „przecinek”, „artykuł”, „paragraf”</span>
           </div>
         </div>
       </div>

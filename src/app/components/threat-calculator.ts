@@ -19,28 +19,28 @@ export interface QuickScenario {
   imports: [CommonModule, MatIconModule, PrescriptionTimer, PenaltyDirectivesPanel],
   template: `
     <section id="section-threat-calc" class="space-y-6">
-      <!-- Panel wprowadzania sytuacji (Taste-Skill Anti-Slop: intentional layout, distinct branding) -->
-      <div class="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 md:p-7 shadow-2xl relative overflow-hidden">
-        <!-- Subtelny akcent tożsamościowy -->
-        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-500/0 via-amber-400/50 to-amber-500/0"></div>
+      <!-- Panel wprowadzania sytuacji (Warm Obsidian & Gilded Seal Header) -->
+      <div class="relative overflow-hidden bg-gradient-to-b from-[#141928] via-[#0f1422] to-[#0a0d16] border border-amber-500/25 rounded-2xl p-5 md:p-7 shadow-2xl shadow-black/60 transition-all">
+        <!-- Złota linia akcentująca u góry karty -->
+        <div class="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
 
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
           <div class="max-w-2xl">
-            <h2 class="text-xl md:text-2xl font-bold text-white tracking-tight font-serif flex items-center gap-2">
+            <h2 class="text-xl md:text-2xl font-serif font-bold text-white tracking-wide flex items-center gap-2">
               Kalkulator Zagrożenia Karnego
             </h2>
-            <p class="text-xs md:text-sm text-slate-400 mt-1 leading-relaxed">
+            <p class="text-xs sm:text-sm text-slate-300/90 mt-1.5 leading-relaxed">
               Wprowadź czyn procesowy – asystent natychmiast wyznaczy kwalifikację prawną, widełki kary i środki karne.
             </p>
           </div>
 
           @if (threatAnalysis()) {
-            <div class="flex items-center gap-2 flex-wrap self-start md:self-auto no-print shrink-0">
+            <div class="flex items-center gap-2.5 flex-wrap self-start md:self-auto no-print shrink-0">
               <button
                 id="btn-print-threat-analysis"
                 type="button"
                 (click)="triggerPrint()"
-                class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 font-semibold text-xs px-3.5 py-2.5 rounded-xl shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+                class="flex items-center gap-2 bg-[#111624] hover:bg-[#1a2136] text-slate-200 hover:text-white border border-slate-700/80 hover:border-amber-500/40 font-semibold text-xs px-3.5 py-2.5 rounded-xl shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
                 title="Wydrukuj urzędową opinię prawno-karną A4 (Ctrl+P)"
               >
                 <mat-icon class="text-base text-amber-400">print</mat-icon>
@@ -51,10 +51,10 @@ export interface QuickScenario {
                 id="btn-export-analysis-pdf"
                 type="button"
                 (click)="exportPdf.emit()"
-                class="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap active:scale-[0.98]"
+                class="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:outline-none"
                 title="Pobierz opinię prawną w formacie pliku PDF"
               >
-                <mat-icon class="text-base">picture_as_pdf</mat-icon>
+                <mat-icon class="text-base text-slate-950 font-bold">picture_as_pdf</mat-icon>
                 <span>Eksportuj PDF</span>
               </button>
             </div>
@@ -240,33 +240,43 @@ export interface QuickScenario {
           <!-- Kolumna Lewa: Podsumowanie Zagrożenia & Kwalifikacja (2/3) -->
           <div class="lg:col-span-2 space-y-6">
             <!-- Karta Kwalifikacji Głównej -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div class="bg-gradient-to-b from-slate-900/95 to-slate-950/95 border border-slate-800/90 hover:border-amber-500/30 rounded-2xl p-6 sm:p-7 shadow-2xl relative overflow-hidden transition-all duration-300">
+              <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+
               <!-- Poziom ryzyka w nagłówku -->
-              <div class="flex items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">
+              <div class="flex items-center justify-between gap-3 border-b border-slate-800/80 pb-4 mb-5">
                 <div class="flex items-center gap-3">
                   <div
                     [class]="res.riskLevel === 'bardzo wysoki'
-                      ? 'bg-red-500/20 text-red-400 border-red-500/40'
+                      ? 'bg-red-500/15 text-red-300 border-red-500/40 shadow-sm shadow-red-950/50'
                       : res.riskLevel === 'wysoki'
-                      ? 'bg-orange-500/20 text-orange-400 border-orange-500/40'
+                      ? 'bg-orange-500/15 text-orange-300 border-orange-500/40 shadow-sm shadow-orange-950/50'
                       : res.riskLevel === 'średni'
-                      ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
-                      : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'"
-                    class="px-3 py-1 rounded-lg border text-xs font-bold uppercase tracking-wide"
+                      ? 'bg-amber-500/15 text-amber-300 border-amber-500/40 shadow-sm shadow-amber-950/50'
+                      : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-sm shadow-emerald-950/50'"
+                    class="px-3.5 py-1.5 rounded-lg border text-xs font-bold uppercase tracking-wider font-mono"
                   >
                     Ryzyko: {{ res.riskLevel }}
                   </div>
-                  <span class="text-xs text-slate-400">Wstępna kwalifikacja prawno-karna</span>
+                  <span class="text-xs text-slate-400 font-medium hidden sm:inline-block">Wstępna kwalifikacja prawno-karna</span>
                 </div>
-                <span class="text-xs text-slate-500 font-mono">Stan prawny: 2025/2026</span>
+                <div class="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+                  <mat-icon class="text-xs text-amber-400/70">verified</mat-icon>
+                  <span>Stan prawny: 2025/2026</span>
+                </div>
               </div>
 
               <!-- Zakres Ustawowego Zagrożenia -->
-              <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-4 mb-5">
-                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider block mb-1">
-                  Główny wymiar ustawowego zagrożenia:
-                </span>
-                <p class="text-base md:text-lg font-bold text-amber-300">
+              <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-4 sm:p-5 mb-6 relative overflow-hidden">
+                <div class="flex items-center justify-between gap-2 mb-1.5">
+                  <span class="text-xs font-semibold text-slate-400 uppercase tracking-widest block font-mono">
+                    Główny wymiar ustawowego zagrożenia:
+                  </span>
+                  <span class="text-[10px] font-mono text-amber-400/80 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
+                    Sankcja Bazowa
+                  </span>
+                </div>
+                <p class="text-lg md:text-2xl font-bold text-amber-300 font-serif tracking-tight">
                   {{ res.primarySentenceRange }}
                 </p>
               </div>
@@ -397,36 +407,37 @@ export interface QuickScenario {
 
               <!-- Dopasowane Artykuły Kodeksu Karnego -->
               <div>
-                <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2.5">
+                <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-widest font-mono mb-3 flex items-center gap-1.5">
+                  <mat-icon class="text-xs text-amber-400">gavel</mat-icon>
                   Podstawa prawna z Kodeksu Karnego:
                 </h4>
                 <div class="space-y-3">
                   @for (art of res.matchedArticles; track art.id) {
-                    <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
-                      <div class="flex items-center justify-between gap-2 mb-1.5">
-                        <span class="text-sm font-bold text-amber-400">
+                    <div class="bg-slate-950/90 border border-slate-800/90 hover:border-amber-500/40 p-4 sm:p-5 rounded-xl transition-all duration-200">
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-sm font-bold text-amber-400 font-mono">
                           Art. {{ art.number }}{{ art.suffix || '' }} k.k. – {{ art.title }}
                         </span>
-                        <span class="text-[11px] text-slate-400 font-mono">{{ art.chapterNumber }}</span>
+                        <span class="text-[11px] text-slate-400 font-mono bg-slate-900 px-2 py-0.5 rounded border border-slate-800">{{ art.chapterNumber }}</span>
                       </div>
-                      <p class="text-xs text-slate-300 font-serif leading-relaxed line-clamp-3 mb-2.5">
+                      <p class="text-xs text-slate-300 font-serif leading-relaxed line-clamp-3 mb-3">
                         {{ art.content }}
                       </p>
-                      <div class="flex items-center gap-2 flex-wrap">
+                      <div class="flex items-center gap-2 flex-wrap pt-2 border-t border-slate-900">
                         <button
                           (click)="inspectArticle.emit(art)"
-                          class="text-[11px] text-amber-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-md border border-slate-700 flex items-center gap-1 cursor-pointer transition-colors"
+                          class="text-[11px] font-semibold text-amber-300 hover:text-white bg-slate-900 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700/80 hover:border-amber-500/40 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
                           title="Przejdź do pełnej treści artykułu w Kodeksie Karnym"
                         >
                           <mat-icon class="text-xs text-amber-400">menu_book</mat-icon>
-                          Zobacz w Kodeksie
+                          <span>Zobacz w Kodeksie</span>
                         </button>
                         <button
                           (click)="createNote.emit(art)"
-                          class="text-[11px] text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-md border border-slate-700 flex items-center gap-1 cursor-pointer transition-colors"
+                          class="text-[11px] font-medium text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-800 hover:border-slate-700 flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
                         >
-                          <mat-icon class="text-xs">add</mat-icon>
-                          Utwórz notatkę do tego art.
+                          <mat-icon class="text-xs text-slate-400">add</mat-icon>
+                          <span>Utwórz notatkę do tego art.</span>
                         </button>
                       </div>
                     </div>
@@ -438,32 +449,34 @@ export interface QuickScenario {
             <!-- Okoliczności łagodzące i obciążające -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Łagodzące -->
-              <div class="bg-slate-900 border border-emerald-500/20 rounded-2xl p-5 shadow-lg">
-                <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-1.5 mb-3">
+              <div class="bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-emerald-500/25 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+                <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent"></div>
+                <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2 mb-3 font-serif">
                   <mat-icon class="text-emerald-400 text-base">verified</mat-icon>
                   Okoliczności łagodzące (argumenty obrony):
                 </h3>
                 <ul class="space-y-2 text-xs text-slate-300">
                   @for (factor of res.mitigatingFactors; track factor) {
                     <li class="flex items-start gap-2">
-                      <mat-icon class="text-xs text-emerald-400 mt-0.5">check_circle</mat-icon>
-                      <span>{{ factor }}</span>
+                      <mat-icon class="text-xs text-emerald-400 mt-0.5 shrink-0">check_circle</mat-icon>
+                      <span class="leading-relaxed">{{ factor }}</span>
                     </li>
                   }
                 </ul>
               </div>
 
               <!-- Obciążające -->
-              <div class="bg-slate-900 border border-red-500/20 rounded-2xl p-5 shadow-lg">
-                <h3 class="text-sm font-bold text-red-400 flex items-center gap-1.5 mb-3">
+              <div class="bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-red-500/25 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+                <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-red-400/60 to-transparent"></div>
+                <h3 class="text-sm font-bold text-red-400 flex items-center gap-2 mb-3 font-serif">
                   <mat-icon class="text-red-400 text-base">error_outline</mat-icon>
                   Okoliczności obciążające (ryzyka procesowe):
                 </h3>
                 <ul class="space-y-2 text-xs text-slate-300">
                   @for (factor of res.aggravatingFactors; track factor) {
                     <li class="flex items-start gap-2">
-                      <mat-icon class="text-xs text-red-400 mt-0.5">cancel</mat-icon>
-                      <span>{{ factor }}</span>
+                      <mat-icon class="text-xs text-red-400 mt-0.5 shrink-0">cancel</mat-icon>
+                      <span class="leading-relaxed">{{ factor }}</span>
                     </li>
                   }
                 </ul>
@@ -474,15 +487,16 @@ export interface QuickScenario {
           <!-- Kolumna Prawa: Orzecznictwo SN i Rekomendowana Strategia (1/3) -->
           <div class="space-y-6 lg:sticky lg:top-24 self-start">
             <!-- Karta Rekomendowanych Kroków Obrony -->
-            <div class="bg-slate-900 border border-slate-800/90 rounded-2xl p-5 shadow-xl ring-1 ring-white/5">
-              <h3 class="text-sm font-bold text-amber-300 flex items-center gap-2 mb-3">
+            <div class="bg-gradient-to-b from-slate-900/95 to-slate-950/95 border border-slate-800/90 hover:border-amber-500/30 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden transition-all duration-300">
+              <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+              <h3 class="text-sm font-bold text-amber-300 flex items-center gap-2 mb-3.5 font-serif">
                 <mat-icon class="text-amber-400 text-base">lightbulb</mat-icon>
                 Rekomendowana Strategia Procesowa:
               </h3>
               <ol class="space-y-2.5 text-xs text-slate-300">
                 @for (step of res.recommendedSteps; track step; let i = $index) {
-                  <li class="flex items-start gap-2 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
-                    <span class="font-mono font-bold text-amber-400">{{ i + 1 }}.</span>
+                  <li class="flex items-start gap-2.5 bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 hover:border-slate-700 transition-colors">
+                    <span class="font-mono font-bold text-amber-400 text-xs w-5 h-5 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center shrink-0">{{ i + 1 }}</span>
                     <span class="leading-relaxed">{{ step }}</span>
                   </li>
                 }
@@ -490,26 +504,27 @@ export interface QuickScenario {
             </div>
 
             <!-- Podobne Wyroki i Orzeczenia Sądu Najwyższego -->
-            <div class="bg-slate-900 border border-slate-800/90 rounded-2xl p-5 shadow-xl ring-1 ring-white/5">
-              <div class="flex items-center justify-between gap-2 mb-3">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <div class="bg-gradient-to-b from-slate-900/95 to-slate-950/95 border border-slate-800/90 hover:border-amber-500/30 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden transition-all duration-300">
+              <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+              <div class="flex items-center justify-between gap-2 mb-3.5 pb-3 border-b border-slate-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2 font-serif">
                   <mat-icon class="text-amber-400 text-base">balance</mat-icon>
                   Precedensy i Wyroki SN:
                 </h3>
-                <span class="text-[11px] text-slate-400 font-mono">{{ res.similarRulings.length }} wyroki</span>
+                <span class="text-[11px] text-amber-300/90 font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800">{{ res.similarRulings.length }} wyroki</span>
               </div>
 
-              <div class="space-y-3.5 max-h-[420px] overflow-y-auto pr-1">
+              <div class="space-y-3.5 max-h-[460px] overflow-y-auto pr-1">
                 @for (ruling of res.similarRulings; track ruling.id) {
-                  <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-3.5 hover:border-slate-700 transition-colors">
+                  <div class="bg-slate-950/80 border border-slate-800/90 rounded-xl p-3.5 hover:border-amber-500/30 transition-all duration-200">
                     <div class="flex items-center justify-between gap-2 mb-1">
                       <span class="font-mono font-bold text-amber-300 text-xs">{{ ruling.signature }}</span>
-                      <span class="text-[10px] text-slate-400">{{ ruling.date }}</span>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ ruling.date }}</span>
                     </div>
                     <p class="text-xs font-semibold text-slate-200 mb-1.5">{{ ruling.title }}</p>
                     <p class="text-[11px] text-slate-400 italic mb-2 line-clamp-2">"{{ ruling.thesis }}"</p>
-                    <div class="bg-slate-900 p-2 rounded text-[11px] border border-slate-800 text-emerald-300">
-                      <span class="font-bold text-slate-400 block text-[10px] uppercase">Zastosowany wyrok:</span>
+                    <div class="bg-slate-900/90 p-2.5 rounded-lg text-[11px] border border-slate-800/90 text-emerald-300">
+                      <span class="font-bold text-slate-400 block text-[10px] uppercase font-mono tracking-wider">Zastosowany wyrok:</span>
                       {{ ruling.sanctionImposed }}
                     </div>
                   </div>

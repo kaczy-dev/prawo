@@ -9,26 +9,30 @@ import { PenaltyCalculatorService, DirectiveWeights, DirectiveCalculationResult 
   imports: [CommonModule, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="bg-gradient-to-br from-slate-900/95 via-slate-950 to-slate-900 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
+    <div class="relative overflow-hidden bg-gradient-to-b from-[#141928] via-[#0f1422] to-[#0a0d16] border border-amber-500/25 rounded-2xl p-4 sm:p-6 shadow-2xl shadow-black/60 transition-all">
+      <!-- Złota linia akcentująca u góry karty -->
+      <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+
       <!-- Akcent nagłówka -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">
         <div>
-          <div class="flex items-center gap-2">
-            <span class="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+          <div class="flex items-center gap-2.5">
+            <span class="p-2 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-900/30 text-amber-400 border border-amber-500/40 shadow-inner">
               <mat-icon class="text-lg">tune</mat-icon>
             </span>
-            <h3 class="text-base sm:text-lg font-bold text-white tracking-wide">
-              Symulator Dyrektyw Wymiaru Kary (Art. 53 k.k. & Art. 60 k.k.)
+            <h3 class="text-base sm:text-lg font-serif font-bold text-white tracking-wide">
+              Symulator Dyrektyw Wymiaru Kary <span class="text-xs sm:text-sm font-sans font-normal text-amber-300/90">(Art. 53 k.k. & Art. 60 k.k.)</span>
             </h3>
           </div>
-          <p class="text-xs text-slate-400 mt-1">
+          <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
             Dostosuj okoliczności czynu i postawę sprawcy, aby automatycznie obliczyć realne zagrożenie i przesłanki złagodzenia kary.
           </p>
         </div>
 
         <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-800 text-amber-300 border border-slate-700">
-            Art. {{ article().number }}{{ article().suffix || '' }} {{ article().codePrefix || 'k.k.' }}
+          <span class="text-xs font-mono font-bold px-3 py-1 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/30 shadow-sm flex items-center gap-1.5">
+            <mat-icon class="text-xs text-amber-400">gavel</mat-icon>
+            <span>Art. {{ article().number }}{{ article().suffix || '' }} {{ article().codePrefix || 'k.k.' }}</span>
           </span>
         </div>
       </div>
