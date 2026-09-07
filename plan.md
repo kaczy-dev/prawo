@@ -68,5 +68,5 @@ Plan opracowany zgodnie z wytycznymi **frontend-design** (unikalna tożsamość 
 | **Faza 1** | **Refaktoryzacja Mobile Layout**: Dolny pasek nawigacji (Bottom Nav Bar), kompaktowy nagłówek, szuflada "Więcej", pozycjonowanie TTS. | ✅ Ukończone |
 | **Faza 2** | **Kancelaryjny Frontend Design**: Paleta barw (onyx, głęboki granat, mosiądz sygnetowy `#D4AF37`), typografia `Cinzel` + `Plus Jakarta Sans`. | ✅ Ukończone |
 | **Faza 3** | **Funkcje Merytoryczne**: Komparator nowelizacji (Diff-View), wzory pism w sejfie, eksport Dossier Sprawy do PDF. | ✅ Ukończone |
-| **Faza 4** | **Refaktoryzacja Desktop UI & Layout**: Centrowana Command Palette (`Ctrl+K`), wieloszpaltowy workspace 2/3 + 1/3, tryb gęstości sali sądowej. | 🔄 W trakcie |
-| **Faza 5** | **Weryfikacja Końcowa**: Kompilacja produkcyjna, testy Puppeteer MCP na Desktopie i Mobile, audyt kontrastów. | ⏳ Następny krok |
+| **Faza 4** | **Refaktoryzacja Desktop UI & Layout**: Centrowana Command Palette (`Ctrl+K`), wieloszpaltowy workspace 2/3 + 1/3, tryb gęstości sali sądowej (Courtroom Dense Mode), kalkulator kary łącznej (art. 85-86 k.k.), kancelaryjny modal druku A4. | ✅ Ukończone |
+| **Faza 5** | **Weryfikacja Końcowa**: Kompilacja produkcyjna (`npx ng build`), testy jednostkowe Vitest (`npx ng test`), audyt layoutu i ergonomii na sali sądowej. | ✅ Ukończone |
