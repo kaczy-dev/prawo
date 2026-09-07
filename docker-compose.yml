@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Główna aplikacja prawnBot (Angular SSR + Node Engine)
+  prawnbot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prawnbot-core
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    networks:
+      - prawnbot-internal
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    tmpfs:
+      - /tmp
+
+  # Odwrócony serwer proxy NGINX z terminacją SSL, HSTS, CSP i ochroną przed atakami
+  nginx-proxy:
+    image: nginx:1.25-alpine
+    container_name: prawnbot-gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - prawnbot-app
+    networks:
+      - prawnbot-internal
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  prawnbot-internal:
+    driver: bridge

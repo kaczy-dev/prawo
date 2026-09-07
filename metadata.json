@@ -1,0 +1,6 @@
+{
+  "name": "prawnBot",
+  "description": "Inteligentny asystent prawa karnego z aktualnym kodeksem, bazą orzecznictwa, kalkulatorem zagrożenia karnego, lokalnym asystentem AI i szyfrowaną bazą notatek.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

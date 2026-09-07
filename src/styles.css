@@ -1,0 +1,169 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import "tailwindcss";
+
+/* ==========================================================================
+   PRINT-FRIENDLY STYLES – Zoptymalizowany widok wydruku dla opinii prawnych
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm 14mm 14mm;
+  }
+
+  /* Reset tła i kolorów dla czystego wydruku oszczędzającego toner */
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 10.5pt !important;
+    line-height: 1.45 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Ukryj całe zbędne menu, nagłówki, odtwarzacz TTS i elementy interaktywne */
+  #app-header,
+  #app-navigation,
+  #app-footer,
+  app-read-aloud-player,
+  #read-aloud-floating-player,
+  .no-print,
+  button,
+  input,
+  .overflow-x-auto,
+  #badge-offline-mode,
+  #badge-network-mode,
+  #btn-open-vault-header,
+  #btn-export-analysis-pdf,
+  #btn-print-threat-analysis,
+  #btn-run-threat-analysis {
+    display: none !important;
+  }
+
+  /* Formularz wprowadzania sytuacji w kalkulatorze - ukryj na wydruku, bo stan faktyczny jest w nagłówku opinii */
+  .bg-slate-900\/90:has(#input-threat-query),
+  #section-threat-calc > .bg-slate-900\/90:first-child {
+    display: none !important;
+  }
+
+  /* Pokaż sekcję kalkulatora zagrożenia w pełnej szerokości */
+  main {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  #section-threat-calc {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Elementy widoczne wyłącznie na wydruku */
+  .print-only-header,
+  .print\:block {
+    display: block !important;
+  }
+
+  /* Transformacja ciemnych kart w eleganckie, białe karty urzędowe z delikatną ramką */
+  .bg-slate-900,
+  .bg-slate-950,
+  .bg-slate-950\/80,
+  .bg-slate-950\/60,
+  .bg-slate-950\/40,
+  .bg-slate-900\/90 {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    color: #0f172a !important;
+    border-radius: 6px !important;
+  }
+
+  /* Zapobieganie ucinaniu kart w połowie strony (Page Breaks) */
+  .bg-slate-900,
+  .bg-slate-950\/80,
+  .print-avoid-break,
+  .grid > div {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Optymalizacja kolorów typografii pod drukarkę (czarne i ciemnoszare) */
+  .text-white,
+  .text-slate-100,
+  .text-slate-200,
+  .text-slate-300 {
+    color: #0f172a !important;
+  }
+
+  .text-slate-400,
+  .text-slate-500 {
+    color: #475569 !important;
+  }
+
+  /* Akcenty kolorystyczne zoptymalizowane pod kontrast i czytelność */
+  .text-amber-300,
+  .text-amber-400 {
+    color: #92400e !important; /* Ciemny bursztyn / brąz */
+    font-weight: 700 !important;
+  }
+
+  .text-emerald-400,
+  .text-emerald-300 {
+    color: #065f46 !important; /* Ciemna butelkowa zieleń */
+    font-weight: 700 !important;
+  }
+
+  .text-red-400,
+  .text-red-300 {
+    color: #991b1b !important; /* Ciemna czerwień */
+    font-weight: 700 !important;
+  }
+
+  /* Badge ryzyka na wydruku */
+  .bg-red-500\/20,
+  .bg-orange-500\/20,
+  .bg-amber-500\/20,
+  .bg-emerald-500\/20 {
+    background-color: #f1f5f9 !important;
+    border: 1.5px solid #0f172a !important;
+    color: #0f172a !important;
+  }
+
+  /* Czerwone ramki dla środków karnych obligatoryjnych */
+  .bg-red-950\/30 {
+    background-color: #fef2f2 !important;
+    border: 1.5px solid #dc2626 !important;
+    color: #7f1d1d !important;
+  }
+
+  /* Ramki łagodzące i obciążające */
+  .border-emerald-500\/20 {
+    border-color: #059669 !important;
+    background-color: #f0fdf4 !important;
+  }
+
+  .border-red-500\/20 {
+    border-color: #dc2626 !important;
+    background-color: #fef2f2 !important;
+  }
+
+  /* Rozwinięcie siatki kolumnowej na układ pionowy optymalny dla kartki A4 */
+  .grid.grid-cols-1.lg\:grid-cols-3 {
+    display: block !important;
+  }
+
+  .lg\:col-span-2 {
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Usuń ukrywanie tekstu (line-clamp) przy drukowaniu */
+  .line-clamp-2,
+  .line-clamp-3 {
+    -webkit-line-clamp: unset !important;
+    display: block !important;
+  }
+}

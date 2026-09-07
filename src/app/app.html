@@ -1,0 +1,390 @@
+<div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-200">
+  <!-- Główny Pasek Górny (Kancelaryjny Header) -->
+  <header id="main-header" class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 py-3.5 transition-colors">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+      <!-- Logo i tożsamość -->
+      <div class="flex items-center gap-3 self-start md:self-auto">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-slate-950 shadow-md shadow-amber-900/20 font-bold">
+          <mat-icon class="text-2xl">gavel</mat-icon>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5 font-serif">
+              prawn<span class="text-amber-400">Bot</span>
+            </h1>
+            <span class="text-[11px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              PRO Kancelaria
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-normal">
+            Inteligentny Asystent Prawa Karnego & Baza Orzecznictwa SN
+          </p>
+        </div>
+      </div>
+
+      <!-- Szybka Wyszukiwarka Globalna "Co mi grozi?" z obsługą Web Speech API -->
+      <div class="w-full md:flex-1 md:max-w-md lg:max-w-xl mx-auto relative my-1 md:my-0">
+        <div class="relative flex items-center">
+          <mat-icon class="absolute left-3 text-amber-400/80 text-lg pointer-events-none">manage_search</mat-icon>
+          <input
+            id="input-global-threat-search"
+            type="text"
+            [value]="quickSearchQuery()"
+            (input)="quickSearchQuery.set($any($event.target).value)"
+            (keydown.enter)="executeGlobalSearch()"
+            (focus)="showQuickSearchDropdown.set(true)"
+            placeholder="Co mi grozi? Wpisz lub podyktuj czyn..."
+            class="w-full pl-9 pr-28 py-2 bg-slate-950/90 border border-slate-700/90 hover:border-amber-500/50 focus:border-amber-500 rounded-xl text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all shadow-inner"
+          />
+
+          <div class="absolute right-1 flex items-center gap-1">
+            <!-- Web Speech API w nagłówku -->
+            <button
+              type="button"
+              (click)="toggleHeaderDictation()"
+              [class]="isHeaderDictating() ? 'text-red-400 animate-pulse bg-red-500/20' : 'text-slate-400 hover:text-amber-300'"
+              class="p-1.5 rounded-lg transition-colors cursor-pointer"
+              [title]="isHeaderDictating() ? 'Zatrzymaj dyktowanie' : 'Dyktuj zapytanie głosem'"
+            >
+              <mat-icon class="text-base">{{ isHeaderDictating() ? 'mic' : 'mic_none' }}</mat-icon>
+            </button>
+
+            @if (quickSearchQuery().trim()) {
+              <button
+                type="button"
+                (click)="quickSearchQuery.set('')"
+                class="text-slate-400 hover:text-white p-1 rounded-full cursor-pointer transition-colors"
+                title="Wyczyść pole wyszukiwania"
+              >
+                <mat-icon class="text-sm">close</mat-icon>
+              </button>
+            }
+
+            <button
+              id="btn-global-threat-search"
+              (click)="executeGlobalSearch()"
+              class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+            >
+              <mat-icon class="text-xs">gavel</mat-icon>
+              <span class="hidden sm:inline">Szukaj</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista szybkich podpowiedzi (Auto-suggest dropdown) -->
+        @if (showQuickSearchDropdown()) {
+          <div
+            class="absolute left-0 right-0 top-full mt-1.5 bg-slate-900/95 backdrop-blur-md border border-slate-700/90 rounded-xl shadow-2xl p-2 z-50 max-h-72 overflow-y-auto"
+          >
+            <div class="flex items-center justify-between px-2 py-1 text-[11px] text-slate-400 border-b border-slate-800 mb-1">
+              <span class="font-semibold text-amber-400">Szybkie wyszukiwania "Co mi grozi?":</span>
+              <button
+                (click)="showQuickSearchDropdown.set(false)"
+                class="text-slate-400 hover:text-white cursor-pointer text-xs"
+              >
+                Zamknij ✕
+              </button>
+            </div>
+            @for (sc of popularScenarios; track sc.label) {
+              <button
+                (click)="executeGlobalSearch(sc.query)"
+                class="w-full text-left px-2.5 py-1.5 hover:bg-slate-800 rounded-lg text-xs text-slate-200 flex items-center justify-between gap-2 cursor-pointer transition-colors"
+              >
+                <div class="flex items-center gap-2 truncate">
+                  <mat-icon class="text-xs text-amber-400">arrow_forward</mat-icon>
+                  <span class="truncate">{{ sc.label }}</span>
+                </div>
+                <span class="text-[10px] font-mono text-amber-300/80 shrink-0">{{ sc.artRef }}</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Statusy bezpieczeństwa, sieci i skarbca kryptograficznego -->
+      <div class="flex flex-wrap items-center gap-2.5 self-end md:self-auto">
+        <!-- Status 100% Offline & Bezpieczny -->
+        <div id="badge-offline-mode" class="flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs px-2.5 py-1.5 rounded-lg shadow-sm">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="font-medium">100% Local & Offline</span>
+        </div>
+
+        <!-- Status sieci i Menedżer Synchronizacji Offline -->
+        <button
+          id="btn-network-sync-status"
+          type="button"
+          (click)="openSyncManager()"
+          class="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border bg-slate-800/80 border-slate-700/70 text-slate-300 hover:border-slate-600 hover:text-white transition-all cursor-pointer font-medium"
+          title="Kliknij, aby otworzyć Menedżer Synchronizacji Offline-First"
+        >
+          @if (offlineSync.isSyncing()) {
+            <mat-icon class="text-sm text-amber-400 animate-spin">sync</mat-icon>
+            <span class="text-amber-300">Synchronizacja...</span>
+          } @else if (offlineSync.effectiveOnline()) {
+            <mat-icon class="text-sm text-emerald-400">cloud_done</mat-icon>
+            <span class="text-emerald-300">
+              Online
+              @if (offlineSync.pendingCount() > 0) {
+                ({{ offlineSync.pendingCount() }})
+              }
+            </span>
+          } @else {
+            <mat-icon class="text-sm text-amber-400">cloud_off</mat-icon>
+            <span class="text-amber-300">
+              Offline
+              @if (offlineSync.pendingCount() > 0) {
+                <span class="ml-1 px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded-full text-[10px] font-bold">
+                  {{ offlineSync.pendingCount() }}
+                </span>
+              }
+            </span>
+          }
+        </button>
+
+        <!-- Przycisk Słownika Prawno-Karnego (Offline) -->
+        <button
+          id="btn-open-legal-dictionary"
+          type="button"
+          (click)="openLegalDictionary()"
+          class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium shadow-sm"
+          title="Otwórz Słownik Pojęć Prawno-Karnych (100% Offline)"
+        >
+          <mat-icon class="text-sm text-amber-400">auto_stories</mat-icon>
+          <span>Słownik Prawny</span>
+        </button>
+
+        <!-- Przycisk Skarbca AES-256 -->
+        @if (cryptoService.isAuthenticated()) {
+          <button
+            id="btn-lock-vault"
+            (click)="lockVault()"
+            class="flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium"
+            title="Skarbiec odblokowany. Kliknij, aby zablokować."
+          >
+            <mat-icon class="text-sm">lock_open</mat-icon>
+            <span>Skarbiec AES: Otwarty</span>
+          </button>
+        } @else {
+          <button
+            id="btn-unlock-vault"
+            (click)="openVaultModal()"
+            class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium"
+            title="Kliknij, aby odblokować szyfrowane notatki"
+          >
+            <mat-icon class="text-sm text-slate-400">lock</mat-icon>
+            <span>Odblokuj Skarbiec</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Pasek Nawigacji (Tabs) -->
+    <nav id="app-navigation" class="max-w-7xl mx-auto mt-3.5 flex items-center gap-1 overflow-x-auto pb-1 border-t border-slate-800/60 pt-2.5 no-scrollbar">
+      <button
+        id="nav-threat-calc"
+        (click)="activeTab.set('threat-calc')"
+        [class]="activeTab() === 'threat-calc'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
+      >
+        <mat-icon class="text-base text-amber-400">gavel</mat-icon>
+        <span>Co mi grozi? (Kalkulator)</span>
+      </button>
+
+      <button
+        id="nav-handbooks"
+        (click)="activeTab.set('handbooks')"
+        [class]="activeTab() === 'handbooks'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
+      >
+        <mat-icon class="text-base text-amber-400">auto_stories</mat-icon>
+        <span>Podręczniki Prawa</span>
+      </button>
+
+      <button
+        id="nav-penal-code"
+        (click)="activeTab.set('penal-code')"
+        [class]="activeTab() === 'penal-code'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
+      >
+        <mat-icon class="text-base text-amber-400">menu_book</mat-icon>
+        <span>Kodeks Karny</span>
+      </button>
+
+      <button
+        id="nav-rulings"
+        (click)="activeTab.set('rulings')"
+        [class]="activeTab() === 'rulings'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
+      >
+        <mat-icon class="text-base text-amber-400">account_balance</mat-icon>
+        <span>Orzecznictwo SN</span>
+      </button>
+
+      <button
+        id="nav-ai-chat"
+        (click)="activeTab.set('ai-chat')"
+        [class]="activeTab() === 'ai-chat'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
+      >
+        <mat-icon class="text-base text-amber-400">smart_toy</mat-icon>
+        <span>Asystent AI (Głosowy)</span>
+      </button>
+
+      <button
+        id="nav-notes"
+        (click)="activeTab.set('notes')"
+        [class]="activeTab() === 'notes'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
+      >
+        <mat-icon class="text-base text-amber-400">enhanced_encryption</mat-icon>
+        <span>Szyfrowane Notatki</span>
+      </button>
+
+      <button
+        id="nav-alerts"
+        (click)="activeTab.set('alerts')"
+        [class]="activeTab() === 'alerts'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
+      >
+        <mat-icon class="text-base text-red-400">notifications_active</mat-icon>
+        <span>Alerty o Zmianach</span>
+      </button>
+
+      <button
+        id="nav-technical-docs"
+        (click)="activeTab.set('technical-docs')"
+        [class]="activeTab() === 'technical-docs'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs md:text-sm font-semibold border transition-all cursor-pointer whitespace-nowrap"
+      >
+        <mat-icon class="text-base text-slate-400">terminal</mat-icon>
+        <span>Architektura & Docker</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Główny Kontener Zawartości -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8">
+    @switch (activeTab()) {
+      @case ('threat-calc') {
+        <app-dashboard-widget-grid
+          (openInCalculator)="executeGlobalSearch($event)"
+          (openArticleInCode)="searchInPenalCodeById($event)"
+          (openNotes)="activeTab.set('notes')"
+          (openDictionary)="openLegalDictionary($event)"
+          (openHandbook)="openHandbookTopic($event)"
+        />
+
+        <app-threat-calculator
+          [query]="threatQuery()"
+          [activeCategory]="threatCategoryFilter()"
+          [threatAnalysis]="threatAnalysis()"
+          [filteredScenarios]="filteredScenarios()"
+          (queryChange)="setThreatQuery($event)"
+          (categoryFilterChange)="setThreatCategory($event)"
+          (runAnalysis)="runThreatAnalysis()"
+          (clearQuery)="clearThreatQuery()"
+          (inspectArticle)="inspectArticleFromThreat($event)"
+          (createNote)="createNoteForArticle($event)"
+          (searchInPenalCode)="searchInPenalCode($event)"
+          (searchInRulings)="searchInRulings($event)"
+          (exportPdf)="exportCurrentAnalysisToPdf()"
+          (savePrescriptionNote)="savePrescriptionNote($event)"
+        />
+      }
+
+      @case ('handbooks') {
+        <app-handbooks-browser
+          (inspectArticle)="openArticleFromHandbook($event)"
+          (inspectRuling)="openRulingFromHandbook($event)"
+          (testInCalculator)="testScenarioInCalculator($event)"
+        />
+      }
+
+      @case ('penal-code') {
+        <app-penal-code-browser
+          (checkThreat)="checkThreatForArticle($event)"
+          (createNote)="createNoteForArticle($event)"
+        />
+      }
+
+      @case ('rulings') {
+        <app-rulings-browser
+          (checkThreat)="checkThreatForRuling($event)"
+          (sendToNotes)="createNoteForRuling($event)"
+        />
+      }
+
+      @case ('ai-chat') {
+        <app-legal-chat
+          (openCalculator)="openCalculatorFromChat($event)"
+          (inspectArticle)="inspectArticleFromChat($event)"
+        />
+      }
+
+      @case ('notes') {
+        <app-encrypted-notes (requestUnlockVault)="openVaultModal()" />
+      }
+
+      @case ('alerts') {
+        <app-legal-alerts />
+      }
+
+      @case ('technical-docs') {
+        <app-technical-docs />
+      }
+    }
+  </main>
+
+  <!-- Stopka Kancelaryjna & Klauzula Prawna -->
+  <footer class="border-t border-slate-900 bg-slate-950/80 px-4 py-5 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <mat-icon class="text-sm text-amber-500">verified_user</mat-icon>
+        <span>
+          <strong>prawnBot Kancelaria</strong> — Zero-Cloud & Tajemnica Obrończa (Offline Architecture).
+        </span>
+      </div>
+      <p class="text-[11px] text-slate-400">
+        Aplikacja wspiera analizę prawną i sporządzanie pism. W konkretnej sprawie karnej zawsze skonsultuj się z adwokatem lub radcą prawnym.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Modal Skarbca Kryptograficznego -->
+  @if (isVaultModalOpen()) {
+    <app-vault-modal (closeModal)="closeVaultModal()" />
+  }
+
+  <!-- Pływający odtwarzacz lektora Web Speech API -->
+  <app-read-aloud-player />
+
+  <!-- Modal Słownika Pojęć Prawnych (100% Offline) -->
+  @if (dictService.isModalOpen()) {
+    <app-legal-dictionary-modal (inspectArticle)="searchInPenalCodeById($event)" />
+  }
+
+  <!-- Pływający Tooltip Kontekstowy na Zaznaczenie / Dwuklik -->
+  <app-legal-context-tooltip />
+
+  <!-- Modal Menedżera Synchronizacji Offline-First -->
+  <app-offline-sync-manager-modal />
+</div>
