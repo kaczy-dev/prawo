@@ -71,7 +71,107 @@ export class PrawnBotAiService {
 
     // 1. Wykrywanie kontekstu prawnego na podstawie słów kluczowych i reguł semantycznych
     const isPoliceChase = testQ.includes('pościg') || testQ.includes('ucieczk') && (testQ.includes('policj') || testQ.includes('radiowóz') || testQ.includes('kontrol')) || testQ.includes('178b');
-    const isAlcoholTraffic = !isPoliceChase && (testQ.includes('alkohol') || testQ.includes('promil') || testQ.includes('pijan') || testQ.includes('piw') || testQ.includes('wódk') || testQ.includes('samochód') || testQ.includes('autem') || testQ.includes('kierowc') || testQ.includes('178a') || testQ.includes('prawo jazdy'));
+    
+    // Rozróżnienie sytuacji alkoholowych:
+    // A. Spożywanie alkoholu w miejscu publicznym (park, ławka, ulica, otwarta puszka - art. 43¹ u.w.t.p.a. - mandat 100 zł)
+    const isPublicDrinking =
+      !testQ.includes('kierow') &&
+      !testQ.includes('samochód') &&
+      !testQ.includes('autem') &&
+      !testQ.includes('pojazd') &&
+      !testQ.includes('kółk') &&
+      !testQ.includes('rower') &&
+      !testQ.includes('hulajnog') &&
+      !testQ.includes('prawo jazdy') &&
+      !testQ.includes('178a') &&
+      (
+        testQ.includes('picie piwa') ||
+        testQ.includes('piwo w parku') ||
+        testQ.includes('piwo na ławce') ||
+        testQ.includes('piwo na ulicy') ||
+        testQ.includes('piwo na dworze') ||
+        testQ.includes('piwo na plaży') ||
+        testQ.includes('piwko') ||
+        testQ.includes('otwarte piwo') ||
+        testQ.includes('otwarta puszka') ||
+        testQ.includes('otwarta butelka') ||
+        testQ.includes('mandat za piwo') ||
+        testQ.includes('mandat za alkohol') ||
+        testQ.includes('spożywanie alkoholu') ||
+        testQ.includes('picie w miejscu publicznym') ||
+        testQ.includes('picie alkoholu') ||
+        testQ.includes('43 uwtpa') ||
+        testQ.includes('wychowaniu w trzeźwości') ||
+        (testQ.includes('piw') && (testQ.includes('park') || testQ.includes('ławk') || testQ.includes('ulic') || testQ.includes('skwer') || testQ.includes('miejsk') || testQ.includes('publiczn') || testQ.includes('mandat'))) ||
+        testQ === 'picie piwa' ||
+        testQ === 'piwo'
+      );
+
+    // B. Prowadzenie roweru lub hulajnogi po alkoholu (art. 87 § 1a i § 2 k.w. - mandat 1000/2500 zł, bez konfiskaty, bez utraty prawka kat. B)
+    const isBicycleAlcohol =
+      (testQ.includes('rower') || testQ.includes('rowerem') || testQ.includes('hulajnog')) &&
+      (testQ.includes('alkohol') || testQ.includes('piw') || testQ.includes('wódk') || testQ.includes('promil') || testQ.includes('pijan') || testQ.includes('trzeźw') || testQ.includes('87 kw'));
+
+    // C. Prowadzenie pojazdu mechanicznego (samochód, motocykl) w stanie nietrzeźwości (art. 178a k.k.)
+    const isAlcoholTraffic =
+      !isPoliceChase &&
+      !isPublicDrinking &&
+      !isBicycleAlcohol &&
+      (
+        testQ.includes('178a') ||
+        ((testQ.includes('alkohol') || testQ.includes('promil') || testQ.includes('pijan') || testQ.includes('wódk') || testQ.includes('piw')) &&
+          (testQ.includes('kierow') || testQ.includes('samochód') || testQ.includes('autem') || testQ.includes('pojazd') || testQ.includes('kółk') || testQ.includes('prawo jazdy') || testQ.includes('jechał') || testQ.includes('jazda') || testQ.includes('drog') || testQ.includes('konfiskat') || testQ.includes('motocykl')))
+      );
+
+    // D. Konfiskata pojazdu (art. 44b k.k.)
+    const isCarConfiscation =
+      testQ.includes('konfiskat') ||
+      testQ.includes('przepadek pojazdu') ||
+      testQ.includes('utrata auta') ||
+      testQ.includes('zabiorą auto') ||
+      testQ.includes('odebranie auta') ||
+      testQ.includes('art 44b') ||
+      testQ.includes('44b kk');
+
+    // E. Alkohol w pracy i kontrola pracodawcy (art. 70 § 2 k.w. & art. 22¹c k.p.)
+    const isAlcoholAtWork =
+      (testQ.includes('pracy') || testQ.includes('pracownik') || testQ.includes('szef') || testQ.includes('pracodawc') || testQ.includes('zakładzie') || testQ.includes('etacie')) &&
+      (testQ.includes('alkohol') || testQ.includes('alkomat') || testQ.includes('promil') || testQ.includes('pijan') || testQ.includes('dmuchan') || testQ.includes('dyscyplinark') || testQ.includes('70 kw') || testQ.includes('22 kp'));
+
+    // F. Ruch wodny pod wpływem alkoholu (art. 35 u.b.o.w.)
+    const isAlcoholWater =
+      (testQ.includes('kajak') || testQ.includes('rower wodny') || testQ.includes('łódk') || testQ.includes('ponton') || testQ.includes('żaglówk') || testQ.includes('motorówk') || testQ.includes('skuter wodny') || testQ.includes('sternik') || testQ.includes('ruchu wodnym') || testQ.includes('jezior') || testQ.includes('rzece')) &&
+      (testQ.includes('alkohol') || testQ.includes('piw') || testQ.includes('promil') || testQ.includes('pijan') || testQ.includes('trzeźw') || testQ.includes('35 ubow'));
+
+    // G. Impreza masowa i wnoszenie alkoholu (art. 56 u.b.i.m.)
+    const isAlcoholMassEvent =
+      (testQ.includes('imprez') || testQ.includes('mecz') || testQ.includes('stadion') || testQ.includes('koncert') || testQ.includes('festiwal')) &&
+      (testQ.includes('alkohol') || testQ.includes('piwo') || testQ.includes('wniesienie') || testQ.includes('wnoszenie') || testQ.includes('56 ubim') || testQ.includes('masow'));
+
+    // H. Rozpijanie nieletnich i sprzedaż alkoholu bez dowodu (art. 208 k.k. & art. 43 u.w.t.p.a.)
+    const isUnderageAlcohol =
+      (testQ.includes('małoletni') || testQ.includes('nieletni') || testQ.includes('dzieck') || testQ.includes('nastolat') || testQ.includes('do lat 18') || testQ.includes('18 lat') || testQ.includes('bez dowodu')) &&
+      (testQ.includes('rozpijan') || testQ.includes('sprzedaż alkoholu') || testQ.includes('kupiłem piwo dla') || testQ.includes('kupowanie alkoholu') || testQ.includes('częstow') || testQ.includes('208') || testQ.includes('koncesj'));
+
+    // I. Nielegalna reklama alkoholu (art. 45² u.w.t.p.a.)
+    const isAlcoholAd =
+      (testQ.includes('reklam') || testQ.includes('promocj') || testQ.includes('influencer') || testQ.includes('instagram') || testQ.includes('tiktok') || testQ.includes('youtube')) &&
+      (testQ.includes('alkohol') || testQ.includes('wódk') || testQ.includes('piw') || testQ.includes('wina') || testQ.includes('45 uwtpa'));
+
+    // J. Izba wytrzeźwień (art. 40 u.w.t.p.a.)
+    const isSoberingStation =
+      testQ.includes('izb') || testQ.includes('wytrzeźwień') || testQ.includes('wytrzeźwiałk') || testQ.includes('opłata za izbę') || testQ.includes('doprowadzenie do izby') || testQ.includes('40 uwtpa');
+
+    // K. Brak niepoczytalności po alkoholu (art. 31 § 3 k.k.)
+    const isAlcoholDefenseInsanity =
+      (testQ.includes('niepoczytaln') || testQ.includes('urwany film') || testQ.includes('nie pamiętam') || testQ.includes('byłem pijany') || testQ.includes('pod wpływem alkoholu')) &&
+      (testQ.includes('łagodząc') || testQ.includes('obron') || testQ.includes('usprawiedliw') || testQ.includes('art 31') || testQ.includes('poczytaln') || testQ.includes('czy to zmniejsza'));
+
+    // L. Kolizja / stłuczka po alkoholu (art. 86 § 2 k.w.)
+    const isAlcoholCollision =
+      (testQ.includes('kolizj') || testQ.includes('stłuczk') || testQ.includes('uderzyłem w auto') || testQ.includes('zarysowałem') || testQ.includes('porysowałem na parkingu') || testQ.includes('86 kw')) &&
+      (testQ.includes('alkohol') || testQ.includes('promil') || testQ.includes('piw') || testQ.includes('pijan') || testQ.includes('wypił'));
+
     const isAccidentOrHitAndRun = testQ.includes('wypadek') || testQ.includes('potrąc') || (testQ.includes('ucieczk') && (testQ.includes('miejsca') || testQ.includes('kolizj') || testQ.includes('wypadk'))) || testQ.includes('177') || testQ.includes('178 ');
     const isFailureToHelp = testQ.includes('nieudzielenie pomocy') || (testQ.includes('pomoc') && (testQ.includes('nie udzieliłem') || testQ.includes('nie pomógł') || testQ.includes('zostawił rann'))) || testQ.includes('162');
     const isBodilyHarm = testQ.includes('uszczerbek') || testQ.includes('złamał') || testQ.includes('złamanie nosa') || testQ.includes('wybicie oka') || testQ.includes('okaleczen') || testQ.includes('obrażenia') || testQ.includes('rozstrój') || testQ.includes('156') || testQ.includes('157');
@@ -105,6 +205,14 @@ export class PrawnBotAiService {
     const isCourtBanViolation = testQ.includes('złamanie zakazu') || testQ.includes('zakaz sądowy') || testQ.includes('pomimo zakazu') || testQ.includes('wbrew zakazowi') || testQ.includes('244');
 
     // Dopasowanie artykułów
+    if (isPublicDrinking) {
+      const art = allArticles.find((a) => a.id === 'art-43-1-uwtpa');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isBicycleAlcohol) {
+      const art = allArticles.find((a) => a.id === 'art-87-kw');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
     if (isPoliceChase) {
       const art = allArticles.find((a) => a.id === 'art-178b-kk');
       if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
@@ -191,6 +299,52 @@ export class PrawnBotAiService {
     if (isAlcoholTraffic) {
       const art = allArticles.find((a) => a.id === 'art-178a');
       if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+      if (testQ.includes('konfiskat') || testQ.includes('przepadek') || testQ.includes('1.5') || testQ.includes('1,5')) {
+        const art44b = allArticles.find((a) => a.id === 'art-44b-kk');
+        if (art44b && !matchedArticles.includes(art44b)) matchedArticles.push(art44b);
+      }
+    }
+    if (isCarConfiscation) {
+      const art44b = allArticles.find((a) => a.id === 'art-44b-kk');
+      if (art44b && !matchedArticles.includes(art44b)) matchedArticles.push(art44b);
+      const art178a = allArticles.find((a) => a.id === 'art-178a');
+      if (art178a && !matchedArticles.includes(art178a)) matchedArticles.push(art178a);
+    }
+    if (isAlcoholAtWork) {
+      const artKw = allArticles.find((a) => a.id === 'art-70-2-kw');
+      const artKp = allArticles.find((a) => a.id === 'art-22-1c-kp');
+      if (artKw && !matchedArticles.includes(artKw)) matchedArticles.push(artKw);
+      if (artKp && !matchedArticles.includes(artKp)) matchedArticles.push(artKp);
+    }
+    if (isAlcoholWater) {
+      const art = allArticles.find((a) => a.id === 'art-35-ubow');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isAlcoholMassEvent) {
+      const art = allArticles.find((a) => a.id === 'art-56-ubim');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isUnderageAlcohol) {
+      const art208 = allArticles.find((a) => a.id === 'art-208-kk');
+      const art43 = allArticles.find((a) => a.id === 'art-43-uwtpa');
+      if (art208 && !matchedArticles.includes(art208)) matchedArticles.push(art208);
+      if (art43 && !matchedArticles.includes(art43)) matchedArticles.push(art43);
+    }
+    if (isAlcoholAd) {
+      const art = allArticles.find((a) => a.id === 'art-45-2-uwtpa');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isSoberingStation) {
+      const art = allArticles.find((a) => a.id === 'art-40-uwtpa');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isAlcoholDefenseInsanity) {
+      const art = allArticles.find((a) => a.id === 'art-31-3-kk');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isAlcoholCollision) {
+      const art = allArticles.find((a) => a.id === 'art-86-2-kw');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
     }
     if (isBurglary) {
       const art = allArticles.find((a) => a.id === 'art-279');
@@ -255,15 +409,100 @@ export class PrawnBotAiService {
       });
     }
 
-    // Jeśli nadal puste, podaj najważniejszy artykuł poglądowo
+    // Jeśli po wyszukiwaniu nadal brak artykułów – nie przypisujemy fałszywie art. 178a!
     if (matchedArticles.length === 0) {
-      matchedArticles = [allArticles[0]];
+      return {
+        matchedArticles: [],
+        riskLevel: 'niski',
+        primarySentenceRange: 'Brak bezpośredniej kwalifikacji przestępstwa (wymaga opisu stanu faktycznego)',
+        possibleSanctions: [
+          'W podanym opisie nie zidentyfikowano znamion przestępstwa z Kodeksu Karnego',
+          'W zależności od okoliczności sprawa może stanowić sprawę cywilną, drobne wykroczenie lub być prawnie indyferentna',
+        ],
+        mandatoryMeasures: [
+          'Zasada domniemania niewinności (art. 5 § 1 k.p.k.) oraz nullum crimen sine lege (art. 1 § 1 k.k.)',
+        ],
+        mitigatingFactors: [
+          'Brak umyślności i zamiaru bezpośredniego',
+          'Brak szkody majątkowej lub uszczerbku na zdrowiu',
+        ],
+        aggravatingFactors: [],
+        plainExplanation:
+          'Opisana sytuacja nie zawiera typowych znamion przestępstwa kryminalnego. W prawie karnym odpowiedzialność wymaga spełnienia konkretnych przesłanek ustawowych. Jeśli sprawa dotyczy sporu o pieniądze, to sprawa cywilna; jeśli drobnego incydentu miejskiego – wykroczenie.',
+        similarRulings: [],
+        recommendedSteps: [
+          'Doprecyzuj zapytanie, podając więcej faktów (np. kwota, skutki dla zdrowia, obecność policji).',
+          'Zadaj pytanie w Asystencie AI w zakładce Czat Prawny.',
+        ],
+      };
     }
 
     // 2. Obliczenie sankcji i poziomu ryzyka
     const primary = matchedArticles[0];
 
-    if (isAlcoholTraffic) {
+    if (isPublicDrinking) {
+      riskLevel = 'niski';
+      primarySentenceRange = 'Mandat karny 100 zł (art. 43¹ ust. 1 ustawy o wychowaniu w trzeźwości). W sądzie grzywna od 20 do 5 000 zł';
+      possibleSanctions.push(
+        'Mandat karny w stałej kwocie 100 zł nakładany na miejscu przez Policję lub Straż Miejską',
+        'W przypadku odmowy przyjęcia mandatu: grzywna w Sądzie Rejonowym od 20 do 5 000 zł (w praktyce zwykle 100–200 zł + zryczałtowane koszty sądowe ok. 70–100 zł)',
+        'Karalne usiłowanie (art. 43¹ ust. 2): mandat za trzymanie otwartej puszki lub butelki z zamiarem spożycia'
+      );
+      mandatoryMeasures.push(
+        'CZYSTA KARTOTEKA (KRK): Spożywanie alkoholu w miejscu publicznym to WYKROCZENIE pozakodeksowe. Nie jest to przestępstwo kryminalne! Mandat ani grzywna sądowa NIE trafiają do Krajowego Rejestru Karnego. Nadal jesteś osobą w 100% niekaraną!',
+        'BRAK WPŁYWU NA PRAWO JAZDY: Za picie piwa na ulicy lub w parku policja w żadnym wypadku NIE MOŻE zatrzymać ani odebrać Ci prawa jazdy!'
+      );
+      mitigatingFactors.push(
+        'Picie w miejscu ustronnym, które nie wywoływało zgorszenia ani zakłócenia spokoju',
+        'Natychmiastowe okazanie dokumentu tożsamości i kulturalne zachowanie wobec funkcjonariuszy',
+        'Wyrzucenie puszki/butelki do kosza na śmieci (wykluczenie zarzutu zaśmiecania z art. 145 k.w.)',
+        'Sprawdzenie, czy teren nie został wyłączony z zakazu uchwałą rady gminy (np. Bulwary Wiślane w Warszawie, Wyspa Słodowa we Wrocławiu)'
+      );
+      aggravatingFactors.push(
+        'Awantura z policją lub strażą miejską (ryzyko przestępstwa znieważenia art. 226 k.k.)',
+        'Odmowa okazania dowodu tożsamości (wykroczenie z art. 65 k.w. – grzywna)',
+        'Rozbicie butelki lub pozostawienie śmieci (art. 145 k.w. – mandat do 500 zł)'
+      );
+      plainExplanation =
+        'Picie piwa w miejscu publicznym (ulica, park, ławka, plaża miejska) jest w Polsce wykroczeniem zagrożonym mandatem w wysokości 100 zł. Nie grozi za to więzienie, nie tracisz prawa jazdy ani statusu osoby niekaranej. Jeżeli puszka była zamknięta lub przebywałeś w strefie wyznaczonej przez gminę, mandat jest bezprawny.';
+      recommendedSteps.push(
+        'Podczas interwencji zachowaj pełny spokój, wylegitymuj się i nie dyskutuj agresywnie.',
+        'Jeśli spożywałeś alkohol w miejscu objętym zakazem, najszybszym i najtańszym rozwiązaniem jest przyjęcie mandatu 100 zł (masz 7 dni na przelew).',
+        'Jeśli nie piłeś (np. niosłeś zamknięty alkohol lub strefa jest legalna wg uchwały gminy), odmów mandatu – sprawa trafi do Sądu Rejonowego, gdzie wskażesz te okoliczności.',
+        'Pod żadnym pozorem po wypiciu piwa nie wsiadaj na rower, hulajnogę ani za kółko samochodu!'
+      );
+    } else if (isBicycleAlcohol) {
+      riskLevel = 'średni';
+      primarySentenceRange = 'Mandat 1000 zł (stan po użyciu: 0,2–0,5 promila) lub 2500 zł (stan nietrzeźwości: >0,5 promila) – art. 87 § 1a i § 2 k.w.';
+      possibleSanctions.push(
+        'Mandat karny 1 000 zł za stan po użyciu alkoholu (od 0,2 do 0,5 promila / 0,1 do 0,25 mg/l)',
+        'Mandat karny 2 500 zł za stan nietrzeźwości (powyżej 0,5 promila / powyżej 0,25 mg/l)',
+        'Przed Sądem Rejonowym: grzywna od 2500 do 30 000 zł lub areszt od 5 do 30 dni',
+        'Możliwy fakultatywny zakaz prowadzenia pojazdów niemechanicznych (wyłącznie na rowery/hulajnogi, art. 87 § 4 k.w.)'
+      );
+      mandatoryMeasures.push(
+        'BEZPIECZEŃSTWO PRAWA JAZDY KAT. B: Jazda rowerem lub hulajnogą po alkoholu NIE POWODUJE utraty prawa jazdy na samochód! Uchwała Sądu Najwyższego (I KZP 8/23) potwierdza, że zakaz może dotyczyć wyłącznie pojazdów innych niż mechaniczne.',
+        'BRAK KONFISKATY POJAZDU: Przepisy o przepadku (konfiskacie) z art. 44b k.k. dotyczą WYŁĄCZNIE pojazdów mechanicznych (aut, motocykli). Rower nie podlega konfiskacie!',
+        'BRAK WPISU DO KRK: To jest wykroczenie, a nie przestępstwo kryminalne.'
+      );
+      mitigatingFactors.push(
+        'Jazda pustą ścieżką rowerową lub drogą polną bez stwarzania zagrożenia dla innych',
+        'Stężenie tuż powyżej 0.2 promila',
+        'Prowadzenie roweru obok siebie (pieszy prowadzący rower nie jest kierującym!)'
+      );
+      aggravatingFactors.push(
+        'Spowodowanie kolizji z pieszym lub samochodem',
+        'Jazda po zmroku bez oświetlenia',
+        'Stężenie alkoholu powyżej 1.5 promila'
+      );
+      plainExplanation =
+        'Rowerzysta lub użytkownik hulajnogi po alkoholu popełnia wykroczenie z art. 87 k.w., a nie przestępstwo. Kary finansowe są wysokie (1000 lub 2500 zł), ale nie traci się prawa jazdy na samochód, nie idzie się do więzienia i nie traci się czystej kartoteki w rejestrze skazanych.';
+      recommendedSteps.push(
+        'Pamiętaj: jeśli zsiądziesz z roweru i prowadzisz go pieszo, jesteś pieszym i nie podlegasz mandatowi z art. 87 k.w.!',
+        'Żądaj powtórzenia badania alkomatem po 15 minutach (procedura sprawdzająca).',
+        'W razie sporu o stan trzeźwości wnioskuj o badanie krwi.'
+      );
+    } else if (isAlcoholTraffic) {
       riskLevel = q.includes('1.5') || q.includes('recydyw') || q.includes('drugi raz') ? 'bardzo wysoki' : 'wysoki';
       primarySentenceRange = 'Pozbawienie wolności od 1 miesiąca do lat 3 (lub do 5 lat w recydywie)';
       possibleSanctions.push(
@@ -815,8 +1054,963 @@ export class PrawnBotAiService {
     let legalCategoryBadge: string | undefined = undefined;
     let actionQuery: string | undefined = undefined;
 
-    // 1. ZAKŁÓCANIE CISZY NOCNEJ / SPOCZYNKU NOCNEGO (art. 51 k.w. vs art. 190a k.k. / art. 191 § 1a k.k.)
+    // 0. POWITANIA, PRZEDSTAWIENIE SIĘ I DIALOG NATURALNY
     if (
+      q === 'cześć' ||
+      q === 'hej' ||
+      q === 'czesc' ||
+      q === 'siema' ||
+      q === 'siemanko' ||
+      q === 'dzień dobry' ||
+      q === 'dzien dobry' ||
+      q === 'witam' ||
+      q === 'witaj' ||
+      q === 'kim jesteś' ||
+      q === 'kim jestes' ||
+      q === 'co potrafisz' ||
+      q === 'jak działasz' ||
+      q === 'jak sie masz' ||
+      q === 'jak się masz' ||
+      q === 'pomoc' ||
+      q === 'pomóż mi' ||
+      q === 'dzięki' ||
+      q === 'dzieki' ||
+      q === 'dziękuję' ||
+      q.startsWith('cześć') ||
+      q.startsWith('czesc') ||
+      q.startsWith('dzień dobry') ||
+      q.startsWith('dzien dobry')
+    ) {
+      legalCategoryBadge = 'Asystent Prawny – Prawnik z Łuczniczej';
+      text = `Dzień dobry! Jestem **Prawnik z Łuczniczej** – Twoim osobistym, niezależnym doradcą prawnym ds. prawa karnego i wykroczeń.
+
+Działam w **100% lokalnie i poufnie** na Twoim urządzeniu. Możesz ze mną rozmawiać swobodnie i naturalnie, dokładnie tak jak z mecenasem w kancelarii.
+
+W czym mogę Ci dzisiaj pomóc?
+- **„Co mi grozi za...?”** – opisz dowolną sytuację z życia (np. *picie piwa na ławce*, *jazda rowerem po piwie*, *kradzież w markecie*, *hejt w internecie*, *przekroczenie prędkości*), a wskażę dokładne artykuły, taryfikatory i realne sankcje.
+- **Taktyka i obrona procesowa** – jak zachować się podczas zatrzymania przez policję, kiedy odmówić zeznań, jak walczyć o warunkowe umorzenie lub dozór elektroniczny (SDE).
+- **Weryfikacja orzecznictwa** – precedensy i tezy Sądu Najwyższego.
+- **Rola asystenta** – możesz przełączyć mój tryb u góry: *Dla Obywatela* (prosty język bez żargonu), *Dla Obrońcy* (argumenty procesowe i błędy organów) lub *Symulator Przesłuchania* (trening przed wizytą na komendzie).
+
+Napisz lub podyktuj głosem swoje pytanie!`;
+      suggestedFollowUps = [
+        'Co mi grozi za picie piwa w parku?',
+        'Jazda rowerem po 2 piwach (jaki mandat?)',
+        'Nowy próg kradzieży 800 zł',
+        'Co mówić podczas przesłuchania na policji?',
+      ];
+    }
+    // 0A. SPOŻYWANIE ALKOHOLU W MIEJSCACH PUBLICZNYCH / PICIE PIWA NA ŁAWCE / W PARKU (art. 43¹ u.w.t.p.a.)
+    else if (
+      !q.includes('samochód') &&
+      !q.includes('autem') &&
+      !q.includes('kierowc') &&
+      !q.includes('kółk') &&
+      !q.includes('pojazd') &&
+      !q.includes('rower') &&
+      !q.includes('hulajnog') &&
+      !q.includes('prawo jazdy') &&
+      !q.includes('178a') &&
+      (
+        q.includes('picie piwa') ||
+        q.includes('picie alkoholu') ||
+        q.includes('piwo w parku') ||
+        q.includes('piwo na ławce') ||
+        q.includes('piwo na ulicy') ||
+        q.includes('piwo na dworze') ||
+        q.includes('piwo na plaży') ||
+        q.includes('piwko') ||
+        q.includes('otwarte piwo') ||
+        q.includes('otwarta puszka') ||
+        q.includes('otwarta butelka') ||
+        q.includes('mandat za piwo') ||
+        q.includes('mandat za alkohol') ||
+        q.includes('spożywanie alkoholu') ||
+        q.includes('picie w miejscu publicznym') ||
+        q.includes('43 uwtpa') ||
+        q.includes('wychowaniu w trzeźwości') ||
+        (q.includes('piw') && (q.includes('park') || q.includes('ławk') || q.includes('ulic') || q.includes('skwer') || q.includes('plaż') || q.includes('publiczn') || q.includes('mandat') || q.includes('grozi')))
+      )
+    ) {
+      referencedArticles.push('Art. 43¹ ust. 1 u.w.t.p.a.', 'Art. 43¹ ust. 2 u.w.t.p.a.', 'Art. 14 ust. 2a u.w.t.p.a.');
+      referencedRulings.push('II KK 142/23');
+      legalCategoryBadge = 'Ustawa o wychowaniu w trzeźwości (art. 43¹ u.w.t.p.a. - Wykroczenie)';
+      actionQuery = 'Picie piwa w parku i mandat 100 zł (art. 43¹ u.w.t.p.a.)';
+      text = `Za samo picie piwa na ulicy, w parku, na ławce czy na skwerze grozi Ci **mandat karny w wysokości dokładnie 100 zł**.
+
+Przede wszystkim – uspokajam: **to jest jedynie drobne wykroczenie, a nie przestępstwo**. Nie tracisz czystej kartoteki w Krajowym Rejestrze Karnym (KRK), nie grozi Ci za to areszt ani wpis w rejestrze skazanych.
+
+Oto jak dokładnie wygląda sytuacja w świetle polskiego prawa:
+
+---
+
+### 1. Podstawa prawna: Art. 43¹ Ustawy o wychowaniu w trzeźwości
+Zgodnie z **art. 43¹ ust. 1 w zw. z art. 14 ust. 2a** Ustawy o wychowaniu w trzeźwości i przeciwdziałaniu alkoholizmowi (u.w.t.p.a.):
+- W Polsce obowiązuje generalny zakaz spożywania napojów alkoholowych w **miejscach publicznych**.
+- Miejsca publiczne to m.in.: ulice, chodniki, place, parki, skwery, plaże miejskie, klatki schodowe, bramy oraz przystanki komunikacji miejskiej.
+- **Wysokość mandatu:** Wynosi sztywno **100 zł** (zgodnie z rozporządzeniem o taryfikatorze mandatów).
+
+---
+
+### 2. Gdzie MOŻNA pić piwo legalnie na świeżym powietrzu?
+Zakaz nie ma charakteru absolutnego w każdym punkcie miasta:
+1. **Miejsca przeznaczone do spożycia:** Ogródki gastronomiczne, puby i restauracje.
+2. **Strefy wyłączone uchwałą rady gminy (art. 14 ust. 2b ustawy):** Samorządy mogą legalizować picie pod chmurką w wyznaczonych rejonach, np.:
+   - **Warszawa:** Bulwary Wiślane oraz Plaża Poniatówka,
+   - **Wrocław:** Wyspa Słodowa,
+   - **Poznań:** Wybrane tereny nadwarciańskie.
+3. **Tereny prywatne:** Własna posesja, ogródek działkowy (ROD) czy prywatny balkon.
+
+---
+
+### 3. Ważny haczyk: Samo trzymanie OTWARTEJ puszki/butelki (Usiłowanie)
+Zgodnie z **art. 43¹ ust. 2 u.w.t.p.a.** *„Usiłowanie wykroczenia określonego w ust. 1 jest karalne”*.
+Oznacza to, że funkcjonariusz policji lub straży miejskiej może nałożyć mandat 100 zł nawet wtedy, gdy jeszcze nie wziąłeś łyka, lecz trzymasz otwartą puszkę lub butelkę w miejscu publicznym.
+- **Wskazówka obronna:** Przenoszenie butelek lub puszek **fabrycznie zamkniętych** (np. w siatce ze sklepu) jest w 100% legalne i nie stanowi nawet usiłowania wykroczenia.
+
+---
+
+### 4. Co jeśli odmówisz przyjęcia mandatu?
+- Masz pełne prawo odmówić przyjęcia mandatu karnego.
+- Sprawa zostanie skierowana z wnioskiem o ukaranie do Sądu Rejonowego.
+- Sąd zazwyczaj wydaje wyrok nakazowy, orzekając grzywnę (najczęściej 100–150 zł + ok. 70 zł zryczałtowanych kosztów sądowych).
+- **Ważne:** Nawet po wyroku skazującym przez sąd za to wykroczenie **nadal zachowujesz status osoby niekaranej** (do KRK trafiają wyłącznie wyroki za przestępstwa lub areszt za wykroczenia).
+
+---
+
+### ⚠️ Na co uważać podczas interwencji?
+1. **Wylegitymowanie się:** Odmowa podania swoich danych policjantowi to osobne wykroczenie z **art. 65 k.w.** (grozi grzywną).
+2. **Zaśmiecanie:** Porzucenie kapsla, puszki lub butelki to wykroczenie z **art. 145 k.w.** (mandat od 500 zł).
+3. **Zachowanie spokoju:** Wszczynanie awantury lub wulgaryzmy mogą skutkować zarzutami z art. 141 k.w. (słowa nieprzyzwoite) lub art. 51 k.w. (zakłócenie spokoju).
+
+💡 **Praktyczna rekomendacja:** Jeżeli interwencja dotyczy wyłącznie spożywania piwa na ławce – wylegitymuj się spokojnie i przyjmij mandat 100 zł (masz 7 dni na płatność przelewem). To zamyka temat od ręki, bez stresu i bez jakichkolwiek konsekwencji w rejestrach karnych.`;
+      suggestedFollowUps = [
+        'Czy samo trzymanie otwartego piwa to wykroczenie?',
+        'Gdzie w moim mieście można legalnie pić pod chmurką?',
+        'Czy mandat za piwo trafia do rejestru skazanych KRK?',
+        'Co zrobić, gdy policjant niesłusznie chce wypisać mandat?',
+      ];
+    }
+    // 0B. JAZDA ROWEREM LUB HULAJNOGĄ PO ALKOHOLU (art. 87 k.w.)
+    else if (
+      (q.includes('rower') || q.includes('rowerem') || q.includes('hulajnog')) &&
+      !q.includes('wodn') &&
+      !q.includes('kajak') &&
+      (q.includes('alkohol') || q.includes('piw') || q.includes('wódk') || q.includes('promil') || q.includes('pijan') || q.includes('trzeźw') || q.includes('87 kw') || q.includes('87 k.w'))
+    ) {
+      referencedArticles.push('Art. 87 § 1a k.w.', 'Art. 87 § 2 k.w.', 'Art. 87 § 4 k.w.');
+      referencedRulings.push('I KZP 8/23');
+      legalCategoryBadge = 'Kodeks Wykroczeń (art. 87 k.w. - Rower po alkoholu)';
+      actionQuery = 'Jazda rowerem po alkoholu (art. 87 k.w. – mandat 1000 zł lub 2500 zł)';
+      text = `**Co grozi za jazdę rowerem lub hulajnogą elektryczną po alkoholu?**
+
+W polskim prawie od 2013 roku jazda rowerem po alkoholu **NIE JEST PRZESTĘPSTWEM**, lecz **WYKROCZENIEM** z art. 87 Kodeksu Wykroczeń.
+
+Najważniejsze fakty:
+- **Nie idziesz do więzienia!**
+- **Nie tracisz prawa jazdy kat. B (na samochód)!**
+- **Nie tracisz roweru (brak konfiskaty pojazdu)!**
+- **Masz w 100% czystą kartotekę w Krajowym Rejestrze Karnym (KRK)!**
+
+---
+
+### 1. Wysokość mandatów (aktualny taryfikator):
+- **Stan po użyciu alkoholu (od 0,2 do 0,5 promila we krwi / 0,1 – 0,25 mg/l w wydychanym):**
+  Mandat karny wynosi dokładnie **1 000 zł** (art. 87 § 1a k.w.).
+- **Stan nietrzeźwości (powyżej 0,5 promila we krwi / powyżej 0,25 mg/l):**
+  Mandat karny wynosi aż **2 500 zł** (art. 87 § 2 k.w.).
+
+---
+
+### 2. Czy policja może odebrać prawo jazdy na samochód?
+**ABSOLUTNIE NIE!**
+Wieloletnia linia orzecznicza Sądu Najwyższego (m.in. uchwała *I KZP 8/23*) jednoznacznie przesądziła, że sąd za jazdę rowerem po alkoholu może orzec zakaz prowadzenia **wyłącznie pojazdów innych niż mechaniczne** (czyli zakaz jazdy rowerem na okres od 6 miesięcy do 3 lat na podstawie art. 87 § 4 k.w.). Prawo jazdy na samochód osobowy (kat. B) pozostaje w pełni bezpieczne!
+
+---
+
+### 3. Złoty trik prawny: Pieszy prowadzący rower!
+Zgodnie z Prawem o ruchu drogowym:
+- Osoba jadąca na rowerze jest kierującym pojazdem (podlega pod art. 87 k.w.).
+- **Osoba, która zsiadła z roweru i prowadzi go obok siebie, jest w świetle prawa PIESZYM!**
+Pieszy idący chodnikiem lub poboczem z rowerem po alkoholu nie popełnia żadnego wykroczenia drogowego! Jeśli więc wypiłeś piwo, zsiądź z siodełka i bezpiecznie poprowadź rower do domu.`;
+      suggestedFollowUps = [
+        'Czy policjant może zatrzymać prawo jazdy rowerzyście?',
+        'Ile wynosi mandat za hulajnogę elektryczną po piwie?',
+        'Co jeśli odmówię dmuchania w alkomat na rowerze?',
+      ];
+    }
+    // 0B_1. KONFISKATA SAMOCHODU OD 14 MARCA 2024 (art. 44b k.k. & art. 178a § 5 k.k.)
+    else if (
+      (q.includes('konfiskat') || q.includes('przepadek pojazdu') || q.includes('zabiorą auto') || q.includes('utrata samochodu') || q.includes('odebranie auta') || q.includes('44b') || (q.includes('leasing') && (q.includes('alkohol') || q.includes('promil')))) &&
+      (q.includes('samochód') || q.includes('auto') || q.includes('pojazd') || q.includes('alkohol') || q.includes('promil') || q.includes('pijan') || q.includes('kierow') || q.includes('leasing'))
+    ) {
+      referencedArticles.push('Art. 44b § 1-3 k.k.', 'Art. 178a § 5 k.k.', 'Art. 178 § 1 i § 1a k.k.');
+      referencedRulings.push('I KZP 1/24');
+      legalCategoryBadge = 'Kodeks Karny (art. 44b k.k. - Konfiskata Samochodu)';
+      actionQuery = 'Konfiskata samochodu za alkohol (art. 44b k.k. od 14 marca 2024 r.)';
+      text = `**Konfiskata samochodu za alkohol (Art. 44b k.k.) – Kompletny przewodnik prawny po nowelizacji z 14 marca 2024 r.:**
+
+W polskim prawie od 14 marca 2024 r. obowiązuje bezwzględny przepadek pojazdów mechanicznych prowadzonych w stanie nietrzeźwości. Przepisy są bardzo rygorystyczne, ale ustawa przewiduje kluczowe wyjątki i procedury ochronne.
+
+---
+
+### 1. Kiedy sąd OBLIGATORYJNIE orzeka konfiskatę pojazdu?
+Sąd nie ma wyboru i MUSI orzec przepadek w następujących sytuacjach:
+1. **Stężenie alkoholu min. 1,5 promila we krwi** (lub **0,75 mg/dm³ w wydychanym powietrzu**) u kierowcy pojazdu mechanicznego (art. 178a § 1 w zw. z art. 178a § 5 k.k.).
+2. **Recydywa trzeźwościowa (art. 178a § 4 k.k.):** Kierowca wcześniej skazany za jazdę po alkoholu lub jadący w okresie zakazu prowadzenia, u którego wykryto **powyżej 0,5 promila alkoholu** (0,25 mg/l).
+3. **Spowodowanie wypadku lub katastrofy (art. 178 k.k.):** Przy stężeniu **powyżej 1,0 promila** (0,5 mg/l) lub w razie ucieczki z miejsca wypadku.
+
+---
+
+### 2. Wyjątki: Co jeśli auto jest w LEASINGU, NAJMIE, KREDYCIE lub WSPÓŁWŁASNOŚCI?
+Zgodnie z **art. 44b § 2 k.k.** oraz uchwałą SN *I KZP 1/24*:
+- Jeżeli pojazd w chwili czynu **nie stanowił wyłącznej własności sprawcy** (np. leasing operacyjny, najem długoterminowy, auto firmowe, współwłasność małżeńska lub ze znajomym), **sąd NIE ZABIERA fizycznie samochodu**. Samochód wraca do firmy leasingowej lub współwłaściciela.
+- Zamiast tego sąd orzeka **PRZEPADEK RÓWNOWARTOŚCI POJAZDU**.
+- **Jak ustala się wartość?** W pierwszej kolejności przyjmuje się wartość z **polisy ubezpieczeniowej AC** z roku popełnienia czynu, a jeśli polisy nie ma – **średnią wartość rynkową pojazdu** (katalogi Eurotax/Info-Ekspert z uwzględnieniem rocznika, przebiegu i stanu). Tę kwotę skazany musi wpłacić Skarbowi Państwa!
+
+---
+
+### 3. Wyjątek dla KIEROWCÓW ZAWODOWYCH (Art. 44b § 3 k.k.):
+Kierowca ciężarówki, autobusu czy kurier prowadzący pojazd pracodawcy podczas wykonywania obowiązków służbowych nie traci pojazdu ani jego równowartości (ciężarówka warta milion zł nie podlega przepadkowi).
+- Sąd orzeka wówczas **NAWIĄZKĘ w wysokości od 5 000 zł do 100 000 zł** na rzecz Funduszu Pomocy Pokrzywdzonym oraz Pomocy Postpenitencjarnej.
+
+---
+
+### 4. Co dzieje się z autem natychmiast po zatrzymaniu?
+- Policja dokonuje **tymczasowego zajęcia pojazdu** na okres do 7 dni.
+- Następnie prokurator wydaje postanowienie o zabezpieczeniu majątkowym. Auto trafia na parking depozytowy (koszty parkingu obciążają sprawcę w razie skazania).`;
+      suggestedFollowUps = [
+        'Jak policja wycenia auto, jeśli nie ma polisy AC?',
+        'Czy można odzyskać auto z parkingu depozytowego przed wyrokiem?',
+        'Co grozi za ukrycie lub sprzedaż auta po zatrzymaniu?',
+      ];
+    }
+    // 0B_2. JAZDA SAMOCHODEM PO ALKOHOLU (art. 178a k.k. vs art. 87 § 1 k.w.)
+    else if (
+      (q.includes('samochód') || q.includes('autem') || q.includes('kierowc') || q.includes('za kółk') || q.includes('pojazd mechaniczn') || q.includes('prawo jazdy') || q.includes('178a')) &&
+      (q.includes('alkohol') || q.includes('promil') || q.includes('pijan') || q.includes('wódk') || q.includes('piw') || q.includes('trzeźw')) &&
+      !q.includes('wypadek') &&
+      !q.includes('potrąc') &&
+      !q.includes('stłuczk') &&
+      !q.includes('kolizj')
+    ) {
+      referencedArticles.push('Art. 178a § 1 i § 4 k.k.', 'Art. 87 § 1 k.w.', 'Art. 42 § 2 k.k.', 'Art. 43a § 2 k.k.');
+      referencedRulings.push('IV KK 206/21');
+      legalCategoryBadge = 'Kodeks Karny (art. 178a k.k.) vs Kodeks Wykroczeń (art. 87 k.w.)';
+      actionQuery = 'Prowadzenie samochodu po alkoholu – konsekwencje i kary';
+      text = `**Prowadzenie samochodu po alkoholu – Pełna analiza prawna i sankcje:**
+
+W polskim prawie kluczowe znaczenie ma dokładne stężenie alkoholu. Ustawa rozróżnia dwa zupełnie odmienne stany o diametralnie różnych skutkach:
+
+---
+
+### 1. STAN PO UŻYCIU ALKOHOLU: od 0,2 do 0,5 promila (0,1 – 0,25 mg/l):
+Jest to **WYKROCZENIE z art. 87 § 1 Kodeksu Wykroczeń**:
+- **Kara:** Grzywna od **2 500 zł do 30 000 zł** lub areszt od 5 do 30 dni.
+- **Zakaz prowadzenia pojazdów:** Obligatoryjny zakaz na okres **od 6 miesięcy do 3 lat**.
+- **Punkty karne:** 15 punktów karnych.
+- **Kartoteka KRK:** Wykroczenie ukarane grzywną **NIE trafia do Krajowego Rejestru Karnego** – zachowujesz status osoby niekaranej!
+
+---
+
+### 2. STAN NIETRZEŹWOŚCI: powyżej 0,5 promila (> 0,25 mg/l):
+Jest to **PRZESTĘPSTWO z art. 178a § 1 Kodeksu Karnego**:
+- **Kara pozbawienia wolności:** Do **lat 3** (od 1 października 2023 r. zaostrzono z 2 do 3 lat!).
+- **Obligatoryjny zakaz prowadzenia:** Na okres **od 3 do 15 lat** (art. 42 § 2 k.k.).
+- **Świadczenie pieniężne:** Minimum **5 000 zł** (przy recydywie min. **10 000 zł**) na Fundusz Sprawiedliwości.
+- **Konfiskata auta (art. 44b k.k.):** Przy stężeniu od **1,5 promila** bezwzględna konfiskata lub spłata równowartości rynkowej.
+- **Wpis do KRK:** Skazanie widnieje w rejestrze skazanych przez okres od 3 do 5 lat od wykonania kary.
+
+---
+
+### 3. RECYDYWA (Art. 178a § 4 k.k.):
+Gdy kierowca był już wcześniej prawomocnie skazany za jazdę po alkoholu lub złamał aktywny zakaz sądowy:
+- Kara: od **3 miesięcy do 5 lat bezwzględnego więzienia**.
+- **Dożywotni zakaz prowadzenia pojazdów** (art. 42 § 3 k.k.).
+- Konfiskata pojazdu już przy przekroczeniu 0,5 promila!
+
+---
+
+### 4. Możliwości obrony procesowej:
+1. **Warunkowe umorzenie postępowania (art. 66 k.k.):** Dostępne tylko dla osób dotychczas niekaranych za przestępstwo umyślne, zazwyczaj przy stężeniach bliskich dolnej granicy (np. 0,55–0,7‰). Pozwala skrócić zakaz do 1 roku i zachować czystą kartotekę!
+2. **Blokada alkoholowa (Alkolock - art. 182a k.k.w.):** Po odbyciu co najmniej połowy orzeczonego zakazu można wnioskować do sądu o zgodę na jazdę autem wyposażonym w blokadę alkoholową.`;
+      suggestedFollowUps = [
+        'Jak uzyskać warunkowe umorzenie z art. 66 k.k. za jazdę po alkoholu?',
+        'Kiedy można złożyć wniosek o blokadę alkoholową (art. 182a k.k.w.)?',
+        'Czy badanie krwi może podważyć wynik z alkomatu?',
+      ];
+    }
+    // 0B_3. WYPADEK DROGOWY PO ALKOHOLU (art. 178 k.k. w zw. z art. 177 k.k.)
+    else if (
+      (q.includes('wypadek') || q.includes('potrąc') || q.includes('zabił na drodze') || q.includes('śmierć na pasach') || q.includes('178 kk') || q.includes('178 k.k')) &&
+      (q.includes('alkohol') || q.includes('pijan') || q.includes('promil') || q.includes('nietrzeźw') || q.includes('ucieczk') || q.includes('uciekł'))
+    ) {
+      referencedArticles.push('Art. 178 § 1 i § 1a k.k.', 'Art. 177 § 1 i § 2 k.k.', 'Art. 42 § 3 k.k.', 'Art. 44b k.k.');
+      legalCategoryBadge = 'Kodeks Karny (art. 178 k.k. - Wypadek pod wpływem alkoholu)';
+      actionQuery = 'Wypadek drogowy w stanie nietrzeźwości (art. 178 k.k.)';
+      text = `**Spowodowanie wypadku drogowego w stanie nietrzeźwości (Art. 178 k.k.) – Skrajnie surowa odpowiedzialność:**
+
+Zgodnie z art. 178 Kodeksu Karnego spowodowanie wypadku pod wpływem alkoholu lub narkotyków, jak również ucieczka z miejsca zdarzenia, pociągają za sobą drastyczne zaostrzenie sankcji karnych i finansowych.
+
+---
+
+### 1. Wymiar kary pozbawienia wolności:
+1. **Wypadek ze średnimi obrażeniami ciała powyżej 7 dni (art. 177 § 1 w zw. z art. 178 § 1 k.k.):**
+   - Dolna granica ustawowego zagrożenia zostaje podwyższona o połowę: kara od **6 miesięcy do 4,5 roku pozbawienia wolności**.
+2. **Wypadek ze skutkiem śmiertelnym lub ciężkim uszczerbkiem na zdrowiu (art. 177 § 2 w zw. z art. 178 § 1a k.k.):**
+   - Od nowelizacji z 1 października 2023 r. kara wynosi **od 5 do aż 16 lat pozbawienia wolności** (wcześniej od 2 do 12 lat).
+   - W przypadku śmierci dwóch lub więcej osób: kara **od 5 do 20 lat więzienia**!
+   - **Brak jakiejkolwiek możliwości zawieszenia wykonania kary (brak art. 69 k.k.)** – kara jest zawsze bezwzględna!
+
+---
+
+### 2. Pozostałe sankcje karne:
+- **Dożywotni zakaz prowadzenia wszelkich pojazdów mechanicznych (art. 42 § 3 k.k.)** – orzekany obligatoryjnie.
+- **Obligatoryjna konfiskata pojazdu (art. 44b k.k.)** przy stężeniu alkoholu powyżej 1,0 promila lub ucieczce.
+- **Nawiązka na rzecz pokrzywdzonych lub Funduszu Sprawiedliwości:** Od **10 000 zł do 100 000 zł**.
+
+---
+
+### 3. Finansowa katastrofa – REGRES UBEZPIECZENIOWY:
+Zgodnie z Ustawą o ubezpieczeniach obowiązkowych:
+- Ubezpieczyciel z polisy OC sprawcy wypłaci ofiarom lub ich rodzinom wszelkie zadośćuczynienia, renty wyrównawcze i koszty leczenia (często sumy rzędu 500 000 zł – 2 000 000 zł).
+- Następnie ubezpieczyciel występuje z **ROŚCZENIEM REGRESOWYM do pijanego sprawcy**.
+- Sprawca ma prawny obowiązek zwrócić ubezpieczycielowi całą kwotę co do grosza z własnego majątku osobistego (komornik na pensji i nieruchomościach do końca życia).`;
+      suggestedFollowUps = [
+        'Jak ubezpieczyciel dochodzi regresu za wypadek po pijanemu?',
+        'Czy ucieczka z miejsca wypadku zawsze oznacza traktowanie jak pijanego?',
+        'Kiedy przysługuje dozór elektroniczny (SDE) przy wyrokach komunikacyjnych?',
+      ];
+    }
+    // 0B_4. ALKOMAT, MARGINES BŁĘDU, ATEST I BADANIE KRWI (art. 5 § 2 k.p.k. i orzecznictwo SN)
+    else if (
+      !q.includes('pracy') &&
+      !q.includes('pracownik') &&
+      !q.includes('szef') &&
+      !q.includes('pracodawc') &&
+      !q.includes('zakładzie') &&
+      (q.includes('alkomat') || q.includes('dmuchan') || q.includes('badanie krwi') || q.includes('wzorcowani') || q.includes('kalibracj') || q.includes('margines błędu') || q.includes('niepewność')) &&
+      (q.includes('błąd') || q.includes('wzorcowani') || q.includes('atest') || q.includes('krwi') || q.includes('dokładnoś') || q.includes('pomiar') || q.includes('niepewność') || q.includes('wzorc'))
+    ) {
+      referencedArticles.push('Art. 5 § 2 k.p.k.', 'Art. 129i Prawa o ruchu drogowym', 'Art. 178a k.k.', 'Art. 87 k.w.');
+      referencedRulings.push('IV KK 206/21');
+      legalCategoryBadge = 'Procedura Karna & Metrologia (Weryfikacja Badania Alkomatem)';
+      actionQuery = 'Błędy pomiaru alkomatu, świadectwo wzorcowania i badanie krwi';
+      text = `**Procedura badania alkomatem, margines błędu i badanie krwi – Strategia obrony:**
+
+Wynik badania trzeźwości nie zawsze przesądza o winie. Pomiary alkomatem podlegają rygorystycznym wymogom ustawy Prawo o miarach i Kodeksu Postępowania Karnego:
+
+---
+
+### 1. Świadectwo wzorcowania (kalibracji) – Pierwszy punkt weryfikacji:
+- Każdy analizator wydechu używany przez Policję (np. Alcotest 7510, Alkometr A2.0) **MUSI posiadać aktualne świadectwo wzorcowania** wydane przez Główny Urząd Miar lub akredytowane laboratorium.
+- Ważność świadectwa wynosi **dokładnie 6 miesięcy**.
+- Badanie przeprowadzone urządzeniem z przeterminowanym choćby o 1 dzień świadectwem wzorcowania **jest nieważne i nie może stanowić dowodu w procesie karnym**!
+
+---
+
+### 2. Margines błędu urządzenia a zasada IN DUBIO PRO REO (Art. 5 § 2 k.p.k.):
+W świadectwie wzorcowania producent określa **niepewność pomiarową urządzenia** (zazwyczaj **+/- 0,01 do 0,02 mg/dm³**).
+- Zgodnie z przełomowym orzecznictwem Sądu Najwyższego (m.in. wyrok *IV KK 206/21*), jeżeli wynik pomiaru oscyluje na granicy:
+  - **Przestępstwa i wykroczenia (0,25 mg/l):** Gdy alkomat wykaże **0,26 mg/l**, po odjęciu marginesu błędu 0,02 mg/l wynik wynosi **0,24 mg/l**. Sąd ma obowiązek rozstrzygnąć tę wątpliwość na korzyść kierowcy (art. 5 § 2 k.p.k.) i zakwalifikować czyn jako **wykroczenie z art. 87 k.w., a nie przestępstwo**!
+  - **Wykroczenia i trzeźwości (0,10 mg/l):** Wynik 0,11 mg/l po odliczeniu błędu oznacza stan trzeźwości (brak jakiejkolwiek kary).
+
+---
+
+### 3. Zasada dwóch pomiarów w odstępie 15 minut:
+Funkcjonariusz ma obowiązek wykonać co najmniej dwa pomiary w odstępie ok. 15 minut. Pozwala to ustalić tzw. **krzywą alkoholową**:
+- Wynik rosnący: alkohol wciąż się wchłaniał (w chwili jazdy stężenie mogło być niższe niż w momencie dmuchania!).
+- Wynik malejący: faza eliminacji.
+
+---
+
+### 4. Prawo do żądania badania krwi:
+Kierowca ma pełne prawo zażądać badania krwi, zwłaszcza gdy:
+- Nie zgadza się ze wskazaniem alkomatu,
+- Przyjmował leki na bazie alkoholu lub płyn do płukania ust,
+- Alkomat wykazał wynik na granicy błędu.
+Krew pobiera się trzykrotnie w odstępach godzinnych. Wynik laboratoryjny z krwi ma pierwszeństwo przed alkomatem wydechowym.`;
+      suggestedFollowUps = [
+        'Jak uzyskać wgląd w świadectwo wzorcowania policyjnego alkomatu?',
+        'Co zrobić, gdy odmówiłem dmuchania i pobrano krew?',
+        'Czy płyn do płukania ust może dać fałszywy wynik na alkomacie?',
+      ];
+    }
+    // 0B_5. ALKOHOL W PRACY I KONTROLA PRACODAWCY (art. 22¹c k.p. i art. 70 § 2 k.w.)
+    else if (
+      (q.includes('pracy') || q.includes('pracownik') || q.includes('szef') || q.includes('pracodawc') || q.includes('zakładzie') || q.includes('etacie') || q.includes('dyscyplinark')) &&
+      (q.includes('alkohol') || q.includes('alkomat') || q.includes('promil') || q.includes('pijan') || q.includes('dmuchan') || q.includes('trzeźw'))
+    ) {
+      referencedArticles.push('Art. 22¹c - 22¹f Kodeksu Pracy', 'Art. 52 § 1 pkt 1 Kodeksu Pracy', 'Art. 70 § 2 Kodeksu Wykroczeń');
+      legalCategoryBadge = 'Kodeks Pracy (art. 22¹c k.p.) & Kodeks Wykroczeń';
+      actionQuery = 'Badanie trzeźwości w pracy i dyscyplinarne zwolnienie';
+      text = `**Kontrola trzeźwości pracowników i alkohol w pracy – Przepisy Kodeksu Pracy:**
+
+Od 2023 r. obowiązują znowelizowane przepisy Kodeksu Pracy (art. 22¹c – 22¹f k.p.), które precyzyjnie regulują uprawnienia szefa i prawa pracownika:
+
+---
+
+### 1. Kiedy pracodawca MOŻE zbadać pracownika alkomatem?
+Pracodawca może przeprowadzić samodzielną kontrolę trzeźwości wyłącznie, gdy spełnione są warunki:
+1. Kontrola jest niezbędna do zapewnienia **ochrony życia i zdrowia** pracowników/innych osób lub ochrony mienia.
+2. Zasady kontroli (częstotliwość, grupy pracowników, sposób badania) zostały wpisane do **regulaminu pracy, układu zbiorowego lub obwieszczenia**.
+3. Pracodawca używa alkomatu posiadającego **ważne świadectwo wzorcowania lub kalibracji**.
+4. Badanie nie może naruszać godności ani intymności pracownika.
+
+---
+
+### 2. Progi stężeń w Kodeksie Pracy:
+- **Poniżej 0,2 promila (< 0,1 mg/l):** Stan trzeźwości – pracodawca nie może wyciągać żadnych konsekwencji.
+- **Od 0,2 do 0,5 promila (0,1 – 0,25 mg/l):** Stan po użyciu alkoholu – pracodawca **ma obowiązek nie dopuścić pracownika do pracy**.
+- **Powyżej 0,5 promila (> 0,25 mg/l):** Stan nietrzeźwości – natychmiastowe odsunięcie od pracy.
+
+---
+
+### 3. Czy pracownik może ODMÓWIĆ dmuchania szefowi?
+**TAK, pracownik ma prawo odmówić dmuchania alkomatem pracodawcy!**
+- W razie odmowy pracodawca nie może użyć przymusu fizycznego.
+- Każda ze stron (zarówno szef, jak i pracownik) ma prawo zażądać **wezwania patrolu Policji** w celu przeprowadzenia profesjonalnego badania alkomatem policyjnym lub zlecenia badania krwi (art. 22¹d k.p.).
+- Jeśli badanie policji wykaże trzeźwość – koszty badania ponosi pracodawca, a pracownik zachowuje prawo do pełnego wynagrodzenia za ten dzień.
+
+---
+
+### 4. Konsekwencje prawne:
+- **Zwolnienie dyscyplinarne (art. 52 § 1 pkt 1 k.p.):** Stawienie się do pracy po alkoholu stanowi ciężkie naruszenie podstawowych obowiązków pracowniczych (zwolnienie z winy pracownika, bez okresu wypowiedzenia i odprawy).
+- **Kary porządkowe:** Nagana, upomnienie, kara pieniężna z art. 108 k.p.
+- **Wykroczenie z art. 70 § 2 k.w.:** Na stanowiskach niebezpiecznych (lekarz, operator żurawia, kierowca, pracownik wysokościowy) podjęcie pracy pod wpływem grozi aresztem do 30 dni lub grzywną do 5 000 zł.`;
+      suggestedFollowUps = [
+        'Co zrobić, gdy szef bezpodstawnie oskarża o alkohol?',
+        'Jak bronić się przed dyscyplinarką za odmowę badania alkomatem?',
+        'Czy badanie krwi w szpitalu obala zarzut pracodawcy?',
+      ];
+    }
+    // 0B_6. IZBA WYTRZEŹWIEŃ – KOSZTY, PRAWA I ZAŻALENIE (art. 40 u.w.t.p.a.)
+    else if (
+      q.includes('izb') ||
+      q.includes('wytrzeźwień') ||
+      q.includes('wytrzeźwiałk') ||
+      q.includes('opłata za izbę') ||
+      q.includes('doprowadzenie do izby')
+    ) {
+      referencedArticles.push('Art. 40 ust. 1-5 Ustawy o wychowaniu w trzeźwości (u.w.t.p.a.)');
+      legalCategoryBadge = 'Ustawa o wychowaniu w trzeźwości (art. 40 - Izba Wytrzeźwień)';
+      actionQuery = 'Pobyt w izbie wytrzeźwień, koszty i procedura zażalenia';
+      text = `**Doprowadzenie do izby wytrzeźwień – Prawa zatrzymanego, koszty i zażalenie do sądu:**
+
+Pobyt w izbie wytrzeźwień jest formą przymusowego pozbawienia wolności o charakterze administracyjnym, regulowaną przez art. 40 Ustawy o wychowaniu w trzeźwości i przeciwdziałaniu alkoholizmowi (u.w.t.p.a.).
+
+---
+
+### 1. Kiedy Policja lub Straż Miejska MOŻE zawieźć na izbę?
+Funkcjonariusze NIE MOGĄ doprowadzić człowieka tylko dlatego, że wypił alkohol! Ustawa wymaga spełnienia co najmniej jednej z przesłanek:
+1. Osoba swoim zachowaniem **daje powód do zgorszenia** w miejscu publicznym lub zakładzie pracy,
+2. Znajduje się w okolicznościach **zagrażających jej życiu lub zdrowiu** (np. leży na mrozie na przystanku),
+3. **Zagraża życiu lub zdrowiu innych osób** (np. jest agresywna).
+Jeśli osoba zachowuje się spokojnie i może wrócić do domu pod opieką trzeźwej osoby bliskiej, doprowadzenie na izbę jest bezprawne!
+
+---
+
+### 2. Czas trwania pobytu i opłaty:
+- Zatrzymany może przebywać na izbie wyłącznie do wytrzeźwienia, **nie dłużej niż 24 godziny**.
+- **Ile wynosi opłata?** Maksymalna stawka ustawowa wynosi ok. **437 zł za dobę** (dokładną stawkę ustala uchwała rady miasta). Opłata jest egzekwowana administracyjnie.
+
+---
+
+### 3. Prawa zatrzymanego w izbie:
+- Prawo do niezwłocznego **badania lekarskiego** przy przyjęciu i wypisie,
+- Prawo do żądania **zawiadomienia osoby najbliższej** lub pracodawcy o miejscu pobytu,
+- Prawo do otrzymania protokołu doprowadzenia z uzasadnieniem przyczyn zatrzymania.
+
+---
+
+### 4. Skuteczna obrona: ZAŻALENIE DO SĄDU (Art. 40 ust. 5 u.w.t.p.a.):
+Każda osoba zwolniona z izby ma prawo wnieść **zażalenie do Sądu Rejonowego w terminie 7 dni od dnia zwolnienia**:
+- Sąd bada legalność, zasadność i prawidłowość doprowadzenia oraz pobytu.
+- Jeżeli sąd uzna zatrzymanie za **bezzasadne lub nielegalne**:
+  1. Opłata za pobyt zostaje w całości uchylona (nie musisz płacić 400+ zł),
+  2. Masz otwartą drogę do pozwania Skarbu Państwa o **odszkodowanie i zadośćuczynienie za bezprawne pozbawienie wolności**!`;
+      suggestedFollowUps = [
+        'Jak napisać zażalenie do sądu na zatrzymanie w izbie wytrzeźwień?',
+        'Czy można odmówić zapłaty rachunku za izbę wytrzeźwień?',
+        'Co zrobić, jeśli pobito mnie w izbie wytrzeźwień?',
+      ];
+    }
+    // 0B_7. PŁYWANIE KAJAKIEM, ROWEREM WODNYM LUB MOTORÓWKĄ PO ALKOHOLU (art. 35 ustawy wodnej vs 178a k.k.)
+    else if (
+      (q.includes('kajak') || q.includes('rower wodny') || q.includes('łódk') || q.includes('ponton') || q.includes('żaglówk') || q.includes('motorówk') || q.includes('skuter wodny') || q.includes('ruchu wodnym') || q.includes('jezior') || q.includes('sternik')) &&
+      (q.includes('alkohol') || q.includes('piw') || q.includes('promil') || q.includes('pijan') || q.includes('trzeźw'))
+    ) {
+      referencedArticles.push('Art. 35 Ustawy o bezpieczeństwie osób przebywających na obszarach wodnych', 'Art. 178a § 1 k.k.');
+      legalCategoryBadge = 'Ustawa Wodna (art. 35) & Kodeks Karny (Ruch Wodny)';
+      actionQuery = 'Pływanie kajakiem, rowerem wodnym lub motorówką po alkoholu';
+      text = `**Alkohol nad wodą: Kajak, rower wodny, żaglówka a motorówka:**
+
+W prawie wodnym kluczowe jest rozróżnienie pomiędzy jednostkami **bez silnika (niemechanicznymi)** a jednostkami **z napędem mechanicznym (motorówki, skutery)**:
+
+---
+
+### 1. OBIEKTY NIEMECHANICZNE: Kajak, rower wodny, łódka wiosłowa, ponton bez silnika:
+Zgodnie z **art. 35 Ustawy o bezpieczeństwie osób przebywających na obszarach wodnych**:
+- Prowadzenie takiego sprzętu w stanie po użyciu alkoholu (0,2–0,5 promila) lub w stanie nietrzeźwości (>0,5 promila) to **WYKROCZENIE**.
+- **Mandat karny:** Wynosi od **100 zł do 500 zł** nakładany przez Policję Wodną.
+- **Bezpieczeństwo prawa jazdy:** **NIE TRACISZ prawa jazdy na samochód (kat. B)**! Nie idziesz do więzienia, nie masz wpisu w rejestrze karnym KRK.
+- Policja może nakazać odholowanie sprzętu do brzegu na koszt wypożyczającego.
+
+---
+
+### 2. JEDNOSTKI MECHANICZNE: Motorówka, skuter wodny, jacht na silniku:
+Tu sytuacja zmienia się diametralnie!
+- Prowadzenie motorówki lub skutera wodnego w stanie nietrzeźwości (>0,5 promila) to **PRZESTĘPSTWO z art. 178a § 1 Kodeksu Karnego** (pojazd mechaniczny w ruchu wodnym).
+- **Kary:**
+  - Pozbawienie wolności do **lat 3**,
+  - Świadczenie pieniężne min. **5 000 zł** na Fundusz Sprawiedliwości,
+  - **Zakaz prowadzenia wszelkich pojazdów mechanicznych** (w tym samochodów!),
+  - **Przepadek motorówki lub skutera wodnego (art. 44b k.k.)** przy stężeniu od 1,5 promila!`;
+      suggestedFollowUps = [
+        'Czy sternik żaglówki bez włączonego silnika odpowiada z kodeksu karnego?',
+        'Ile promili może mieć pasażer kajaka lub łódki?',
+        'Co grozi za kąpiel w jeziorze pod wpływem alkoholu?',
+      ];
+    }
+    // 0B_8. ROZPIJANIE NIELETNICH I SPRZEDAŻ ALKOHOLU BEZ DOWODU (art. 208 k.k. i art. 43 u.w.t.p.a.)
+    else if (
+      (q.includes('małoletni') || q.includes('nieletni') || q.includes('dzieck') || q.includes('nastolat') || q.includes('do lat 18') || q.includes('18 lat') || q.includes('bez dowodu') || q.includes('sprzedaż alkoholu') || q.includes('rozpijan')) &&
+      (q.includes('rozpijan') || q.includes('alkohol') || q.includes('piwo') || q.includes('koncesj') || q.includes('częstow') || q.includes('sklep'))
+    ) {
+      referencedArticles.push('Art. 208 k.k.', 'Art. 43 ust. 1-2 u.w.t.p.a.', 'Art. 18 ust. 10 u.w.t.p.a.');
+      legalCategoryBadge = 'Kodeks Karny (art. 208 k.k.) & Ustawa o wychowaniu w trzeźwości';
+      actionQuery = 'Rozpijanie małoletniego i sprzedaż alkoholu bez dowodu';
+      text = `**Rozpijanie małoletnich i sprzedaż alkoholu bez dowodu – Konsekwencje karne i utrata koncesji:**
+
+Polskie prawo chroni osoby poniżej 18. roku życia w sposób bezwzględny, nakładając sankcje zarówno na osoby prywatne, jak i sprzedawców w sklepach:
+
+---
+
+### 1. Przestępstwo rozpijania małoletniego (Art. 208 Kodeksu Karnego):
+- *„Kto rozpija małoletniego, dostarczając mu napoju alkoholowego, ułatwiając jego spożycie lub nakłaniając go do spożywania takiego napoju, podlega karze pozbawienia wolności do lat 2.”*
+- **Kto odpowiada?** Dorosły kolega kupujący piwo na prośbę 15-latków pod sklepem, rodzic regularnie pijący z nastolatkiem, starsze rodzeństwo.
+- Karane jest działanie powtarzalne lub zmierzające do wytworzenia u dziecka nawyku picia.
+
+---
+
+### 2. Sprzedaż alkoholu nieletniemu w sklepie (Art. 43 ust. 2 u.w.t.p.a.):
+- Sprzedaż piwa, wina lub wódki osobie do lat 18 jest przestępstwem z ustawy o wychowaniu w trzeźwości.
+- **Konsekwencje dla sprzedawcy/kasjera:** Grzywna sądowa, wpis do Krajowego Rejestru Karnego (KRK) oraz natychmiastowe zwolnienie dyscyplinarne z pracy (art. 52 k.p.).
+- **Konsekwencje dla właściciela sklepu (KATASTROFALNE):**
+  Zgodnie z art. 18 ust. 10 pkt 1 u.w.t.p.a. wójt/burmistrz/prezydent miasta wydaje decyzję o **OBLIGATORYJNYM COFNIĘCIU KONCESJI NA SPRZEDAŻ ALKOHOLU**.
+  O ponowne zezwolenie przedsiębiorca może ubiegać się dopiero **po upływie 3 lat**!`;
+      suggestedFollowUps = [
+        'Czy sprzedawca ma prawo zatrzymać fałszywy dowód tożsamości?',
+        'Kiedy pojedyncze kupienie piwa nieletniemu nie jest rozpijaniem z art. 208 k.k.?',
+        'Jak sklep może bronić się przed utratą koncesji za błąd kasjera?',
+      ];
+    }
+    // 0B_9. NIELEGALNA REKLAMA ALKOHOLU W MEDIACH SPOŁECZNOŚCIOWYCH (art. 45² u.w.t.p.a.)
+    else if (
+      (q.includes('reklam') || q.includes('promocj') || q.includes('influencer') || q.includes('instagram') || q.includes('tiktok') || q.includes('youtube') || q.includes('sponsorow')) &&
+      (q.includes('alkohol') || q.includes('wódk') || q.includes('piw') || q.includes('wina') || q.includes('drinki'))
+    ) {
+      referencedArticles.push('Art. 45² ust. 1 u.w.t.p.a.', 'Art. 13¹ u.w.t.p.a.');
+      legalCategoryBadge = 'Ustawa o wychowaniu w trzeźwości (art. 45² - Nielegalna Reklama)';
+      actionQuery = 'Nielegalna reklama alkoholu przez influencerów na Instagramie/TikToku';
+      text = `**Nielegalna reklama alkoholu w social mediach (Instagram, TikTok, YouTube) – Art. 45² u.w.t.p.a.:**
+
+W polskim prawie obowiązuje niemal całkowity zakaz reklamy i promocji napojów alkoholowych. Prokuratura i UOKiK aktywnie ścigają posty sponsorowane w mediach społecznościowych:
+
+---
+
+### 1. Co jest całkowicie zabronione?
+- **Alkohole mocne i wina (wódka, whisky, gin, wino, likiery):** Bezwzględny, 100% zakaz reklamy i promocji w jakiejkolwiek formie w przestrzeni publicznej i w internecie.
+- Wrzucenie na Instagram, stories, post czy film na YouTube zdjęcia butelki z oznaczeniem marki, zachęcanie do zakupu czy prezentowanie drinków w ramach współpracy komercyjnej stanowi przestępstwo!
+
+---
+
+### 2. Sankcje karne:
+Zgodnie z art. 45² ust. 1 u.w.t.p.a.:
+- Kara grzywny od **10 000 zł do aż 500 000 zł**.
+- Odpowiedzialność ponosi osobiście influencer, osoba prowadząca profil, agencja marketingowa organizująca kampanię oraz członkowie zarządu zlecającego producenta.
+- Skazanie powoduje **wpis do Krajowego Rejestru Karnego (rejestr osób skazanych za przestępstwa)**.
+- Sąd może orzec przepadek korzyści majątkowej (zwrot pełnego wynagrodzenia za kampanię).`;
+      suggestedFollowUps = [
+        'Czy reklama piwa w internecie jest legalna?',
+        'Kiedy prywatne zdjęcie z drinkiem nie stanowi nielegalnej reklamy?',
+        'Jakie wyroki zapadają w sprawach influencerów reklamujących alkohol?',
+      ];
+    }
+    // 0B_10. CZY BYCIE PIJANYM ŁAGODZI KARĘ? ZAWINIONA NIEPOCZYTALNOŚĆ (art. 31 § 3 k.k.)
+    else if (
+      (q.includes('niepoczytaln') || q.includes('urwany film') || q.includes('nie pamiętam') || q.includes('byłem pijany') || q.includes('pod wpływem alkoholu')) &&
+      (q.includes('łagodz') || q.includes('obron') || q.includes('usprawiedliw') || q.includes('art 31') || q.includes('poczytaln') || q.includes('zmniejsz') || q.includes('kar') || q.includes('win') || q.includes('odpowiedzialnoś'))
+    ) {
+      referencedArticles.push('Art. 31 § 1-3 k.k.');
+      legalCategoryBadge = 'Kodeks Karny (art. 31 § 3 k.k. - Actio libera in causa)';
+      actionQuery = 'Picie alkoholu a niepoczytalność – dlaczego alkohol nie łagodzi kary';
+      text = `**Czy bycie pijanym i „urwany film” zmniejsza odpowiedzialność karną? (Art. 31 § 3 k.k.)**
+
+**NIE! To jeden z najgroźniejszych i najbardziej kosztownych mitów prawnych!**
+W polskim procesie karnym powoływanie się na to, że sprawca „był pijany i nic nie pamięta”, z reguły tylko pogarsza jego sytuację procesową.
+
+---
+
+### 1. Kluczowa zasada: Actio libera in causa (Art. 31 § 3 k.k.):
+Zgodnie z Kodeksem Karnym:
+- Przepisów o niepoczytalności (art. 31 § 1 k.k. – brak winy) i ograniczonej poczytalności (art. 31 § 2 k.k. – złagodzenie kary) **NIE STOSUJE SIĘ**, gdy sprawca wprawił się w stan nietrzeźwości lub odurzenia, który przewidywał albo mógł przewidzieć.
+- Jeśli dorosły, poczytalny człowiek sam sięga po kieliszek lub butelkę, prawo uznaje, że ponosi **pełną, stuprocentową odpowiedzialność** za wszystko, co zrobi w stanie upojenia!
+
+---
+
+### 2. Alkohol jako okoliczność OBCIĄŻAJĄCA w sądzie:
+W polskim orzecznictwie sądowym popełnienie przestępstwa (pobicie, zniszczenie mienia, rozbój, znieważenie) w stanie upojenia alkoholowego jest traktowane jako **istotna okoliczność obciążająca** przy wymiarze kary (wskazuje na lekceważenie norm społecznych i samokontroli).
+
+---
+
+### 3. Kiedy stan nietrzeźwości MOŻE wyłączyć odpowiedzialność? (Tylko 2 wyjątki):
+1. **Podstępne odurzenie wbrew woli (tzw. pigułka gwałtu / dosypanie czegoś do napoju):** Jeżeli ktoś bez Twojej wiedzy i zgody dolał Ci substancji psychoaktywnej lub alkoholu do soku, nie było to wprawienie się zawinione.
+2. **Upojenie patologiczne (atypowe):** Niezwykle rzadkie zaburzenie psychiczne stwierdzane przez biegłych psychiatrów, gdy mikroskopijna ilość alkoholu wywołuje ostry stan psychotyczny u osoby, która wcześniej nigdy takich reakcji nie miała.`;
+      suggestedFollowUps = [
+        'Jak biegli psychiatrzy badają upojenie patologiczne?',
+        'Co zrobić, jeśli podejrzewam, że ktoś dosypał mi czegoś do drinka?',
+        'Jakie są realne okoliczności łagodzące w sprawach po alkoholu?',
+      ];
+    }
+    // 0B_11. KOLIZJA DROGOWA POD WPŁYWEM ALKOHOLU I REGRES OC (art. 86 § 2 k.w.)
+    else if (
+      (q.includes('kolizj') || q.includes('stłuczk') || q.includes('uderzyłem w auto') || q.includes('zarysowałem') || q.includes('porysowałem na parkingu') || q.includes('stłuczka po')) &&
+      (q.includes('alkohol') || q.includes('promil') || q.includes('piw') || q.includes('pijan') || q.includes('wypił') || q.includes('regres'))
+    ) {
+      referencedArticles.push('Art. 86 § 1 i § 2 k.w.', 'Art. 43 Ustawy o ubezpieczeniach obowiązkowych');
+      legalCategoryBadge = 'Kodeks Wykroczeń (art. 86 § 2 k.w.) & Prawo Ubezpieczeniowe (Regres OC)';
+      actionQuery = 'Kolizja drogowa pod wpływem alkoholu i regres od ubezpieczyciela';
+      text = `**Stłuczka i kolizja drogowa po alkoholu (Art. 86 § 2 k.w.) – Finansowa pułapka regresu ubezpieczeniowego:**
+
+Jeżeli doprowadziłeś do stłuczki, w której nikt nie odniósł obrażeń ciała trwających powyżej 7 dni, sprawa na gruncie kodeksowym jest kwalifikowana jako wykroczenie, ale grozi Ci potężny cios finansowy:
+
+---
+
+### 1. Kary z Kodeksu Wykroczeń (Art. 86 § 2 k.w.):
+- Spowodowanie zagrożenia bezpieczeństwa w ruchu drogowym w stanie po użyciu alkoholu (> 0,2 promila) lub w stanie nietrzeźwości (> 0,5 promila):
+  - **Mandat karny:** Od **3 500 zł w górę** (2 500 zł stawka bazowa + taryfikator za kolizję),
+  - **W sądzie:** Grzywna do **30 000 zł**,
+  - **Sądowy zakaz prowadzenia pojazdów:** Od 6 miesięcy do 3 lat,
+  - **15 punktów karnych**.
+- *Uwaga:* Jeżeli miałeś powyżej 0,5 promila, odpowiadasz DODATKOWO za przestępstwo z **art. 178a § 1 k.k.** (za samo prowadzenie auta!).
+
+---
+
+### 2. Finansowy dramat: REGRES UBEZPIECZENIOWY (Art. 43 Ustawy o ubezpieczeniach obowiązkowych):
+To najważniejsza informacja, o której wielu kierowców dowiaduje się za późno:
+1. **Poszkodowany otrzyma odszkodowanie:** Firma ubezpieczeniowa z Twojego OC wypłaci poszkodowanemu pełną kwotę za rozbite auto, zniszczone ogrodzenie czy skasowaną latarnię.
+2. **Ubezpieczyciel zażąda ZWROTU 100% KWOTY:** Ustawa daje ubezpieczycielowi prawo tzw. **regresu nietrzeźwościowego**. Firma ubezpieczeniowa wyśle do Ciebie wezwanie do zapłaty całej wypłaconej sumy (np. 40 000 zł, 80 000 zł, a przy drogim aucie nawet 200 000 zł).
+3. **Brak ochrony z Autocasco (AC):** Żadne AC nie wypłaci Ci ani grosza na naprawę Twojego własnego samochodu.`;
+      suggestedFollowUps = [
+        'Czy ubezpieczyciel może rozłożyć regres na raty?',
+        'Jak podważyć winę w kolizji, gdy obaj kierowcy przyczynili się do zdarzenia?',
+        'Co zrobić, gdy ubezpieczyciel żąda zawyżonej kwoty regresu?',
+      ];
+    }
+    // 0B_12. ALKOHOL NA IMPREZIE MASOWEJ (art. 56 ustawy o bezpieczeństwie imprez masowych)
+    else if (
+      (q.includes('imprez') || q.includes('mecz') || q.includes('stadion') || q.includes('koncert') || q.includes('festiwal')) &&
+      (q.includes('alkohol') || q.includes('piwo') || q.includes('wniesienie') || q.includes('wnoszenie') || q.includes('wniosłem') || q.includes('ochrona'))
+    ) {
+      referencedArticles.push('Art. 56 Ustawy o bezpieczeństwie imprez masowych');
+      legalCategoryBadge = 'Ustawa o bezpieczeństwie imprez masowych (art. 56)';
+      actionQuery = 'Wnoszenie i spożywanie alkoholu na imprezie masowej';
+      text = `**Wnoszenie lub posiadanie alkoholu na imprezie masowej (Mecz, koncert) – Art. 56 u.b.i.m.:**
+
+Wnoszenie własnego alkoholu na teren imprezy masowej (stadion piłkarski, duży koncert plenerowy, festiwal muzyczny) nie jest zwykłym wykroczeniem porządkowym, lecz czynem podlegającym zaostrzonym rygorom karnym:
+
+---
+
+### 1. Zagrożenie karą:
+Zgodnie z art. 56 Ustawy o bezpieczeństwie imprez masowych:
+- *„Kto wnosi lub posiada na imprezie masowej napoje alkoholowe, podlega karze ograniczenia wolności albo grzywny nie niższej niż 2000 zł.”*
+- **Minimalna grzywna wynosi aż 2 000 zł** (maksymalnie do 5 000 zł w postępowaniu mandatowym lub sądowym).
+- Sprawca zostaje niezwłocznie zatrzymany przez służbę porządkową (ochronę) i przekazany Policji.
+
+---
+
+### 2. Dodatkowa dolegliwość: ZAKAZ KLUBOWY I STADIONOWY:
+- Sąd może orzec **zakaz wstępu na imprezy masowe** na okres od **2 do 6 lat**.
+- W przypadku meczów piłkarskich orzeka się zakaz stadionowy połączony z obowiązkiem osobistego stawiennictwa na komendzie policji w czasie trwania meczów reprezentacji lub klubu!
+
+---
+
+### 3. Jaki alkohol jest legalny na imprezie masowej?
+- Wyłącznie napoje alkoholowe zawierające **do 3,5% alkoholu** (lekkie piwo), sprzedawane i podawane przez organizatora wyłącznie w wyznaczonych punktach gastronomicznych w kubkach plastikowych.`;
+      suggestedFollowUps = [
+        'Czym różni się impreza masowa od zwykłego koncertu w klubie?',
+        'Jak zaskarżyć zakaz stadionowy orzeczony przez sąd?',
+        'Co grozi za próbę wniesienia piwa w plecaku?',
+      ];
+    }
+    // 0C. NAGRYWANIE POLICJANTA TELEFONEM PODCZAS INTERWENCJI
+    else if (
+      (q.includes('nagryw') || q.includes('filmow') || q.includes('kamera') || q.includes('telefon')) &&
+      (q.includes('policj') || q.includes('radiowóz') || q.includes('funkcjonariusz') || q.includes('straż miejsk') || q.includes('kontrol'))
+    ) {
+      referencedArticles.push('Art. 61 Konstytucji RP', 'Art. 81 Prawa Autorskiego', 'Art. 15 Ustawy o Policji');
+      legalCategoryBadge = 'Prawa Obywatelskie & Ustawa o Policji (Nagrywanie Interwencji)';
+      text = `**Czy wolno nagrywać telefonem interweniującego policjanta lub strażnika miejskiego?**
+
+**TAK, W 100% LEGALNIE!** Masz pełne konstytucyjne prawo nagrywać każdą interwencję policyjną i kontrolę drogową.
+
+---
+
+### 1. Podstawa prawna:
+- **Zasada jawności działań organów władzy publicznej (art. 61 Konstytucji RP):** Funkcjonariusz policji wykonujący czynności służbowe w miejscu publicznym jest osobą pełniącą funkcję publiczną. Jego działania są jawne.
+- Policjant **NIE MA PRAWA** zakazać Ci nagrywania, żądać wyłączenia telefonu ani tym bardziej żądać usunięcia nagrania czy wyrywać telefonu z ręki (byłoby to przekroczenie uprawnień z art. 231 k.k.).
+
+---
+
+### 2. Warunek konieczny: Nie wolno utrudniać czynności!
+Nagrywać wolno pod jednym warunkiem: nagrywanie **nie może przeszkadzać w wykonywaniu czynności służbowych**.
+- Trzymaj bezpieczny dystans (np. 2–3 metry od policjantów),
+- Nie wtykaj obiektywu w twarz funkcjonariusza,
+- Nie wykonuj gwałtownych ruchów telefonem mogących wyglądać jak zamach.
+
+---
+
+### 3. Różnica: SAMO NAGRYWANIE a PUBLIKACJA W INTERNECIE:
+- **Nagrywanie „do szuflady” (jako dowód w sądzie / skardze):** W pełni legalne bez żadnych zgód!
+- **WrScrolling do sieci (TikTok, YouTube, Facebook):** Zgodnie z **art. 81 Ustawy o prawie autorskim**, wizerunek policjanta podlega ochronie. Aby legalnie opublikować nagranie w sieci bez jego pisemnej zgody, musisz **zamazać (zanonimizować) twarz i zmodulować głos**, chyba że policjant stanowi jedynie szczegół całości zgromadzenia publicznego.`;
+      suggestedFollowUps = [
+        'Co zrobić, gdy policjant każe wyłączyć telefon?',
+        'Czy nagranie z telefonu jest ważnym dowodem w sądzie?',
+        'Czy muszę pokazać policjantowi galerię w telefonie?',
+      ];
+    }
+    // 0D. PRZEKLINANIE I WULGARYZMY W MIEJSCU PUBLICZNYM (art. 141 k.w.)
+    else if (
+      q.includes('przeklin') ||
+      q.includes('wulgaryzm') ||
+      q.includes('brzydkie słowa') ||
+      q.includes('słowa nieprzyzwoite') ||
+      q.includes('141 kw') ||
+      q.includes('141 k.w')
+    ) {
+      referencedArticles.push('Art. 141 k.w.');
+      legalCategoryBadge = 'Kodeks Wykroczeń (art. 141 k.w. - Słowa nieprzyzwoite)';
+      actionQuery = 'Używanie słów nieprzyzwoitych w miejscu publicznym (art. 141 k.w.)';
+      text = `**Co grozi za przeklinanie w miejscu publicznym? (Art. 141 k.w.)**
+
+Zgodnie z **art. 141 Kodeksu Wykroczeń**: *„Kto w miejscu publicznym umieszcza nieprzyzwoite ogłoszenie, napis lub rysunek albo używa słów nieprzyzwoitych, podlega karze ograniczenia wolności, grzywny do 1 500 złotych albo karze nagany.”*
+
+---
+
+### 1. Wymiar kary w praktyce:
+- **Mandat karny od Policji lub Straży Miejskiej:** zazwyczaj **od 50 zł do 100 zł** (lub pouczenie).
+- **Przed Sądem Rejonowym (w razie odmowy mandatu):** grzywna od 20 do 1 500 zł lub nagana.
+- **Czysta kartoteka:** To wykroczenie porządkowe, **nie trafia do Krajowego Rejestru Karnego (KRK)**.
+
+---
+
+### 2. Kluczowe rozróżnienie: Przeklinanie ogólne vs Znieważenie policjanta!
+- Rzucenie wulgaryzmu „w przestrzeń” ze złości (np. potknięcie się, emocje) = wykroczenie z **art. 141 k.w.** (mandat 100 zł).
+- Skierowanie wulgaryzmu **bezpośrednio do policjanta** (np. „ty taki a taki”) = **PRZESTĘPSTWO z art. 226 § 1 k.k. (znieważenie funkcjonariusza publicznego na służbie)** – za co grozi grzywna, ograniczenie wolności lub **do 1 roku więzienia i wpis do KRK**!`;
+      suggestedFollowUps = [
+        'Czym różni się art. 141 k.w. od znieważenia z art. 226 k.k.?',
+        'Czy można dostać mandat za przeklinanie we własnym aucie?',
+        'Kiedy policjant może zastosować pouczenie zamiast mandatu?',
+      ];
+    }
+    // 0E. ZAŚMIECANIE MIEJSC PUBLICZNYCH / WYRZUCENIE PETA LUB BUTELKI (art. 145 k.w.)
+    else if (
+      q.includes('zaśmiec') ||
+      q.includes('wyrzucenie peta') ||
+      q.includes('niedopałek') ||
+      q.includes('butelk') && (q.includes('wyrzuc') || q.includes('rozbi')) ||
+      q.includes('śmieci') && (q.includes('las') || q.includes('ulic')) ||
+      q.includes('145 kw')
+    ) {
+      referencedArticles.push('Art. 145 k.w.', 'Art. 154 k.w.');
+      legalCategoryBadge = 'Kodeks Wykroczeń (art. 145 k.w. - Zaśmiecanie)';
+      actionQuery = 'Zaśmiecanie miejsc publicznych (art. 145 k.w.)';
+      text = `**Co grozi za zaśmiecanie miejsc publicznych (rzucenie peta, butelki, papierka)?**
+
+Od 1 września 2022 r. kary za zaśmiecanie zostały drastycznie zaostrzone!
+
+---
+
+### 1. Kwalifikacja prawna: Art. 145 Kodeksu Wykroczeń
+- **Zaśmiecanie ulicy, parku, trawnika, przystanku (art. 145 § 1 k.w.):**
+  Mandat karny wynosi **do 500 zł**, a sąd może orzec grzywnę do **5 000 zł** oraz **nakaz posprzątania terenu**.
+- **Wyrzucanie śmieci do lasu (art. 162 k.w.):**
+  Minimalna grzywna wynosi **500 zł**, a maksymalna aż **5 000 zł** plus obowiązek pokrycia kosztów utylizacji odpadów.
+
+---
+
+### 2. Czysta kartoteka:
+Zaśmiecanie to wykroczenie. Ukarany mandatem lub grzywną **pozostaje w świetle prawa osobą niekaraną (brak wpisu w KRK)**.`;
+      suggestedFollowUps = [
+        'Ile wynosi mandat za rzucenie niedopałka na chodnik?',
+        'Co grozi za wywóz śmieci do lasu?',
+        'Czy straż miejska może wystawić mandat na podstawie monitoringu?',
+      ];
+    }
+    // 0F. GAZ PIEPRZOWY, NÓŻ W KIESZENI, PAŁKA TELESKOPOWA – LEGALNOŚĆ
+    else if (
+      q.includes('gaz pieprzow') ||
+      q.includes('gaz obronn') ||
+      (q.includes('nóż') && (q.includes('kieszen') || q.includes('nosić') || q.includes('legaln') || q.includes('ulic') || q.includes('scyzoryk'))) ||
+      q.includes('pałka teleskopow') ||
+      q.includes('paralizator')
+    ) {
+      referencedArticles.push('Art. 11 Ustawy o broni i amunicji', 'Art. 50a k.w.');
+      legalCategoryBadge = 'Ustawa o broni i amunicji & Kodeks Wykroczeń';
+      text = `**Czy gaz pieprzowy, nóż w kieszeni lub pałka teleskopowa są legalne w Polsce?**
+
+---
+
+### 1. Gaz pieprzowy: W 100% LEGALNY BEZ ZEZWOLENIA!
+Zgodnie z **art. 11 pkt 8 Ustawy o broni i amunicji**, ręczne miotacze gazu obezwładniającego (gazy pieprzowe i CS) są w Polsce **całkowicie legalne i dostępne dla każdej osoby pełnoletniej bez zezwolenia i bez rejestracji**. Możesz legalnie nosić gaz w kieszeni, torebce czy plecaku w celach samoobrony.
+
+---
+
+### 2. Noszenie noża w Polsce: W 100% LEGALNE!
+Wbrew powszechnemu mitowi o „długości ostrza na 4 palce” – **w polskim prawie nie ma żadnego limitu długości ostrza!**
+- Możesz legalnie nosić przy sobie nóż składany, kuchenny, myśliwski, maczetę czy multitoól.
+- **JEDYNY WYJĄTEK (Art. 50a k.w.):** Karalne (areszt, ograniczenie wolności lub grzywna min. 3 000 zł) jest posiadanie noża, maczety lub innego niebezpiecznego przedmiotu w miejscu publicznym, **gdy okoliczności wskazują na zamiar użycia go do popełnienia przestępstwa** (np. podczas zbiegowiska pseudokibiców, awantury pod klubem).
+
+---
+
+### 3. Pałka teleskopowa i paralizator:
+- Zwykła pałka teleskopowa (baton) ze stalowych rurek jest legalna bez zezwolenia. Nielegalna bez pozwolenia jest jedynie pałka zakończona ciężkim odlewem ołowianym.
+- Paralizator o energii prądu do 10 mA jest legalny bez pozwolenia dla osób pełnoletnich.`;
+      suggestedFollowUps = [
+        'Kiedy użycie gazu pieprzowego to obrona konieczna (art. 25 k.k.)?',
+        'Czy można wejść z nożem lub gazem do sądu lub urzędu?',
+        'Co grozi za nieuzasadnione użycie gazu na ulicy?',
+      ];
+    }
+    // 0G. PRZEJŚCIE NA CZERWONYM ŚWIETLE / POZA PASAMI (art. 97 k.w.)
+    else if (
+      q.includes('czerwonym świetle') ||
+      q.includes('czerwonym swietle') ||
+      q.includes('przejście poza pasami') ||
+      q.includes('przechodzenie w niedozwolonym')
+    ) {
+      referencedArticles.push('Art. 97 k.w.', 'Art. 13-14 Prawa o ruchu drogowym');
+      legalCategoryBadge = 'Kodeks Wykroczeń (art. 97 k.w. - Ruch Pieszych)';
+      actionQuery = 'Przejście na czerwonym świetle przez pieszego (mandat z art. 97 k.w.)';
+      text = `**Co grozi pieszemu za przejście na czerwonym świetle lub poza pasami?**
+
+---
+
+### 1. Taryfikator mandatów:
+- **Wejście na przejście przy czerwonym świetle:** mandat karny wynosi dokładnie **200 zł** (od 2022 r. podniesiony ze 100 zł).
+- **Przechodzenie przez jezdnię poza pasami w miejscu niedozwolonym:** mandat **50 zł**.
+- **Korzystanie z telefonu podczas wchodzenia/przechodzenia przez jezdnię** w sposób ograniczający obserwację sytuacji: mandat **300 zł**!
+
+---
+
+### 2. Kiedy MOŻNA legalnie przejść poza pasami?
+Zgodnie z art. 13 ust. 2 Prawa o ruchu drogowym:
+Jeżeli odległość od najbliższego przejścia dla pieszych przekracza **100 metrów**, wolno przejść przez jezdnię poza przejściem, pod warunkiem ustąpienia pierwszeństwa pojazdom i pokonania jezdni prostopadle najkrótszą drogą.`;
+      suggestedFollowUps = [
+        'Kiedy wolno przejść przez ulicę poza pasami?',
+        'Czy za przejście na czerwonym dostaje się punkty karne?',
+        'Co zrobić w razie odmowy przyjęcia mandatu za pieszego?',
+      ];
+    }
+    // 0H. JAZDA BEZ BILETU (OPŁATA DODATKOWA VS SZALBIERSTWO ART. 121 K.W.)
+    else if (
+      q.includes('bez biletu') ||
+      q.includes('brak biletu') ||
+      q.includes('kanar') ||
+      q.includes('szalbierstw') ||
+      q.includes('121 kw')
+    ) {
+      referencedArticles.push('Art. 121 § 1 k.w.', 'Art. 33a Prawa Przewozowego');
+      legalCategoryBadge = 'Prawo Przewozowe & Kodeks Wykroczeń (art. 121 k.w.)';
+      text = `**Co grozi za jazdę bez biletu w autobusie, tramwaju lub pociągu?**
+
+Zwykła jazda bez biletu to **NIE PRZESTĘPSTWO I NIE WYKROCZENIE**, lecz sprawa cywilna z Prawa Przewozowego!
+
+---
+
+### 1. Standardowy przypadek – Wezwanie do zapłaty (tzw. "mandat od kanara"):
+- Kontroler wystawia **opłatę dodatkową** (zazwyczaj od 150 do 350 zł w zależności od miasta) + cenę biletu.
+- Jest to roszczenie cywilnoprawne. Nie grozi za to areszt, policja ani wpis do KRK.
+- Jeśli zapłacisz w ciągu 7 dni, opłata jest często obniżana o 30–50%.
+
+---
+
+### 2. Kiedy jazda bez biletu staje się WYKROCZENIEM? (Art. 121 § 1 k.w. - Szalbierstwo):
+Jeżeli pasażer **po raz trzeci w ciągu roku** jedzie bez biletu i nie uiszcza nałożonych opłat w terminie:
+- Popełnia wykroczenie **szalbierstwa (art. 121 § 1 k.w.)**.
+- Grozi za to kara **aresztu, ograniczenia wolności albo grzywny do 5 000 zł**.
+- Przewoźnik kieruje wówczas oficjalne zawiadomienie na policję.`;
+      suggestedFollowUps = [
+        'Czy kontroler biletów ma prawo mnie przytrzymać?',
+        'Kiedy przedawnia się opłata za jazdę bez biletu?',
+        'Jak odwołać się od opłaty za brak biletu, gdy bilet był kupiony w aplikacji?',
+      ];
+    }
+    // 0I. NIESPŁACONE KREDYTY, CHWILÓWKI, KOMORNIK – ZAKAZ WIĘZIENIA ZA DŁUGI
+    else if (
+      (q.includes('dług') || q.includes('kredyt') || q.includes('chwilówk') || q.includes('pożyczk')) &&
+      (q.includes('więzien') || q.includes('kara') || q.includes('grozi') || q.includes('policj') || q.includes('komornik') || q.includes('spłat'))
+    ) {
+      referencedArticles.push('Art. 1 Protokołu nr 4 EKPC', 'Art. 286 k.k.', 'Art. 300 k.k.');
+      legalCategoryBadge = 'Prawo Cywilne & Kodeks Karny (Ochrona przed długami)';
+      text = `**Czy można iść do więzienia za niespłacone długi, kredyty lub chwilówki?**
+
+**NIE! W Polsce NIE MA kary więzienia za same długi!**
+
+Zgodnie z **art. 1 Protokołu nr 4 do Europejskiej Konwencji Praw Człowieka**: *Nikt nie może być pozbawiony wolności jedynie z powodu niemożności wykonania zobowiązania umownego*.
+
+---
+
+### 1. Sprawa cywilna a nie karna:
+Niespłacenie pożyczki, raty kredytu czy rachunku to wyłącznie sprawa cywilna:
+- Wierzyciel może złożyć pozew do e-Sądu w Lublinie (EPU) lub sądu rejonowego,
+- Po uzyskaniu nakazu zapłaty sprawa może trafić do komornika sądowego (zajęcie pensji, konta bankowego).
+- **Komornik to nie policja!** Komornik nie zamyka w więzieniu.
+
+---
+
+### 2. KIEDY DŁUG STAJE SIĘ PRZESTĘPSTWEM?
+Prawo karne wkracza tylko w dwóch szczególnych przypadkach:
+1. **Oszustwo kredytowe (art. 286 § 1 k.k. / art. 297 k.k.):** Jeżeli biorąc pożyczkę, posłużyłeś się sfałszowanym zaświadczeniem o zarobkach, cudzymi danymi lub od samego początku miałeś udowodniony zamiar niespłacenia ani jednej raty (wyłudzenie).
+2. **Ukrywanie majątku przed komornikiem (art. 300 k.k.):** Przepisanie domu lub auta na żonę/dzieci po otrzymaniu nakazu zapłaty w celu udaremnienia egzekucji komorniczej.`;
+      suggestedFollowUps = [
+        'Co zrobić, gdy komornik zajął konto bankowe?',
+        'Jak działa upadłość konsumencka i umorzenie długów?',
+        'Kiedy sprawa pożyczki przedawnia się w sądzie cywilnym?',
+      ];
+    }
+    // 0J. PALENIE PAPIEROSÓW NA PRZYSTANKU LUB PERONIE (Ustawa tytoniowa)
+    else if (
+      (q.includes('palenie') || q.includes('papieros') || q.includes('e-papieros') || q.includes('vape')) &&
+      (q.includes('przystank') || q.includes('peron') || q.includes('dworc') || q.includes('zakaz palenia') || q.includes('mandat'))
+    ) {
+      referencedArticles.push('Art. 13 ust. 1 Ustawy o ochronie zdrowia przed następstwami używania tytoniu');
+      legalCategoryBadge = 'Ustawa tytoniowa (art. 13 - Zakaz palenia)';
+      text = `**Co grozi za palenie papierosów lub e-papierosów na przystanku lub peronie?**
+
+---
+
+### 1. Zagrożenie karą:
+Zgodnie z **art. 13 ust. 1 Ustawy o ochronie zdrowia przed następstwami używania tytoniu**:
+- Obowiązuje bezwzględny zakaz palenia wyrobów tytoniowych oraz **nowatorskich wyrobów tytoniowych i papierosów elektronicznych (e-papierosów/vape)** na:
+  - Przystankach komunikacji publicznej (w całej wiacie przystankowej oraz w obrębie wyznaczonej strefy przystanku),
+  - Peronach kolejowych,
+  - Terenach placów zabaw dla dzieci,
+  - Terenach szkół, szpitali i obiektów sportowych.
+- **Wysokość mandatu:** Policja lub Straż Miejska może nałożyć mandat karny w wysokości **do 500 zł**.
+
+---
+
+### 2. Czysta kartoteka:
+Jest to wykroczenie porządkowe. Mandat **nie trafia do rejestru skazanych KRK**.`;
+      suggestedFollowUps = [
+        'Jaki jest zasięg strefy przystanku objętej zakazem palenia?',
+        'Czy zakaz obejmuje również beznikotynowe e-papierosy?',
+      ];
+    }
+    // 1. ZAKŁÓCANIE CISZY NOCNEJ / SPOCZYNKU NOCNEGO (art. 51 k.w. vs art. 190a k.k. / art. 191 § 1a k.k.)
+    else if (
       q.includes('cisz') ||
       q.includes('nocn') ||
       q.includes('spoczynk') ||
@@ -1553,154 +2747,84 @@ Dozór elektroniczny pozwala odbywać karę z nadajnikiem (tzw. "opaską") w mie
    - Dodatkowe 24 godziny (łącznie max. 72 godziny), jeżeli prokurator skieruje do sądu wniosek o tymczasowe aresztowanie.
 5. **Prawo do bezpłatnego tłumacza i pomocy medycznej.**`;
       suggestedFollowUps = ['Co mówić podczas pierwszego przesłuchania?', 'Jak złożyć zażalenie na zatrzymanie?', 'Kiedy sąd orzeka tymczasowy areszt?'];
-    } else if (
-      q.includes('co mi grozi') ||
-      q.includes('co grozi') ||
-      q.includes('ile grozi') ||
-      q.includes('jaka kara') ||
-      q.includes('kara za') ||
-      q.includes('art') ||
-      q.includes('kradzież') ||
-      q.includes('alkohol') ||
-      q.includes('bójk') ||
-      q.includes('oszust') ||
-      q.includes('blik') ||
-      q.includes('aliment')
-    ) {
-      // DYNAMICZNY SILNIK ANALIZY DLA KAŻDEGO ZAPYTANIA O KARĘ
-      const analysis = this.analyzeSituation(userPrompt);
-      const mainArt = analysis.matchedArticles[0];
-      const codeType = mainArt.codePrefix || 'k.k.';
-      legalCategoryBadge = `${codeType === 'k.w.' ? 'Kodeks Wykroczeń' : codeType === 'UoPN' ? 'Ustawa Narkotykowa' : 'Kodeks Karny'} (${mainArt.title})`;
-      actionQuery = userPrompt;
-
-      for (const a of analysis.matchedArticles) {
-        referencedArticles.push(`Art. ${a.number}${a.suffix || ''} ${a.codePrefix || 'k.k.'}`);
-      }
-      for (const r of analysis.similarRulings.slice(0, 2)) {
-        referencedRulings.push(r.signature);
-      }
-
-      const riskColorBadge =
-        analysis.riskLevel === 'bardzo wysoki'
-          ? '🔴 BARDZO WYSOKIE'
-          : analysis.riskLevel === 'wysoki'
-            ? '🟠 WYSOKIE'
-            : analysis.riskLevel === 'średni'
-              ? '🟡 ŚREDNIE'
-              : '🟢 NISKIE';
-
-      text = `**Analiza kwalifikacji prawno-karnej: „${userPrompt}”**
-
-- **Poziom ryzyka prawnego:** ${riskColorBadge}
-- **Podstawa prawna:** ${analysis.matchedArticles.map((a) => `**Art. ${a.number}${a.suffix || ''} ${a.codePrefix || 'k.k.'}** – *${a.title}*`).join(', ')}
-
----
-
-### 1. Zagrożenie ustawowe i realne sankcje:
-- **Ustawowy wymiar kary:** ${analysis.primarySentenceRange}
-${analysis.possibleSanctions.map((s) => `- ${s}`).join('\n')}
-
----
-
-### 2. Kluczowe środki i obostrzenia:
-${analysis.mandatoryMeasures.map((m) => `⚠️ ${m}`).join('\n\n')}
-
----
-
-### 3. Czynniki łagodzące (argumenty obrony):
-${analysis.mitigatingFactors.map((f) => `✔️ ${f}`).join('\n')}
-
----
-
-### 4. Czynniki zaostrzające (ryzyka oskarżenia):
-${analysis.aggravatingFactors.map((f) => `❌ ${f}`).join('\n')}
-
----
-
-### 5. Rekomendowane działania:
-${analysis.recommendedSteps.map((step, idx) => `${idx + 1}. ${step}`).join('\n')}
-
-*Wskazówka:* Możesz przejść do zakładki **Kalkulator Zagrożenia**, aby wyeksportować pełną pisemną opinię prawną do pliku PDF.`;
-
-      suggestedFollowUps = [
-        'Jak uzyskać warunkowe umorzenie w tej sprawie?',
-        'Co mówić na pierwszym przesłuchaniu na policji?',
-        'Czy sprawa trafi do rejestru skazanych KRK?',
-      ];
     } else {
-      // DYNAMICZNY SILNIK ANALIZY DLA WSZYSTKICH INNYCH ZAPYTAŃ ZWIĄZANYCH Z PRZEPISAMI I CZYNAMI
-      const fallbackAnalysis = this.analyzeSituation(userPrompt);
-      if (fallbackAnalysis.matchedArticles.length > 0) {
-        const mainArt = fallbackAnalysis.matchedArticles[0];
+      // DYNAMICZNY SILNIK ANALIZY DLA WSZYSTKICH POZOSTAŁYCH ZAPYTAŃ PRAWNYCH
+      const analysis = this.analyzeSituation(userPrompt);
+      if (analysis.matchedArticles && analysis.matchedArticles.length > 0) {
+        const mainArt = analysis.matchedArticles[0];
         const codeType = mainArt.codePrefix || 'k.k.';
-        legalCategoryBadge = `${codeType === 'k.w.' ? 'Kodeks Wykroczeń' : codeType === 'UoPN' ? 'Ustawa Narkotykowa' : 'Kodeks Karny'} (${mainArt.title})`;
+        legalCategoryBadge = `${codeType === 'k.w.' ? 'Kodeks Wykroczeń' : codeType === 'UoPN' ? 'Ustawa Narkotykowa' : codeType === 'u.w.t.p.a.' ? 'Ustawa o wychowaniu w trzeźwości' : 'Kodeks Karny'} (${mainArt.title})`;
         actionQuery = userPrompt;
 
-        for (const a of fallbackAnalysis.matchedArticles) {
+        for (const a of analysis.matchedArticles) {
           referencedArticles.push(`Art. ${a.number}${a.suffix || ''} ${a.codePrefix || 'k.k.'}`);
         }
-        for (const r of fallbackAnalysis.similarRulings.slice(0, 2)) {
+        for (const r of analysis.similarRulings.slice(0, 2)) {
           referencedRulings.push(r.signature);
         }
 
         const riskColorBadge =
-          fallbackAnalysis.riskLevel === 'bardzo wysoki'
+          analysis.riskLevel === 'bardzo wysoki'
             ? '🔴 BARDZO WYSOKIE'
-            : fallbackAnalysis.riskLevel === 'wysoki'
+            : analysis.riskLevel === 'wysoki'
               ? '🟠 WYSOKIE'
-              : fallbackAnalysis.riskLevel === 'średni'
+              : analysis.riskLevel === 'średni'
                 ? '🟡 ŚREDNIE'
                 : '🟢 NISKIE';
 
-        text = `**Analiza prawno-karna zagadnienia: „${userPrompt}”**
+        text = `W Twojej sprawie dotyczącej: **„${userPrompt}”** przygotowałem analizę prawno-karną.
 
-- **Ocena ryzyka:** ${riskColorBadge}
-- **Podstawa prawna:** ${fallbackAnalysis.matchedArticles.map((a) => `**Art. ${a.number}${a.suffix || ''} ${a.codePrefix || 'k.k.'}** – *${a.title}*`).join(', ')}
+Oto najważniejsze wnioski w świetle polskich przepisów i aktualnej praktyki sądowej:
 
----
+📌 **1. Kwalifikacja prawna i zagrożenie ustawowe:**
+- **Podstawa prawna:** ${analysis.matchedArticles.map((a) => `**Art. ${a.number}${a.suffix || ''} ${a.codePrefix || 'k.k.'}** – *${a.title}*`).join(', ')}
+- **Ustawowy wymiar kary:** ${analysis.primarySentenceRange}
+- **Poziom ryzyka prawnego:** ${riskColorBadge}
 
-### 1. Zagrożenie ustawowe i charakterystyka czynu:
-- **Wymiar kary:** ${fallbackAnalysis.primarySentenceRange}
-- **Komentarz:** ${fallbackAnalysis.plainExplanation}
-${fallbackAnalysis.possibleSanctions.map((s) => `- ${s}`).join('\n')}
-
----
-
-### 2. Kluczowe środki i okoliczności:
-${fallbackAnalysis.mandatoryMeasures.length > 0 ? fallbackAnalysis.mandatoryMeasures.map((m) => `⚠️ ${m}`).join('\n\n') : 'Brak obligatoryjnych środków o zaostrzonym rygorze.'}
+${analysis.plainExplanation}
 
 ---
 
-### 3. Okoliczności łagodzące (argumentacja obrończa):
-${fallbackAnalysis.mitigatingFactors.map((f) => `✔️ ${f}`).join('\n')}
+⚖️ **2. Realne sankcje orzekane w praktyce sądowej:**
+${analysis.possibleSanctions.map((s) => `- ${s}`).join('\n')}
 
 ---
 
-### 4. Zalecana strategia postępowania:
-${fallbackAnalysis.recommendedSteps.map((step, idx) => `${idx + 1}. ${step}`).join('\n')}`;
+⚠️ **3. Kluczowe środki i obostrzenia:**
+${analysis.mandatoryMeasures.length > 0 ? analysis.mandatoryMeasures.map((m) => `• ${m}`).join('\n\n') : 'Brak obligatoryjnych środków o zaostrzonym rygorze.'}
+
+---
+
+🛡️ **4. Okoliczności łagodzące (jak budować linię obrony):**
+${analysis.mitigatingFactors.map((f) => `✔️ ${f}`).join('\n')}
+
+---
+
+💡 **5. Rekomendowane działania krok po kroku:**
+${analysis.recommendedSteps.map((step, idx) => `${idx + 1}. ${step}`).join('\n')}`;
 
         suggestedFollowUps = [
-          'Jakie dowody przedstawić na swoją korzyść?',
-          'Czy w tej sprawie przysługuje warunkowe umorzenie?',
-          'Jakie są koszty postępowania sądowego?',
-          'Co mówić podczas przesłuchania na policji?',
+          'Jak uzyskać warunkowe umorzenie w tej sprawie?',
+          'Co mówić na pierwszym przesłuchaniu na policji?',
+          'Czy sprawa trafi do rejestru skazanych KRK?',
+          'Jakie dowody zabezpieczyć na swoją korzyść?',
         ];
       } else {
-        // Domyślna odpowiedź doradcy prawnego Prawnik z Łuczniczej
-        text = `Jestem **Prawnik z Łuczniczej** – Twoim asystentem prawa karnego. Działam w 100% lokalnie i bezpiecznie na Twoim urządzeniu, gwarantując pełną poufność danych.
+        // Gdy zapytanie nie zawiera znamion przestępstwa ani wykroczenia w bazie
+        text = `Przeanalizowałem Twoje zapytanie: **„${userPrompt}”**.
 
-Mogę pomóc Ci w:
-- **Analizie "Co mi grozi?"**: Wpisz sytuację życiową (np. *jazda po 2 piwach*, *kradzież w markecie*, *płatność znalezioną kartą*, *podrobienie podpisu*), a przedstawię sankcje, przepisy i linię obrony.
-- **Wyjaśnianiu trudnych pojęć prostym językiem**: recydywa, obrona konieczna, warunkowe umorzenie, dozór elektroniczny (SDE), zatarcie skazania.
-- **Wyszukiwaniu orzecznictwa Sądu Najwyższego**: tezy, sygnatury i precedensy.
-- **Sprawdzaniu zmian przepisów**: m.in. konfiskata aut od 2024 r., próg 800 zł przy kradzieży.
+W podanym opisie nie zidentyfikowałem bezpośrednich znamion czynu zabronionego ani przestępstwa z Kodeksu Karnego.
 
-W czym konkretnie mogę pomóc w Twojej sprawie?`;
+W polskim prawie karnym obowiązuje fundamentalna zasada **nullum crimen sine lege** (nie ma przestępstwa bez wyraźnego przepisu ustawy). Odpowiedzialność karna zależy od konkretnych okoliczności faktycznych:
+- Jeżeli sprawa dotyczy **sporu o pieniądze, pożyczkę, rozliczenie umowy lub niewypłacone wynagrodzenie** – jest to sprawa cywilna lub pracownicza, a nie karna (brak kary więzienia).
+- Jeżeli sprawa dotyczy **drobnego incydentu miejskiego lub sąsiedzkiego** – może stanowić wykroczenie zagrożone mandatem (bez wpisu do rejestru skazanych).
+- Jeżeli chodzi o **czyn karalny** – istotne są szczegóły: kwota ewentualnej szkody, użycie gróźb lub przemocy oraz czy interweniowała policja.
+
+Opisz swoją sytuację nieco szerzej lub wybierz jedno z sugerowanych pytań poniżej, a chętnie przedstawię dokładne przepisy i możliwe kroki obronne!`;
         suggestedFollowUps = [
-          'Co grozi za jazdę po alkoholu?',
-          'Co to jest wypadek mniejszej wagi?',
-          'Jakie są prawa osoby zatrzymanej?',
+          'Co grozi za picie piwa w parku?',
+          'Nowy próg kradzieży 800 zł (art. 119 k.w. vs 278 k.k.)',
+          'Prawa osoby zatrzymanej przez policję',
           'Kiedy sąd może zawiesić wykonanie kary?',
         ];
       }

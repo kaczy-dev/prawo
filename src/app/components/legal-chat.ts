@@ -497,13 +497,14 @@ export class LegalChat {
         ];
       default:
         return [
+          'Ile grozi za picie piwa w parku?',
+          'Jazda rowerem po piwie (jaki mandat?)',
+          'Czy wolno nagrywać policjanta telefonem?',
           'Co mi grozi za zakłócanie ciszy nocnej?',
           'Jazda bez uprawnień (art. 94 k.w.)',
           'Posiadanie marihuany na własny użytek',
-          'Hejt w internecie i opinie google (art. 212 k.k.)',
-          'Porysowanie auta na parkingu (art. 288 k.k.)',
-          'Jazda po 2 piwach (konfiskata auta)',
-          'Płatność cudzą kartą zbliżeniową',
+          'Nowy próg kradzieży 800 zł (art. 119 k.w.)',
+          'Jazda autem po 2 piwach (konfiskata auta)',
         ];
     }
   });
