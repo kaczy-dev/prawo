@@ -115,4 +115,79 @@ describe('PrawnBotAiService', () => {
     expect(has44b).toBe(true);
     expect(has178a).toBe(true);
   });
+
+  it('should explain samowola budowlana, 50 000 zl fee and 30 days deadline under art. 48 and 90 Pr. bud.', () => {
+    const query = 'co mi grozi za samowolę budowlaną i jak ją zalegalizować?';
+    const response = service.generateChatResponse(query, 'citizen');
+
+    expect(response.text).toContain('90');
+    expect(response.text).toContain('50 000 zł');
+    expect(response.text).toContain('30 dni');
+    expect(response.text).toContain('rozbiórk');
+  });
+
+  it('should explain simplified 20-year legalisation without fees under art. 49f Pr. bud.', () => {
+    const query = 'jak działa darmowa legalizacja po 20 latach dla starej samowoli budowlanej?';
+    const response = service.generateChatResponse(query, 'citizen');
+
+    expect(response.text).toContain('49f');
+    expect(response.text).toContain('0 ZŁ');
+    expect(response.text).toContain('20 lat');
+  });
+
+  it('should explain moving in without occupancy permit (zamieszkanie bez odbioru) and 60-day warning', () => {
+    const query = 'co grozi za zamieszkanie w domu bez odbioru i jakie są kary PINB?';
+    const response = service.generateChatResponse(query, 'citizen');
+
+    expect(response.text).toContain('93');
+    expect(response.text).toContain('10 000 zł');
+    expect(response.text).toContain('60 dni');
+    expect(response.text).toContain('ŻÓŁTEJ KARTKI');
+  });
+
+  it('should explain distance from boundary lines (4m with windows, 3m blind wall)', () => {
+    const query = 'ile metrów od granicy działki sąsiada mogę postawić ścianę z oknem?';
+    const response = service.generateChatResponse(query, 'citizen');
+
+    expect(response.text).toContain('4 METRY');
+    expect(response.text).toContain('3 METRY');
+    expect(response.text).toContain('okna');
+  });
+
+  it('should explain 70m2 houses and fence height rules without permit under art. 29 Pr. bud.', () => {
+    const query = 'do jakiej wysokości ogrodzenie nie wymaga zgłoszenia i jak postawić dom do 70m2?';
+    const response = service.generateChatResponse(query, 'citizen');
+
+    expect(response.text).toContain('70 m²');
+    expect(response.text).toContain('2,20 m');
+    expect(response.text).toContain('kierownika budowy');
+  });
+
+  it('should explain site manager safety liability under art. 220 kk for accidents on construction site', () => {
+    const query = 'jaka jest odpowiedzialność kierownika budowy za wypadek pracownika i upadek z rusztowania?';
+    const response = service.generateChatResponse(query, 'citizen');
+
+    expect(response.text).toContain('220');
+    expect(response.text).toContain('kierownik budowy');
+    expect(response.text).toContain('BHP');
+  });
+
+  it('should explain disaster risk and demolishing load-bearing walls under art. 163 and 164 kk', () => {
+    const query = 'co grozi za samowolne wyburzenie ściany nośnej w bloku mieszkalnym?';
+    const response = service.generateChatResponse(query, 'citizen');
+
+    expect(response.text).toContain('164');
+    expect(response.text).toContain('ściany nośnej');
+  });
+
+  it('should accurately analyze situation for construction unauthorized work in analyzeSituation', () => {
+    const analysis = service.analyzeSituation('postawiłem garaż i dom bez pozwolenia na budowę, czy grozi nakaz rozbiórki?');
+    const hasArt90 = analysis.matchedArticles.some((a) => a.id === 'art-90-pr-bud');
+    const hasArt48 = analysis.matchedArticles.some((a) => a.id === 'art-48-pr-bud');
+
+    expect(hasArt90).toBe(true);
+    expect(hasArt48).toBe(true);
+    expect(analysis.primarySentenceRange).toContain('90 Pr. bud.');
+    expect(analysis.possibleSanctions.some((s) => s.includes('50 000 zł'))).toBe(true);
+  });
 });

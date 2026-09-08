@@ -479,6 +479,9 @@ export class LegalChat {
     switch (this.selectedPersona()) {
       case 'counsel':
         return [
+          'Obrona przed nakazem rozbiórki (art. 48 Pr. bud.)',
+          'Uproszczona legalizacja po 20 latach (art. 49f Pr. bud.)',
+          'Odpowiedzialność kierownika budowy z art. 220 k.k.',
           'Zarzuty apelacyjne z art. 438 k.p.k.',
           'Wniosek o umorzenie przed rozprawą (art. 339 k.p.k.)',
           'Legalność przeszukania i art. 168a k.p.k.',
@@ -488,6 +491,7 @@ export class LegalChat {
         ];
       case 'interrogator':
         return [
+          'Przesłuchanie PINB w sprawie samowoli budowlanej',
           'Co mówić na pierwszym przesłuchaniu?',
           'Policja wzywa mnie na świadka, a podejrzewa o czyn',
           'Czy odmowa odpowiedzi na pytania pogorszy moją sytuację?',
@@ -497,6 +501,9 @@ export class LegalChat {
         ];
       default:
         return [
+          'Samowola budowlana i jak ją zalegalizować',
+          'Zamieszkanie bez odbioru (kara PINB)',
+          'Odległość budynku od granicy działki',
           'Ile grozi za picie piwa w parku?',
           'Jazda rowerem po piwie (jaki mandat?)',
           'Czy wolno nagrywać policjanta telefonem?',

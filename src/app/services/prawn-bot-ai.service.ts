@@ -204,6 +204,102 @@ export class PrawnBotAiService {
     const isPropertyDamage = testQ.includes('zniszcz') || testQ.includes('uszkodz') || testQ.includes('porysow') || testQ.includes('dewast') || testQ.includes('wybicie szyb') || testQ.includes('graffiti') || testQ.includes('288') || testQ.includes('124 kw');
     const isCourtBanViolation = testQ.includes('złamanie zakazu') || testQ.includes('zakaz sądowy') || testQ.includes('pomimo zakazu') || testQ.includes('wbrew zakazowi') || testQ.includes('244');
 
+    // M. Prawo budowlane - samowola budowlana (art. 90, 48, 49f Pr. bud.)
+    const isBuildingUnauthorized =
+      !testQ.includes('ściany nośnej') &&
+      !testQ.includes('sciany nosnej') &&
+      !testQ.includes('katastrof') &&
+      !testQ.includes('zawalenie') &&
+      (
+        testQ.includes('samowol') ||
+        testQ.includes('budowa bez pozwolenia') ||
+        testQ.includes('budowa bez zgłoszenia') ||
+        testQ.includes('nielegalna budowa') ||
+        testQ.includes('dobudówk') ||
+        testQ.includes('rozbudowa bez') ||
+        (testQ.includes('legalizacj') && (testQ.includes('budow') || testQ.includes('dom') || testQ.includes('garaż') || testQ.includes('samowol') || testQ.includes('pinb'))) ||
+        testQ.includes('opłata legalizacyjna') ||
+        testQ.includes('nakaz rozbiórki') ||
+        testQ.includes('90 pr bud') ||
+        testQ.includes('90 prawo budowlane') ||
+        (testQ.includes('art 90') && testQ.includes('budow')) ||
+        (testQ.includes('garaż') && testQ.includes('bez pozwolenia')) ||
+        testQ.includes('uproszczona legalizacja') ||
+        testQ.includes('legalizacja po 20 latach') ||
+        testQ.includes('49f')
+      );
+
+    // N. Prawo budowlane - złamanie nakazu wstrzymania robót (art. 91 Pr. bud.)
+    const isBuildingHaltViolation =
+      (testQ.includes('wstrzymani') && (testQ.includes('budow') || testQ.includes('robót') || testQ.includes('pinb'))) ||
+      testQ.includes('91 pr bud') ||
+      testQ.includes('kontynuowanie robót') ||
+      testQ.includes('dalsza budowa mimo wstrzymania');
+
+    // O. Prawo budowlane - zły stan techniczny / odśnieżanie dachu (art. 91a Pr. bud.)
+    const isBuildingMaintenanceNeglect =
+      (testQ.includes('odśnieżan') && (testQ.includes('dach') || testQ.includes('hali') || testQ.includes('budynku'))) ||
+      (testQ.includes('utrzymani') && testQ.includes('budynku')) ||
+      testQ.includes('91a') ||
+      (testQ.includes('zarządc') && testQ.includes('katastrof')) ||
+      testQ.includes('zły stan techniczny budynku');
+
+    // P. Prawo budowlane - wykroczenia wykonawcze / odstępstwa (art. 92 Pr. bud.)
+    const isBuildingMisdemeanor =
+      testQ.includes('odstąpienie od projektu') ||
+      testQ.includes('istotne odstąpienie') ||
+      testQ.includes('zmiana sposobu użytkowania') ||
+      (testQ.includes('kierownik budowy') && (testQ.includes('bez uprawnień') || testQ.includes('brak uprawnień'))) ||
+      testQ.includes('92 pr bud');
+
+    // Q. Prawo budowlane - zamieszkanie bez odbioru / brak KOB (art. 93 Pr. bud. & art. 59f)
+    const isBuildingIllegalOccupancy =
+      ((testQ.includes('zamieszkani') || testQ.includes('mieszkan') || testQ.includes('użytkowan') || testQ.includes('wprowadzen') || testQ.includes('odbiór') || testQ.includes('odbior')) &&
+       (testQ.includes('bez odbioru') || testQ.includes('bez pozwolenia na użytkowanie') || testQ.includes('bez zgłoszenia zakończenia'))) ||
+      testQ.includes('nielegalne użytkowanie') ||
+      testQ.includes('kara za brak odbioru') ||
+      testQ.includes('książka obiektu') ||
+      testQ.includes('c-kob') ||
+      testQ.includes('93 pr bud');
+
+    // R. Katastrofa budowlana i wyburzenie ściany nośnej (art. 163 § 1 pkt 2 & art. 164 k.k.)
+    const isBuildingDisaster =
+      (testQ.includes('katastrof') && (testQ.includes('budow') || testQ.includes('ściany') || testQ.includes('dachu') || testQ.includes('hali'))) ||
+      (testQ.includes('zawalenie') && (testQ.includes('budowl') || testQ.includes('dom') || testQ.includes('kamienic') || testQ.includes('dach') || testQ.includes('ścian'))) ||
+      (testQ.includes('runięcie') && testQ.includes('budyn')) ||
+      (testQ.includes('wyburzenie') && (testQ.includes('ściany nośnej') || testQ.includes('sciany nosnej') || testQ.includes('konstrukcj'))) ||
+      testQ.includes('ściana nośna') ||
+      testQ.includes('ściany nośnej') ||
+      (testQ.includes('163') && testQ.includes('budow')) ||
+      (testQ.includes('164') && testQ.includes('budow'));
+
+    // S. Wypadek na budowie i BHP (art. 220 k.k.)
+    const isBuildingSafetyAccident =
+      (testQ.includes('wypadek na budowie') || (testQ.includes('budow') && (testQ.includes('rusztowani') || testQ.includes('wykop') || testQ.includes('upadek z dachu') || testQ.includes('szelki') || testQ.includes('kask')))) ||
+      (testQ.includes('kierownik budowy') && (testQ.includes('wypadek') || testQ.includes('śmierć pracownika') || testQ.includes('bhp') || testQ.includes('odpowiedzialność za pracownika'))) ||
+      testQ.includes('220 kk');
+
+    // T. Domy do 70 m², wiaty, altany, ogrodzenia (art. 29 Pr. bud.)
+    const isBuildingExemptions70m =
+      testQ.includes('70 m') ||
+      testQ.includes('70m2') ||
+      testQ.includes('dom bez pozwolenia') ||
+      testQ.includes('wysokość ogrodzenia') ||
+      testQ.includes('płot bez zgłoszenia') ||
+      (testQ.includes('ogrodzeni') && testQ.includes('2.20')) ||
+      (testQ.includes('wiata') && testQ.includes('bez pozwolenia')) ||
+      (testQ.includes('altana') && testQ.includes('działkow'));
+
+    // U. Odległości od granicy działki (4 m / 3 m / okno)
+    const isBuildingDistanceBoundary =
+      testQ.includes('odległość od granicy') ||
+      testQ.includes('ile metrów od granicy') ||
+      testQ.includes('okno od sąsiada') ||
+      testQ.includes('ściana z oknem') ||
+      testQ.includes('w granicy działki') ||
+      testQ.includes('4 metry od granicy') ||
+      testQ.includes('3 metry od granicy');
+
     // Dopasowanie artykułów
     if (isPublicDrinking) {
       const art = allArticles.find((a) => a.id === 'art-43-1-uwtpa');
@@ -397,6 +493,44 @@ export class PrawnBotAiService {
     }
     if (isConditionalDischarge) {
       const art = allArticles.find((a) => a.id === 'art-66');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isBuildingUnauthorized) {
+      const art1 = allArticles.find((a) => a.id === 'art-90-pr-bud');
+      const art2 = allArticles.find((a) => a.id === 'art-48-pr-bud');
+      const art3 = allArticles.find((a) => a.id === 'art-49f-pr-bud');
+      if (art1 && !matchedArticles.includes(art1)) matchedArticles.push(art1);
+      if (art2 && !matchedArticles.includes(art2)) matchedArticles.push(art2);
+      if (art3 && !matchedArticles.includes(art3)) matchedArticles.push(art3);
+    }
+    if (isBuildingHaltViolation) {
+      const art = allArticles.find((a) => a.id === 'art-91-pr-bud');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isBuildingMaintenanceNeglect) {
+      const art = allArticles.find((a) => a.id === 'art-91a-pr-bud');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isBuildingMisdemeanor) {
+      const art = allArticles.find((a) => a.id === 'art-92-pr-bud');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isBuildingIllegalOccupancy) {
+      const art = allArticles.find((a) => a.id === 'art-93-pr-bud');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isBuildingDisaster) {
+      const art1 = allArticles.find((a) => a.id === 'art-163-kk');
+      const art2 = allArticles.find((a) => a.id === 'art-164-kk');
+      if (art1 && !matchedArticles.includes(art1)) matchedArticles.push(art1);
+      if (art2 && !matchedArticles.includes(art2)) matchedArticles.push(art2);
+    }
+    if (isBuildingSafetyAccident) {
+      const art = allArticles.find((a) => a.id === 'art-220-kk');
+      if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
+    }
+    if (isBuildingExemptions70m || isBuildingDistanceBoundary) {
+      const art = allArticles.find((a) => a.id === 'art-29-pr-bud');
       if (art && !matchedArticles.includes(art)) matchedArticles.push(art);
     }
 
@@ -941,6 +1075,177 @@ export class PrawnBotAiService {
         'Sprawdź w aktach sprawy datę uprawomocnienia orzeczenia i zwrotne potwierdzenie odbioru (ZPO).',
         'Złóż wniosek o odbywanie kary w systemie dozoru elektronicznego (SDE).',
         'Konsultuj niezwłocznie linię obrony z adwokatem.'
+      );
+    } else if (isBuildingUnauthorized) {
+      riskLevel = 'wysoki';
+      primarySentenceRange =
+        'Grzywna, ograniczenie wolności albo pozbawienie wolności do lat 2 (art. 90 Pr. bud.) + opłata legalizacyjna 50 000 zł lub nakaz rozbiórki';
+      possibleSanctions.push(
+        'Kara karna z art. 90 Prawa budowlanego: grzywna w stawkach dziennych, ograniczenie wolności albo pozbawienie wolności do lat 2',
+        'Decyzja PINB o nakazie rozbiórki obiektu budowlanego lub jego części na koszt inwestora (art. 48 ust. 1 Pr. bud.)',
+        'Opłata legalizacyjna w trybie standardowym: 50 000 zł dla domu jednorodzinnego, 25 000 zł dla garażu (art. 49d Pr. bud.)',
+        'Procedura uproszczona: 0 zł opłaty legalizacyjnej dla budynków wzniesionych co najmniej 20 lat temu (art. 49f Pr. bud.)'
+      );
+      mandatoryMeasures.push(
+        'RYGORYSTYCZNY TERMIN 30 DNI: Od doręczenia postanowienia PINB o wstrzymaniu budowy inwestor ma dokładnie 30 dni na złożenie wniosku o legalizację. Spóźnienie obliguje organ do wydania nakazu rozbiórki!',
+        'ZGODNOŚĆ Z MPZP LUB DECYZJĄ WZ: Obiekt musi być zgodny z przeznaczeniem terenu w planie miejscowym.',
+        'WSTRZYMANIE ROBÓT: Wszelkie dalsze roboty muszą zostać natychmiast przerwane.'
+      );
+      mitigatingFactors.push(
+        'Wiek obiektu powyżej 20 lat – prawo do uproszczonej, w 100% darmowej legalizacji (art. 49f Pr. bud., orzeczenie NSA II OSK 1560/21)',
+        'Pozytywna ekspertyza techniczna inżyniera budownictwa wykluczająca zagrożenie dla życia i zdrowia',
+        'Zgodność obiektu z przepisami techniczno-budowlanymi i planem miejscowym (MPZP)',
+        'Złożenie wniosku o legalizację w terminie 30 dni'
+      );
+      aggravatingFactors.push(
+        'Kontynuowanie prac budowlanych pomimo doręczenia postanowienia PINB o wstrzymaniu robót (przestępstwo z art. 91 Pr. bud. – utrata prawa do legalizacji!)',
+        'Rażące przekroczenie dopuszczalnych odległości od granicy działki sąsiada lub przepisów przeciwpożarowych',
+        'Zagrożenie katastrofą budowlaną'
+      );
+      plainExplanation =
+        'Budowa, rozbudowa lub dobudówka bez wymaganego pozwolenia na budowę albo zgłoszenia jest przestępstwem z art. 90 Prawa budowlanego. Sprawa toczy się równolegle w prokuraturze oraz przed Powiatowym Inspektorem Nadzoru Budowlanego (PINB). Aby ocalić budynek przed przymusową rozbiórką, należy w ciągu 30 dni złożyć formalny wniosek o legalizację. Jeśli budynek powstał ponad 20 lat temu, legalizacja jest całkowicie bezpłatna (0 zł zamiast 50 000 zł opłaty)!';
+      recommendedSteps.push(
+        'Natychmiast wstrzymaj wszelkie prace budowlane – złamanie zakazu to kolejne przestępstwo (art. 91 Pr. bud.) zamykające drogę do legalizacji.',
+        'Złóż do PINB wniosek o legalizację samowoli w nieprzekraczalnym terminie 30 dni od doręczenia postanowienia o wstrzymaniu budowy.',
+        'Sprawdź datę zakończenia budowy – jeśli minęło 20 lat, powołaj się na art. 49f Pr. bud. i wnoś o bezpłatną legalizację uproszczoną.',
+        'Zleć uprawnionemu konstruktorowi/inżynierowi sporządzenie ekspertyzy technicznej potwierdzającej bezpieczeństwo obiektu.'
+      );
+    } else if (isBuildingHaltViolation) {
+      riskLevel = 'bardzo wysoki';
+      primarySentenceRange = 'Grzywna, kara ograniczenia wolności albo pozbawienia wolności do lat 2 (art. 91 Pr. bud.) + obligatoryjna rozbiórka';
+      possibleSanctions.push(
+        'Pozbawienie wolności do lat 2, ograniczenie wolności lub wysoka grzywna',
+        'Obligatoryjny nakaz rozbiórki obiektu bez możliwości legalizacji (art. 49e pkt 2 Pr. bud.)'
+      );
+      mandatoryMeasures.push('Zignorowanie postanowienia PINB definitywnie przekreśla szanse na legalizację samowoli.');
+      mitigatingFactors.push('Wykonywanie wyłącznie prac zabezpieczających konstrukcję przed zawaleniem');
+      aggravatingFactors.push('Świadome zerwanie taśm i plomb inspekcji budowlanej, pośpiech w celu zatarcia śladów');
+      plainExplanation =
+        'Dalsze prowadzenie robót budowlanych po doręczeniu postanowienia PINB o ich wstrzymaniu to przestępstwo z art. 91 Prawa budowlanego. Inwestor bezpowrotnie traci możliwość legalizacji obiektu, a PINB ma ustawowy obowiązek wydać decyzję o rozbiórce.';
+      recommendedSteps.push(
+        'Natychmiast przerwij wszelkie prace na budowie i opuść plac budowy.',
+        'Wnieś zażalenie na postanowienie o wstrzymaniu robót do Wojewódzkiego Inspektora (WINB), jeżeli postanowienie zawierało błędy formalne.',
+        'Ustanów profesjonalnego obrońcę w toczącym się śledztwie prokuratorskim.'
+      );
+    } else if (isBuildingMaintenanceNeglect) {
+      riskLevel = 'wysoki';
+      primarySentenceRange = 'Grzywna min. 100 stawek dziennych, ograniczenie wolności albo pozbawienie wolności do roku (art. 91a Pr. bud.)';
+      possibleSanctions.push(
+        'Grzywna nie mniejsza niż 100 stawek dziennych (od 1 000 zł do kilkudziesięciu tysięcy złotych)',
+        'Kara ograniczenia wolności lub pozbawienia wolności do roku',
+        'Decyzja PINB o natychmiastowym wyłączeniu obiektu z użytkowania i opróżnieniu lokali (art. 68 Pr. bud.)'
+      );
+      mandatoryMeasures.push('Obowiązek natychmiastowego usunięcia nawisów śnieżnych, lodu lub zabezpieczenia odpadających elementów elewacji.');
+      mitigatingFactors.push('Natychmiastowe podjęcie prac odśnieżających i zabezpieczających', 'Brak poszkodowanych');
+      aggravatingFactors.push('Narażenie wielu osób na utratę życia (np. dach galerii handlowej, hali, marketu, szkoły)');
+      plainExplanation =
+        'Właściciel lub zarządca nieruchomości odpowiada karnie za brak odśnieżenia dachu grożącego zawaleniem lub doprowadzenie budynku do ruiny technicznej. Minimalna kara grzywny to aż 100 stawek dziennych.';
+      recommendedSteps.push(
+        'Natychmiast zamknij dostęp do terenu pod okapem dachu (wygrodzenie taśmami ostrzegawczymi).',
+        'Zleć specjalistycznej firmie odśnieżenie dachu i skucie sopli lodu.',
+        'Uzupełnij wpisy w Książce Obiektu Budowlanego (c-KOB).'
+      );
+    } else if (isBuildingIllegalOccupancy) {
+      riskLevel = 'średni';
+      primarySentenceRange = 'Grzywna do 5 000 zł (art. 93 pkt 9 Pr. bud.) + kara administracyjna 10 000 zł (art. 59f Pr. bud.)';
+      possibleSanctions.push(
+        'Grzywna w sądzie za wykroczenie z art. 93 pkt 9 Pr. bud. (do 5 000 zł)',
+        'Administracyjna kara pieniężna nakładana przez PINB na podstawie art. 59f Pr. bud. (dla domu jednorodzinnego 10 000 zł)',
+        'Odmowa wypłaty odszkodowania przez ubezpieczyciela w razie pożaru/zalania budynku bez odbioru'
+      );
+      mandatoryMeasures.push(
+        'PROCEDURA ŻÓŁTEJ KARTKI: Zgodnie z nowelizacją PINB najpierw poucza inwestora i daje 60 dni na dopełnienie formalności odbiorowych. Jeśli złożysz zawiadomienie w terminie 60 dni – unikniesz kary 10 000 zł!'
+      );
+      mitigatingFactors.push(
+        'Dopełnienie formalności zawiadomienia o zakończeniu budowy w terminie 60 dni od pouczenia PINB',
+        'Posiadanie kompletnego dziennika budowy i oświadczenia kierownika budowy',
+        'Brak zagrożenia bezpieczeństwa mieszkańców'
+      );
+      aggravatingFactors.push('Ignorowanie upomnień PINB i użytkowanie obiektu komercyjnego bez odbioru');
+      plainExplanation =
+        'Zamieszkanie w domu przed formalnym zawiadomieniem o zakończeniu budowy (lub uzyskaniem pozwolenia na użytkowanie) to wykroczenie z art. 93 pkt 9 Pr. bud. oraz ryzyko kary 10 000 zł z art. 59f. Dzięki nowym przepisom PINB musi najpierw dać Ci 60 dni na uzupełnienie dokumentów odbiorowych.';
+      recommendedSteps.push(
+        'Niezwłocznie skompletuj dokumentację powykonawczą: oświadczenie kierownika budowy, protokoły kominiarskie, elektryczne i inwentaryzację geodezyjną.',
+        'Złóż do PINB zawiadomienie o zakończeniu budowy (lub wniosek o pozwolenie na użytkowanie).',
+        'Pamiętaj: jeśli organ nie wniesie sprzeciwu w terminie 14 dni od złożenia kompletnego zawiadomienia (tzw. milcząca zgoda), obiekt jest legalnie odebrany!'
+      );
+    } else if (isBuildingDisaster) {
+      riskLevel = 'bardzo wysoki';
+      primarySentenceRange = 'Pozbawienie wolności od 1 roku do 10 lat (art. 163 § 1 pkt 2 k.k.), z ofiarami: od 2 do 15 lat';
+      possibleSanctions.push(
+        'Kara bezwzględnego pozbawienia wolności od 1 roku do 10 lat (umyślne)',
+        'W razie śmierci człowieka lub ciężkiego uszczerbku wielu osób: pozbawienie wolności od lat 2 do 15 (art. 163 § 3 k.k.)',
+        'Nieumyślne sprowadzenie katastrofy: pozbawienie wolności od 3 miesięcy do lat 5 (art. 163 § 2 k.k.)',
+        'Sprowadzenie bezpośredniego niebezpieczeństwa (wyburzenie ściany nośnej bez zawalenia): kara od 6 miesięcy do 8 lat (art. 164 k.k.)',
+        'Zakaz wykonywania zawodu inżyniera budownictwa / architekta (art. 41 k.k.)'
+      );
+      mandatoryMeasures.push(
+        'Kwalifikacja z art. 163 k.k. dotyczy zniszczenia struktury nośnej zagrażającej wielu osobom (min. 6-10 osób) lub mieniu w wielkich rozmiarach (powyżej 1 000 000 zł).'
+      );
+      mitigatingFactors.push(
+        'Działanie nieumyślne wynikające z ukrytych wad materiałowych',
+        'Natychmiastowe zaalarmowanie służb ratunkowych i ewakuacja mieszkańców',
+        'Naprawienie szkody i zadośćuczynienie poszkodowanym'
+      );
+      aggravatingFactors.push(
+        'Świadome samowolne wycięcie elementów nośnych w bloku mieszkalnym',
+        'Śmierć wielu osób lub zniszczenie zabytku'
+      );
+      plainExplanation =
+        'Zawalenie się budynku lub stworzenie bezpośredniego zagrożenia katastrofą (np. wyburzenie ściany nośnej) to jedno z najcięższych przestępstw przeciwko bezpieczeństwu powszechnemu. Odpowiedzialność ponoszą wykonawcy, kierownik budowy oraz inwestor. Grozi za to nawet do 15 lat pozbawienia wolności.';
+      recommendedSteps.push(
+        'Wstrzymaj natychmiast jakiekolwiek ingerencje w elementy konstrukcyjne budynku.',
+        'Zabezpiecz pełną dokumentację projektową, wpisy w dzienniku budowy i korespondencję z kierownikiem robót.',
+        'Ustanów obrońcę karnistę na potrzeby czynności prokuratorskich i komisji powypadkowej PINB.'
+      );
+    } else if (isBuildingSafetyAccident) {
+      riskLevel = 'wysoki';
+      primarySentenceRange = 'Pozbawienie wolności do lat 3 (art. 220 § 1 k.k.), w zbiegu z art. 155 k.k. (śmierć) do lat 5';
+      possibleSanctions.push(
+        'Pozbawienie wolności do lat 3 (umyślne narażenie pracownika na niebezpieczeństwo)',
+        'Nieumyślne narażenie: grzywna, ograniczenie wolności lub pozbawienie wolności do roku (art. 220 § 2 k.k.)',
+        'W razie śmierci pracownika: zbieg z art. 155 k.k. – kara do lat 5 więzienia',
+        'Środek karny: zakaz pełnienia samodzielnych funkcji technicznych w budownictwie (kierownika budowy/robót)',
+        'Nawiązka i zadośćuczynienie cywilne dla poszkodowanego pracownika lub rodziny zmarłego'
+      );
+      mandatoryMeasures.push(
+        'GWARANCYJNA ODPOWIEDZIALNOŚĆ KIEROWNIKA BUDOWY: Zgodnie z art. 22 pkt 3 Pr. bud. i orzecznictwem SN (V KK 123/20) kierownik budowy odpowiada za stan BHP na całej budowie, w tym wobec pracowników podwykonawców!'
+      );
+      mitigatingFactors.push(
+        'Klauzula niekaralności (art. 220 § 3 k.k.): sprawca dobrowolnie uchylił grożące niebezpieczeństwo przed wypadkiem',
+        'Posiadanie aktualnych szkoleń BHP, badań lekarskich i wydanych na piśmie środków ochrony indywidualnej (szelki, kaski)',
+        'Wypadek wynikający z rażącego, samowolnego nieposłuszeństwa pracownika łamiącego procedury'
+      );
+      aggravatingFactors.push(
+        'Dopuszczenie do pracy na wysokości bez zabezpieczeń (szelek, siatek, balustrad)',
+        'Prace w wykopie o głębokości powyżej 1 m bez odesklowania/szalunku',
+        'Stan nietrzeźwości osób nadzoru budowlanego lub pracowników'
+      );
+      plainExplanation =
+        'Kierownik budowy, majster lub pracodawca odpowiada karnie z art. 220 k.k. za brak zapewnienia bezpiecznych warunków pracy na budowie. Dopuszczenie do pracy na dachu bez szelek lub w wykopie bez szalunków grozi karą do 3 lat więzienia, a w razie śmierci pracownika – do lat 5.';
+      recommendedSteps.push(
+        'Zabezpiecz natychmiast dowody: wpisy w dzienniku budowy, karty szkoleń BHP, potwierdzenia odbioru sprzętu asekuracyjnego.',
+        'Współpracuj z Państwową Inspekcją Pracy (PIP) i prokuraturą, wyjaśniając procedury wdrożone na budowie.',
+        'Ustal, czy pracownik nie zignorował pisemnych instrukcji bezpieczeństwa.'
+      );
+    } else if (isBuildingExemptions70m || isBuildingDistanceBoundary) {
+      riskLevel = 'niski';
+      primarySentenceRange = 'Działanie w granicach prawa (art. 29 Pr. bud.) – brak sankcji karnej przy zachowaniu parametrów';
+      possibleSanctions.push(
+        'W razie przekroczenia parametrów ustawowych: kwalifikacja jako samowola budowlana (art. 90 Pr. bud.)',
+        'W razie naruszenia odległości od granicy: nakaz doprowadzenia do stanu zgodnego z prawem (np. zamurowanie okien lub przesunięcie ściany)'
+      );
+      mandatoryMeasures.push(
+        'ZASADY ODLEGŁOŚCI OD GRANICY DZIAŁKI (§ 12 Warunków Technicznych): 4 m dla ściany z oknami/drzwiami, 3 m dla ściany bez okien (ślepej). Zbliżenie do 1,5 m lub w granicy dopuszczalne tylko w przypadkach przewidzianych w planie MPZP lub na wąskich działkach do 16 m.'
+      );
+      mitigatingFactors.push('Prawidłowe zgłoszenie w Starostwie Powiatowym przed rozpoczęciem prac', 'Brak sprzeciwu organu w terminie 21 dni');
+      aggravatingFactors.push('Rozpoczęcie budowy przed upływem terminu na sprzeciw lub pomimo wniesienia sprzeciwu');
+      plainExplanation =
+        'Budowa domu do 70 m² zabudowy jest możliwa na zgłoszenie bez kierownika budowy. Płot do 2,20 m wysokości postawisz bez żadnych formalności. Kluczowe jest zachowanie odległości od granic sąsiada: 4 metry (ściana z oknami) lub 3 metry (ściana ślepa).';
+      recommendedSteps.push(
+        'Dokładnie zweryfikuj wypis i wyrys z Miejscowego Planu Zagospodarowania Przestrzennego (MPZP) przed rozpoczęciem prac.',
+        'Zachowaj odległości od granicy działki: min. 4 m ze ścianą z oknami, min. 3 m ściana ślepa.',
+        'Pamiętaj: ogrodzenie do 2,20 m nie wymaga żadnego zgłoszenia, ale nie może mieć ostrych elementów poniżej 1,80 m wysokości!'
       );
     } else {
       // Przypadek ogólny
@@ -2007,6 +2312,449 @@ Jest to wykroczenie porządkowe. Mandat **nie trafia do rejestru skazanych KRK**
       suggestedFollowUps = [
         'Jaki jest zasięg strefy przystanku objętej zakazem palenia?',
         'Czy zakaz obejmuje również beznikotynowe e-papierosy?',
+      ];
+    }
+    // 0K_1. SAMOWOLA BUDOWLANA I PROCEDURA LEGALIZACJI (art. 90, art. 48, art. 49f Pr. bud.)
+    else if (
+      !q.includes('ściany nośnej') &&
+      !q.includes('sciany nosnej') &&
+      !q.includes('ściana nośna') &&
+      !q.includes('katastrof') &&
+      !q.includes('zawalenie') &&
+      (
+        q.includes('samowol') ||
+        q.includes('budowa bez pozwolenia') ||
+        q.includes('budowa bez zgłoszenia') ||
+        q.includes('nielegalna budowa') ||
+        q.includes('dobudówk') ||
+        q.includes('rozbudowa bez') ||
+        (q.includes('legalizacj') && (q.includes('budow') || q.includes('dom') || q.includes('garaż') || q.includes('samowol') || q.includes('pinb'))) ||
+        q.includes('opłata legalizacyjna') ||
+        q.includes('nakaz rozbiórki') ||
+        q.includes('90 pr bud') ||
+        q.includes('90 prawo budowlane') ||
+        (q.includes('art 90') && q.includes('budow')) ||
+        (q.includes('garaż') && q.includes('bez pozwolenia')) ||
+        q.includes('uproszczona legalizacja') ||
+        q.includes('legalizacja po 20 latach') ||
+        q.includes('49f')
+      )
+    ) {
+      referencedArticles.push('Art. 90 Pr. bud.', 'Art. 48 Pr. bud.', 'Art. 49d Pr. bud.', 'Art. 49f Pr. bud.');
+      referencedRulings.push('II OSK 1560/21');
+      legalCategoryBadge = 'Prawo Budowlane (art. 90, 48, 49f - Samowola Budowlana)';
+      actionQuery = 'Samowola budowlana: legalizacja, opłaty i nakaz rozbiórki (art. 90 i 48 Pr. bud.)';
+
+      if (persona === 'counsel') {
+        text = `**STANOWISKO OBROŃCY / PEŁNOMOCNIKA INWESTORA: Obrona przed nakazem rozbiórki (art. 48) i zarzutem karnym z art. 90 Pr. bud.:**
+
+1. **Rygorystyczny termin zawity 30 dni (art. 48 ust. 2 i 3 Pr. bud.):**
+   - Od dnia doręczenia postanowienia PINB o wstrzymaniu robót budowlanych inwestor ma **dokładnie 30 dni na złożenie wniosku o legalizację**.
+   - Przekroczenie tego terminu wiąże ręce organowi – PINB jest ustawowo zobligowany do wydania **decyzji o nakazie rozbiórki** (art. 49e pkt 1)! Natychmiast składamy wniosek legalizacyjny, nawet jeśli brakuje jeszcze pełnej dokumentacji technicznej.
+
+2. **Strategia bezpłatnej legalizacji po 20 latach (art. 49f Pr. bud. – orzeczenie NSA II OSK 1560/21):**
+   - Jeżeli budynek został ukończony co najmniej 20 lat temu, wnosimy o przeprowadzenie **uproszczonego postępowania legalizacyjnego**.
+   - W tym trybie organ NIE bada zgodności z Miejscowym Planem Zagospodarowania (MPZP) ani NIE nakłada opłaty legalizacyjnej (**oszczędność 50 000 zł**). Wystarczy inwentaryzacja geodezyjna i ekspertyza techniczna inżyniera potwierdzająca brak zagrożenia życia.
+
+3. **Obrona przed zarzutem karnym z art. 90 Pr. bud. (prokuratura):**
+   - Czyn z art. 90 Pr. bud. jest przestępstwem formalnym. Karalność przedawnia się z upływem 5 lat od momentu zakończenia samowolnych robót budowlanych (art. 101 § 1 pkt 4 k.k.). Jeżeli prace zakończono ponad 5 lat temu, wnosimy o natychmiastowe umorzenie śledztwa wobec przedawnienia karalności!
+   - W przypadku świeżych budów wnosimy o warunkowe umorzenie postępowania karnego (art. 66 k.k.) w oparciu o wszczęcie procedury naprawczej przed PINB.`;
+      } else if (persona === 'interrogator') {
+        text = `**SYMULATOR PRZESŁUCHANIA (Inspektor PINB / Policja ds. Przestępczości Gospodarczej):**
+
+*„Podejrzany oświadcza, że nie wiedział o konieczności uzyskania pozwolenia na budowę? Proszę zaprotokołować następujące pytania:*
+1. W jakich dokładnie datach (dzień, miesiąc, rok) rozpoczęto prace ziemne, stawianie fundamentów oraz montaż więźby dachowej?
+2. Kto sporządził projekt techniczny dobudówki/garażu i komu powierzono faktyczne kierownictwo robót? Gdzie znajdują się rachunki za materiały budowlane i beton?
+3. Czy przed rozpoczęciem budowy inwestor występował do Starostwa o wypis z MPZP lub decyzję o warunkach zabudowy (WZ)?
+4. Dlaczego roboty były kontynuowane pomimo wywieszenia przez sąsiada informacji o naruszeniu granicy działki?
+
+*Pouczenie procesowe: Zgodnie z art. 90 Prawa budowlanego samowolne wznoszenie obiektu jest przestępstwem zagrożonym karą pozbawienia wolności do lat 2. Dalsze prowadzenie robót po doręczeniu postanowienia o wstrzymaniu będzie traktowane jako przestępstwo z art. 91 Pr. bud. skutkujące bezwzględną rozbiórką!”*`;
+      } else {
+        text = `**Samowola budowlana – Co grozi, ile wynosi opłata legalizacyjna i jak uniknąć rozbiórki?**
+
+Wzniesienie domu, garażu, wiaty lub dobudówki bez wymaganego pozwolenia na budowę albo bez zgłoszenia jest w Polsce **przestępstwem z art. 90 Prawa budowlanego**. Sprawa toczy się równolegle na dwóch płaszczyznach: administracyjnej (przed PINB) oraz karnej (przed sądem rejonowym).
+
+---
+
+### 1. Co grozi w sądzie karnym (Art. 90 Pr. bud.)?
+- **Sankcje karne:** Grzywna (w stawkach dziennych), kara ograniczenia wolności (prace społeczne) albo **kara pozbawienia wolności do lat 2**.
+- **Przedawnienie:** Ściganie karne samowoli budowlanej przedawnia się po **5 latach od momentu zakończenia prac budowlanych**.
+
+---
+
+### 2. Dwie drogi przed Inspektorem Nadzoru (PINB):
+
+#### Ścieżka A: ZWYKŁA LEGALIZACJA (dla nowych samowoli - art. 48 Pr. bud.):
+1. PINB wydaje **postanowienie o wstrzymaniu budowy**.
+2. **TERMIN 30 DNI:** Masz dokładnie 30 dni od doręczenia pisma na złożenie wniosku o legalizację. Jeśli przegapisz ten termin – PINB **MANDATOWO nakaże przymusową rozbiórkę**!
+3. Wymagane dokumenty: Zaświadczenie wójta/burmistrza o zgodności z planem miejscowym (MPZP) lub decyzja WZ, projekt zagospodarowania działki i projekt architektoniczny.
+4. **OPŁATA LEGALIZACYJNA:** Po weryfikacji dokumentów PINB nalicza opłatę legalizacyjną:
+   - Dla **domu jednorodzinnego: 50 000 zł** (stawka 500 zł × 50 × współczynnik kategorii 2.0).
+   - Dla **garażu lub budynku gospodarczego: 25 000 zł**.
+   - Dla budynków usługowych/komercyjnych: **od 125 000 zł do kilkuset tysięcy złotych**.
+
+#### Ścieżka B: UPROSZCZONA LEGALIZACJA PO 20 LATACH (Art. 49f Pr. bud.) – CAŁKOWICIE BEZPŁATNA:
+Jeżeli od zakończenia budowy upłynęło **co najmniej 20 lat**:
+- **Płacisz 0 ZŁ opłaty legalizacyjnej** (oszczędzasz 50 000 zł!).
+- PINB **NIE bada zgodności z planem zagospodarowania (MPZP)**.
+- Wymagane dokumenty: oświadczenie o prawie do dysponowania działką, inwentaryzacja geodezyjna oraz ekspertyza techniczna inżyniera potwierdzająca, że budynek nie grozi zawaleniem i jest bezpieczny.
+
+---
+
+### 3. Kiedy grozi bezwzględna rozbiórka?
+PINB nakaże przymusową rozbiórkę (art. 49e Pr. bud.), jeżeli:
+- Nie złożysz wniosku o legalizację w terminie 30 dni,
+- Budynek narusza przeznaczenie działki w planie MPZP (np. postawiono dom mieszkalny na terenie zalewowym, w pasie drogowym lub w strefie leśnej),
+- Nie uiścisz naliczonej opłaty legalizacyjnej w terminie,
+- Będziesz kontynuować budowę pomimo doręczenia postanowienia o wstrzymaniu (art. 91 Pr. bud.).`;
+      }
+      suggestedFollowUps = [
+        'Jak udowodnić przed PINB, że budynek powstał ponad 20 lat temu?',
+        'Co zrobić, gdy samowola jest sprzeczna z planem zagospodarowania (MPZP)?',
+        'Czy opłatę legalizacyjną 50 000 zł można rozłożyć na raty?',
+        'Kiedy przedawnia się przestępstwo z art. 90 Prawa budowlanego?',
+      ];
+    }
+    // 0K_2. ZAMIESZKANIE BEZ ODBIORU / NIELEGALNE UŻYTKOWANIE (art. 93 pkt 9 & art. 59f Pr. bud.)
+    else if (
+      ((q.includes('zamieszkani') || q.includes('mieszkan') || q.includes('użytkowan') || q.includes('wprowadzen') || q.includes('odbiór') || q.includes('odbior')) &&
+       (q.includes('bez odbioru') || q.includes('bez pozwolenia na użytkowanie') || q.includes('bez zgłoszenia zakończenia'))) ||
+      q.includes('nielegalne użytkowanie') ||
+      q.includes('kara za brak odbioru')
+    ) {
+      referencedArticles.push('Art. 93 pkt 9 Pr. bud.', 'Art. 54 Pr. bud.', 'Art. 55 Pr. bud.', 'Art. 59f Pr. bud.');
+      legalCategoryBadge = 'Prawo Budowlane (art. 93 pkt 9 i art. 59f - Użytkowanie bez odbioru)';
+      actionQuery = 'Zamieszkanie w domu bez odbioru (art. 93 pkt 9 i kara 10 000 zł z art. 59f)';
+      text = `**Zamieszkanie w nowym domu bez odbioru – Kary, procedury i „żółta kartka” od PINB:**
+
+Wielu inwestorów po wykończeniu wnętrz wprowadza się do domu przed formalnym zakończeniem budowy. Jest to tzw. **nielegalne przystąpienie do użytkowania obiektu budowlanego**.
+
+---
+
+### 1. Jakie kary grożą w świetle przepisów?
+1. **Odpowiedzialność wykroczeniowa (art. 93 pkt 9 Pr. bud.):**
+   - Jest to wykroczenie zagrożone **karą grzywny do 5 000 zł** nakładaną przez Sąd Rejonowy (lub mandatem karnym).
+2. **Administracyjna kara z art. 59f Pr. bud.:**
+   - Jest to sankcja finansowa nakładana bezpośrednio przez PINB: stawka 500 zł × współczynnik kategorii (10 dla domu jednorodzinnego) × współczynnik wielkości (1.0) = **dokładnie 10 000 zł**.
+   - Dla budynków wielorodzinnych lub usługowych kara ta sięga **od kilkudziesięciu do kilkuset tysięcy złotych**.
+
+---
+
+### 2. Rewolucyjna procedura „ŻÓŁTEJ KARTKI” (Ochrona przed karą 10 000 zł):
+Od 19 września 2020 r. weszła w życie kluczowa nowelizacja łagodząca rygory dla inwestorów indywidualnych:
+- Inspektor PINB w razie stwierdzenia zamieszkania bez odbioru **NIE MOŻE od razu nałożyć kary 10 000 zł!**
+- Organ ma ustawowy obowiązek wydać **POUCZENIE (żółtą kartkę)** i wyznaczyć inwestorowi **termin 60 dni** na dopełnienie formalności odbiorowych (złożenie zawiadomienia o zakończeniu budowy lub wniosku o pozwolenie na użytkowanie).
+- **Jeżeli w ciągu 60 dni złożysz kompletne dokumenty – UNIKASZ JAKIEJKOLWIEK KARY FINANSOWEJ!** Dopiero w przypadku zignorowania upomnienia PINB wymierza karę 10 000 zł.
+
+---
+
+### 3. Śmiertelna pułapka ubezpieczeniowa:
+Jeżeli w nieodebranym formalnie domu dojdzie do pożaru, wybuchu gazu lub zalania:
+- **Ubezpieczyciel niemal na pewno odmówi wypłaty odszkodowania z polisy!**
+- Ogólne Warunki Ubezpieczenia (OWU) niemal każdego towarzystwa ubezpieczeniowego zawierają klauzulę wyłączającą odpowiedzialność za szkody powstałe w obiektach użytkowanych bez wymaganych prawem odbiorów technicznych (zwłaszcza braku protokołu odbioru kominiarskiego i instalacji elektrycznej).
+
+---
+
+### 4. Jak szybko i legalnie odebrać budynek?
+1. Skompletuj wpis kierownika budowy o zakończeniu robót i uporządkowaniu terenu.
+2. Przygotuj: protokół badania instalacji elektrycznej, protokół kominiarski, geodezyjną inwentaryzację powykonawczą oraz świadectwo charakterystyki energetycznej.
+3. Złóż w PINB **zawiadomienie o zakończeniu budowy**.
+4. **Zasada milczącej zgody (14 dni):** Jeżeli w terminie 14 dni od doręczenia zawiadomienia PINB nie wniesie sprzeciwu w drodze decyzji, możesz w 100% legalnie użytkować dom!`;
+      suggestedFollowUps = [
+        'Jakie dokumenty są niezbędne do zawiadomienia o zakończeniu budowy?',
+        'Co zrobić, gdy kierownik budowy zaginął lub odmawia wpisu o zakończeniu?',
+        'Czy inspektor PINB przychodzi osobiście na kontrolę domu jednorodzinnego?',
+      ];
+    }
+    // 0K_3. ODLEGŁOŚCI OD GRANICY DZIAŁKI I OKNA SĄSIADA (§ 12 Warunków Technicznych & art. 92 Pr. bud.)
+    else if (
+      q.includes('odległość od granicy') ||
+      q.includes('odleglosc od granicy') ||
+      q.includes('ile metrów od granicy') ||
+      q.includes('ile metrow od granicy') ||
+      q.includes('okno od sąsiada') ||
+      q.includes('okno od sasiada') ||
+      q.includes('ściana z oknem') ||
+      q.includes('sciana z oknem') ||
+      q.includes('w granicy działki') ||
+      q.includes('4 metry od granicy') ||
+      q.includes('3 metry od granicy')
+    ) {
+      referencedArticles.push('§ 12 Rozporządzenia Ministra Infrastruktury w sprawie warunków technicznych', 'Art. 92 ust. 1 Pr. bud.');
+      legalCategoryBadge = 'Warunki Techniczne (§ 12 - Odległości od granicy działki)';
+      actionQuery = 'Minimalne odległości budynku od granicy działki (4 m / 3 m / 1.5 m)';
+      text = `**Minimalne odległości budynku od granicy działki budowlanej – Przepisy, wyjątki i nowe normy 2024:**
+
+Usytuowanie budynku na działce reguluje **§ 12 Rozporządzenia w sprawie warunków technicznych, jakim powinny odpowiadać budynki i ich usytuowanie**.
+
+---
+
+### 1. Zasada podstawowa:
+- **4 METRY od granicy działki:** gdy ściana budynku zwrócona w stronę granicy posiada **okna lub drzwi**.
+- **3 METRY od granicy działki:** gdy ściana budynku zwrócona w stronę granicy **NIE posiada okien ani drzwi** (tzw. ślepa ściana).
+- **1,5 METRA dla okapu, gzymsu, balkonu, tarasu lub schodów zewnętrznych:** elementy te nie mogą być bliżej granicy niż 1,5 m.
+
+---
+
+### 2. Kiedy wolno budować 1,5 metra od granicy lub BEZPOŚREDNIO W GRANICY?
+Budowa ściany bez okien w odległości 1,5 m od granicy lub bezpośrednio na granicy jest legalna WYŁĄCZNIE w następujących przypadkach:
+1. **Zapis w planie MPZP:** Gdy Miejscowy Plan Zagospodarowania Przestrzennego lub decyzja o warunkach zabudowy (WZ) wprost dopuszcza taką możliwość.
+2. **Wąska działka (do 16 metrów szerokości):** Na działce budowlanej o szerokości 16 m lub mniejszej wolno sytuować budynek ścianą bez okien w odległości 1,5 m lub bezpośrednio w granicy.
+3. **Zabudowa przylegająca:** Budynek przylega całą długością ściany do ściany budynku istniejącego na sąsiedniej działce (lub projektowanego, na który uzyskano ostateczne pozwolenie).
+4. **Garaż lub budynek gospodarczy:** O długości do 6,5 m i wysokości do 3 m można postawić bezpośrednio w granicy lub 1,5 m od granicy na działce jednorodzinnej.
+
+---
+
+### 3. Zmiany od 1 sierpnia 2024 r. (Przepisy antypatodeweloperskie):
+- Dla budynków mieszkalnych wielorodzinnych powyżej 4 kondygnacji nadziemnych minimalna odległość od granicy działki wynosi teraz **minimum 5 metrów** (nawet dla ściany ślepej!).
+- Lokale użytkowe nie mogą mieć powierzchni poniżej 25 m² (koniec tzw. mikrokawalerek inwestycyjnych).
+
+---
+
+### 4. Co grozi za samowolne naruszenie odległości?
+- PINB traktuje to jako **istotne odstąpienie od projektu** lub samowolę budowlaną.
+- Organ nakazuje przeprowadzenie postępowania naprawczego (art. 51 Pr. bud.): nakaz zamurowania okien pustakami szklanymi (luksferami o odporności ogniowej EI 60) lub nakaz doprowadzenia do stanu zgodnego z prawem (w skrajnych przypadkach rozbiórka naruszającej części obiektu).`;
+      suggestedFollowUps = [
+        'Czy sąsiad może wyrazić pisemną zgodę na budowę bliżej granicy niż 3/4 metry?',
+        'Czy luksfery są traktowane przez prawo budowlane jako okno czy ściana?',
+        'Jak liczy się odległość od granicy, jeśli działka ma nieregularny kształt?',
+      ];
+    }
+    // 0K_4. DOMY DO 70 M², WIATY, GARAŻE, ALTANY I OGRODZENIA BEZ POZWOLENIA (art. 29 Pr. bud.)
+    else if (
+      q.includes('70 m') ||
+      q.includes('70m2') ||
+      q.includes('dom bez pozwolenia') ||
+      q.includes('wysokość ogrodzenia') ||
+      q.includes('płot bez zgłoszenia') ||
+      q.includes('płot do jakiej wysokości') ||
+      q.includes('wiata bez pozwolenia') ||
+      q.includes('garaż bez zgłoszenia') ||
+      q.includes('altana działkowa') ||
+      q.includes('ogrodzenie bez pozwolenia')
+    ) {
+      referencedArticles.push('Art. 29 ust. 1 i 2 Pr. bud.', '§ 43 Warunków Technicznych');
+      legalCategoryBadge = 'Prawo Budowlane (art. 29 - Budowa bez pozwolenia i bez zgłoszenia)';
+      actionQuery = 'Budowa bez formalności: dom do 70 m², ogrodzenie do 2,20 m, wiata do 50 m²';
+      text = `**Katalog budów bez pozwolenia i bez zgłoszenia (Art. 29 Prawa budowlanego):**
+
+Polskie prawo budowlane zwalnia szereg popularnych inwestycji przydomowych z konieczności uzyskiwania pozwolenia na budowę.
+
+---
+
+### 1. Domy jednorodzinne do 70 m² (Art. 29 ust. 1 pkt 1a Pr. bud.):
+- **Warunki:** Budynek wolnostojący, maksymalnie dwukondygnacyjny, o powierzchni zabudowy do 70 m², którego obszar oddziaływania w całości mieści się na działce inwestora.
+- **Wymóg:** Budowa wyłącznie w celu zaspokojenia własnych potrzeb mieszkaniowych.
+- **Ułatwienia:** Budowa na zgłoszenie z projektem budowlanym. **BRAK OBOWIĄZKU zatrudniania kierownika budowy** oraz brak obowiązku prowadzenia dziennika budowy (inwestor przejmuje odpowiedzialność za bezpieczeństwo).
+
+---
+
+### 2. Ogrodzenia i płoty (Art. 29 ust. 2 pkt 2 Pr. bud.):
+- **Do 2,20 m wysokości:** Budowa ogrodzenia **NIE WYMAGA ANI POZWOLENIA, ANI ZGŁOSZENIA!** Stawiasz płot do 2,20 m bez informowania urzędu.
+- **Powyżej 2,20 m:** Wymagane formalne zgłoszenie w Starostwie Powiatowym przed rozpoczęciem prac.
+- **BEZWZGLĘDNY ZAKAZ PONIŻEJ 1,80 M (§ 43 Warunków Technicznych):** Zabrania się umieszczania na ogrodzeniach, na wysokości mniejszej niż 1,80 m, ostro zakończonych elementów, drutu kolczastego, tłuczonego szkła czy stalowych grotów. Za narażenie ludzi na uszczerbek odpowiadasz karnie (art. 160 k.k.)!
+
+---
+
+### 3. Wiaty przydomowe (Art. 29 ust. 2 pkt 1 Pr. bud.):
+- Wolnostojąca wiata o powierzchni zabudowy **do 50 m²** usytuowana na działce, na której znajduje się budynek mieszkalny – **BEZ POZWOLENIA I BEZ ZGŁOSZENIA**!
+- Limit: łączna liczba wiat nie może przekraczać 2 na każde 1000 m² powierzchni działki.
+
+---
+
+### 4. Garaże i budynki gospodarcze (Art. 29 ust. 1 pkt 14 Pr. bud.):
+- Parterowe budynki gospodarcze, garaże, altany o powierzchni zabudowy **do 35 m²** – wymagają **ZGŁOSZENIA** w urzędzie (bez konieczności pełnego projektu budowlanego). Limit: 2 obiekty na każde 500 m² działki.
+
+---
+
+### 5. Altany działkowe w Rodzinnych Ogrodach Działkowych (ROD):
+- Powierzchnia zabudowy do 35 m², wysokość do 5 m (dach stromy) lub 4 m (dach płaski) – **całkowicie bez zgłoszenia i bez pozwolenia** na podstawie Ustawy o ROD.`;
+      suggestedFollowUps = [
+        'Czy sąsiad musi wyrazić zgodę na budowę płotu w granicy działki?',
+        'Kto płaci za ogrodzenie między sąsiadami w myśl Kodeksu Cywilnego?',
+        'Czy poddasze użytkowe liczy się jako druga kondygnacja w domu do 70 m²?',
+      ];
+    }
+    // 0K_5. WYPADEK NA BUDOWIE I ODPOWIEDZIALNOŚĆ KIEROWNIKA BUDOWY (BHP, art. 220 k.k.)
+    else if (
+      q.includes('wypadek na budowie') ||
+      (q.includes('kierownik budowy') && (q.includes('wypadek') || q.includes('śmierć pracownika') || q.includes('odpowiedzialność za pracownika') || q.includes('bhp'))) ||
+      q.includes('upadek z rusztowania') ||
+      q.includes('upadek z dachu') ||
+      q.includes('wykop bez szalunku') ||
+      q.includes('220 kk') ||
+      q.includes('220 k.k')
+    ) {
+      referencedArticles.push('Art. 220 § 1-3 k.k.', 'Art. 155 k.k.', 'Art. 22 pkt 3 Pr. bud.');
+      referencedRulings.push('V KK 123/20');
+      legalCategoryBadge = 'Kodeks Karny (art. 220 k.k. - Odpowiedzialność BHP na budowie)';
+      actionQuery = 'Odpowiedzialność karna kierownika budowy za wypadek pracownika (art. 220 k.k.)';
+      text = `**Wypadek na budowie – Odpowiedzialność karna kierownika budowy i majstra (Art. 220 k.k.):**
+
+Wypadek robotnika budowlanego (upadek z rusztowania, przysypanie ziemią w wykopie, porażenie prądem) niemal natychmiast uruchamia śledztwo prokuratury i kontrolę Państwowej Inspekcji Pracy (PIP).
+
+---
+
+### 1. Kwalifikacja karna: Art. 220 Kodeksu Karnego
+- **§ 1 (Typ umyślny):** Kto będąc odpowiedzialny za BHP, nie dopełnia obowiązku i naraża pracownika na bezpośrednie niebezpieczeństwo utraty życia albo ciężkiego uszczerbku – kara **pozbawienia wolności do lat 3**.
+- **§ 2 (Typ nieumyślny):** Jeżeli sprawca działa nieumyślnie – grzywna, ograniczenie wolności lub **pozbawienie wolności do roku**.
+- **W razie śmierci pracownika (zbieg kumulatywny z art. 155 k.k. - nieumyślne spowodowanie śmierci):** Grozi kara **od 3 miesięcy do 5 lat więzienia**!
+
+---
+
+### 2. Gwarancyjna odpowiedzialność kierownika budowy (Uchwała SN V KK 123/20):
+Zgodnie z **art. 22 pkt 3 Prawa budowlanego** kierownik budowy ma ustawowy obowiązek koordynowania realizacji zadań zapobiegających zagrożeniom bezpieczeństwa.
+- **Sąd Najwyższy przesądził:** Kierownik budowy NIE MOŻE zwolnić się z odpowiedzialności zrzucając winę na podwykonawców!
+- Nawet jeśli poszkodowany pracownik był zatrudniony przez zewnętrznego podwykonawcę na umowę zlecenie lub „na czarno”, kierownik budowy odpowiada karnie, jeżeli tolerował pracę bez zabezpieczeń.
+
+---
+
+### 3. Prace krytyczne pod szczególnym nadzorem prokuratorskim:
+1. **Prace na wysokości (powyżej 1 m):** Brak atestowanych balustrad, brak szelek bezpieczeństwa z linką amortyzującą przypiętą do punktu kotwiczenia.
+2. **Głębokie wykopy (powyżej 1 m):** Brak deskowania, obudów stalowych lub bezpiecznego skarpowania wykopu (ryzyko osunięcia mas ziemnych).
+3. **Rusztowania:** Brak odbioru technicznego rusztowania i brak wpisu w dzienniku budowy.
+
+---
+
+### 4. Klauzula niekaralności i linia obrony:
+- **Art. 220 § 3 k.k. (Złoty przepis):** *„Nie podlega karze sprawca, który dobrowolnie uchylił grożące niebezpieczeństwo.”*
+- Jeżeli kierownik budowy wstrzymał roboty, nakazał opuszczenie rusztowania i wpisał to do dziennika budowy, a pracownik samowolnie i wbrew zakazowi wszedł na dach – kierownik nie popełnia przestępstwa!`;
+      suggestedFollowUps = [
+        'Jakie wpisy w dzienniku budowy chronią kierownika budowy przed prokuratorem?',
+        'Czy podpisanie przez pracownika oświadczenia o szkoleniu BHP wyłącza winę kierownika?',
+        'Co grozi za wypadek pracownika zatrudnionego na czarno?',
+      ];
+    }
+    // 0K_6. KATASTROFA BUDOWLANA / ZAWALENIE SIĘ BUDYNKU / ŚCIANA NOŚNA (art. 163 i 164 k.k.)
+    else if (
+      q.includes('katastrofa budowlana') ||
+      (q.includes('zawalenie') && (q.includes('budowl') || q.includes('dom') || q.includes('kamienic') || q.includes('dach') || q.includes('ścian'))) ||
+      q.includes('runięcie') ||
+      (q.includes('wyburzenie') && (q.includes('ściany nośnej') || q.includes('konstrukcj'))) ||
+      q.includes('163 kk') ||
+      q.includes('164 kk')
+    ) {
+      referencedArticles.push('Art. 163 § 1 pkt 2 k.k.', 'Art. 164 § 1 i 2 k.k.', 'Art. 73-79 Pr. bud.');
+      referencedRulings.push('IV KK 180/19');
+      legalCategoryBadge = 'Kodeks Karny (art. 163 i 164 k.k. - Katastrofa budowlana)';
+      actionQuery = 'Katastrofa budowlana i wyburzenie ściany nośnej (art. 163 i 164 k.k.)';
+      text = `**Katastrofa budowlana – Kary, definicje i odpowiedzialność za naruszenie konstrukcji:**
+
+Sprowadzenie katastrofy budowlanej lub bezpośredniego niebezpieczeństwa jej wystąpienia należy do najsurowiej karanych przestępstw w polskim prawie karnym.
+
+---
+
+### 1. Kwalifikacja karna:
+- **Sprowadzenie katastrofy (art. 163 § 1 pkt 2 k.k.):**
+  Zdarzenie polegające na zawaleniu się budowli, oderwaniu części budowli lub rozpadnięciu się urządzeń technicznych zagrażające życiu lub zdrowiu wielu osób (min. 6-10 osób) albo mieniu w wielkich rozmiarach (powyżej 1 000 000 zł).
+  - Kara: **od 1 roku do 10 lat pozbawienia wolności** (umyślne) lub **od 3 miesięcy do 5 lat** (nieumyślne).
+  - **Jeżeli następstwem jest śmierć człowieka lub ciężki uszczerbek wielu osób (§ 3):** Kara wynosi **od lat 2 do 15 pozbawienia wolności**!
+- **Sprowadzenie bezpośredniego niebezpieczeństwa katastrofy (art. 164 k.k.):**
+  Karalne jest samo stworzenie realnego zagrożenia (np. wycięcie słupów nośnych lub głęboki wykop podmywający fundamenty kamienicy obok). Kara: **od 6 miesięcy do lat 8**.
+
+---
+
+### 2. Samowolne wyburzenie ściany nośnej w bloku mieszkalnym:
+- Wyburzenie ściany nośnej lub podciągu w lokalu mieszkalnym bez projektu konstruktora i bez pozwolenia na budowę stanowi przestępstwo z **art. 164 k.k.**!
+- Sprawca odpowiada karnie za stworzenie zagrożenia dla dziesiątek rodzin mieszkających na wyższych kondygnacjach.
+- Obok prokuratury PINB nakłada natychmiastowy nakaz podstemplowania stropów oraz odbudowy elementów nośnych pod rygorem eksmisji całego pionu budynku na koszt sprawcy!
+
+---
+
+### 3. Czym jest katastrofa budowlana wg Prawa budowlanego (art. 73 Pr. bud.)?
+Katastrofą budowlaną jest niezamierzone, gwałtowne zniszczenie obiektu budowlanego lub jego części, a także konstrukcyjnych elementów rusztowań i deskowań.
+- **Wyłączenie:** Katastrofą budowlaną w rozumieniu ustawy NIE JEST uszkodzenie elementu wbudowanego w obiekt budowlany, nadającego się do naprawy lub wymiany (np. pęknięcie rury, zerwanie kilku dachówek).`;
+      suggestedFollowUps = [
+        'Jak zalegalizować wyburzenie ściany w bloku z wielkiej płyty?',
+        'Kto powołuje komisję do zbadania przyczyn katastrofy budowlanej?',
+        'Kiedy zniszczenie mienia przekracza próg „wielkich rozmiarów” (1 mln zł)?',
+      ];
+    }
+    // 0K_7. OBOWIĄZKI ZARZĄDCY: ODŚNIEŻANIE DACHU I ZŁY STAN TECHNICZNY (art. 91a Pr. bud.)
+    else if (
+      q.includes('odśnieżanie dachu') ||
+      q.includes('odsniezanie dachu') ||
+      q.includes('sopel lodu') ||
+      q.includes('zły stan techniczny') ||
+      q.includes('zly stan techniczny') ||
+      q.includes('odpowiedzialność zarządcy') ||
+      q.includes('odpowiedzialnosc zarzadcy') ||
+      q.includes('91a')
+    ) {
+      referencedArticles.push('Art. 91a Pr. bud.', 'Art. 61 pkt 2 Pr. bud.', 'Art. 62 Pr. bud.');
+      legalCategoryBadge = 'Prawo Budowlane (art. 91a - Odśnieżanie dachu i stan techniczny)';
+      actionQuery = 'Odśnieżanie dachu i odpowiedzialność zarządcy nieruchomości (art. 91a Pr. bud.)';
+      text = `**Odśnieżanie dachów i stan techniczny obiektów – Odpowiedzialność zarządcy (Art. 91a Pr. bud.):**
+
+Zgodnie z **art. 61 pkt 2 Prawa budowlanego**, właściciel lub zarządca obiektu budowlanego ma bezwzględny obowiązek zapewnić bezpieczne użytkowanie obiektu w razie wystąpienia czynników zewnętrznych oddziałujących na obiekt, takich jak **intensywne opady śniegu, oblodzenie czy silne wiatry**.
+
+---
+
+### 1. Sankcje karne za brak odśnieżenia dachu (Art. 91a Pr. bud.):
+*Kto nie spełnia obowiązku utrzymania obiektu budowlanego w należytym stanie technicznym lub nie zapewnia bezpieczeństwa użytkowania obiektu, podlega:*
+- **Grzywnie nie mniejszej niż 100 stawek dziennych** (bardzo wysoka sankcja finansowa!),
+- Karze **ograniczenia wolności**,
+- Karze **pozbawienia wolności do roku**.
+
+---
+
+### 2. Obiekty wielkopowierzchniowe pod specjalnym rygorem:
+Budynki o powierzchni zabudowy przekraczającej **1 000 m²** lub o powierzchni dachu przekraczającej **2 000 m²** (hale magazynowe, hipermarkety, hale sportowe, galerie handlowe):
+- Zarządca musi przeprowadzać kontrole stanu technicznego dachu **co najmniej dwa razy w roku**:
+  1. do 31 maja (po sezonie zimowym),
+  2. do 30 listopada (przed sezonem zimowym).
+- Wyniki kontroli muszą być niezwłocznie wprowadzone do centralnego systemu cyfrowego **c-KOB** oraz przekazane do PINB.
+
+---
+
+### 3. Sople lodu i nawisy śnieżne nad chodnikami:
+- Spadający sopel lodu lub bryła śniegu z dachu kamienicy/bloku, która uszkodzi zaparkowany samochód lub zrani pieszego, skutkuje:
+  - Odpowiedzialnością cywilną za szkody (odszkodowanie i renty płacone przez zarządcę/wspólnotę),
+  - Odpowiedzialnością karną z art. 160 k.k. (narażenie na utratę życia) lub art. 156/157 k.k. (spowodowanie ciężkiego uszczerbku na zdrowiu).`;
+      suggestedFollowUps = [
+        'Kiedy mandat za nieodśnieżony chodnik przed posesją?',
+        'Kto odpowiada za sople na dachu w bloku: spółdzielnia czy lokator?',
+        'Jakie są kary za brak wpisu w cyfrowej książce obiektu (c-KOB)?',
+      ];
+    }
+    // 0K_8. WYKROCZENIA BUDOWLANE: ODSTĄPIENIE OD PROJEKTU I ZMIANA UŻYTKOWANIA (art. 92 Pr. bud.)
+    else if (
+      q.includes('odstąpienie od projektu') ||
+      q.includes('istotne odstąpienie') ||
+      q.includes('zmiana sposobu użytkowania') ||
+      q.includes('przekształcenie lokalu') ||
+      q.includes('kierownik budowy bez uprawnień') ||
+      q.includes('92 pr bud')
+    ) {
+      referencedArticles.push('Art. 92 ust. 1 Pr. bud.', 'Art. 36a Pr. bud.', 'Art. 71 Pr. bud.');
+      legalCategoryBadge = 'Prawo Budowlane (art. 92 - Wykroczenia wykonawcze)';
+      actionQuery = 'Istotne odstąpienie od projektu budowlanego i zmiana sposobu użytkowania (art. 92 Pr. bud.)';
+      text = `**Istotne odstąpienie od projektu i samowolna zmiana sposobu użytkowania (Art. 92 Pr. bud.):**
+
+Art. 92 Prawa budowlanego penalizuje naruszenia wykonawcze i proceduralne jako wykroczenia zagrożone **karą aresztu, ograniczenia wolności albo grzywny do 5 000 zł**.
+
+---
+
+### 1. Kiedy odstąpienie od projektu budowlanego jest ISTOTNE (Art. 36a Pr. bud.)?
+Odstąpienie jest istotne i wymaga sporządzenia projektu zamiennego oraz decyzji o zmianie pozwolenia na budowę, jeśli dotyczy:
+1. **Powierzchni zabudowy, kubatury lub wysokości obiektu** (z wyjątkiem nieznacznych zmian do 2%),
+2. **Liczby kondygnacji** (np. samowolne podniesienie ścianki kolankowej i zrobienie poddasza użytkowego),
+3. **Usytuowania obiektu na działce** (zbliżenie budynku do granicy działki sąsiada),
+4. **Warunków korzystania z obiektu przez osoby niepełnosprawne**,
+5. **Zmiany zamierzonego sposobu użytkowania** obiektu lub jego części.
+
+*Uwaga:* Nieistotne odstąpienia (np. przesunięcie ścianek działowych, zmiana koloru tynku, drobna zmiana rozmieszczenia okien) nie wymagają zmiany pozwolenia – wystarczy zamieszczenie przez projektanta odpowiednich rysunków i opisu w projekcie budowlanym.
+
+---
+
+### 2. Samowolna zmiana sposobu użytkowania lokalu (Art. 71 Pr. bud.):
+- Przekształcenie mieszkania w gabinet stomatologiczny, biuro rachunkowe, przedszkole lub warsztat samochodowy wymaga **uprzedniego formalnego zgłoszenia zmiany sposobu użytkowania** do Starosty/Prezydenta.
+- Przystąpienie do nowej działalności bez zgłoszenia (lub pomimo sprzeciwu organu) stanowi wykroczenie z art. 92 ust. 1 pkt 2 Pr. bud.
+- PINB wszczyna postępowanie legalizacyjne i nakazuje wstrzymanie użytkowania lokalu oraz nalicza opłatę legalizacyjną!`;
+      suggestedFollowUps = [
+        'Jakie warunki musi spełnić lokal mieszkalny, by przekształcić go w gabinet lekarski?',
+        'O ile procent można zmienić wymiary domu bez projektu zamiennego?',
+        'Co grozi inżynierowi za pełnienie funkcji kierownika budowy bez uprawnień?',
       ];
     }
     // 1. ZAKŁÓCANIE CISZY NOCNEJ / SPOCZYNKU NOCNEGO (art. 51 k.w. vs art. 190a k.k. / art. 191 § 1a k.k.)
